@@ -51,6 +51,7 @@
 (add-hook 'c-mode-common-hook
           '(lambda () 
 	     (c-set-style "gnu")
+	     (c-toggle-auto-state 0)                  
 	     (c-toggle-hungry-state 1)))                  
 
 ;;setq compile-command '("gmake"))
