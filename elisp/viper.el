@@ -204,7 +204,7 @@
   (comment-dwim nil)
   (viper-insert nil))
   ;; (viper-change-state-to-insert)))
-(define-key viper-vi-local-user-map " " 'martin-insert-comment)
+;(define
 
 ;; walk through mark ring with space
 ;(define-key viper-vi-local-user-map " " 'pop-global-mark)

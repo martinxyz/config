@@ -182,3 +182,4 @@
 
 (auto-compression-mode t)
 
+(global-set-key "\M- " 'pop-global-mark)

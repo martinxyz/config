@@ -9,9 +9,9 @@ Style "*" GrabFocus
 Style "*" GrabFocusTransient
 Style "*" SkipMapping
 
-Style "Eterm" BorderWidth 0, HandleWidth 0, NoTitle
-Style "aterm" BorderWidth 0, HandleWidth 0, NoTitle
-Style "Emacs" BorderWidth 0, HandleWidth 0, NoTitle
+Style "Eterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "aterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "Emacs" BorderWidth 1, HandleWidth 1, NoTitle
 # When a Etern has the focus, do not grab it for a newly created window.
 #Style "Eterm" OverrideGrabFocus
 
@@ -38,7 +38,7 @@ AddToMenu MartinMenu "Martin" Title
 + "&Konqueror" Exec exec konqueror
 + "&Netscape" Exec exec netscape
 + "&Descent II" Exec exec descent2
-+ "G&imp" Exec exec gimp
++ "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec xchat
 + "&Abiword" Exec exec abiword
 + "&OpenOffice" Exec exec /home/martin/bin/soffice
