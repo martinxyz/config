@@ -1,14 +1,14 @@
 ;;; swbuff.el --- Quick switch between Emacs buffers.
 
-;; Copyright (C) 1998, 2000, 2001, 2003 by David Ponce
+;; Copyright (C) 1998, 2000, 2001, 2003, 2004 by David Ponce
 
 ;; Author: David Ponce <david@dponce.com>
 ;; Maintainer: David Ponce <david@dponce.com>
 ;; Created: 12 Nov 1998
 ;; Keywords: extensions convenience
-;; Revision: $Id: swbuff.el,v 1.19 2003/04/25 11:31:22 ponced Exp $
+;; Revision: $Id: swbuff.el,v 1.20 2004/10/12 07:18:51 ponced Exp $
 
-(defconst swbuff-version "3.2")
+(defconst swbuff-version "3.3")
 
 ;; This file is not part of Emacs
 
@@ -34,29 +34,29 @@
 ;; the next or previous buffer in the buffer list.
 ;;
 ;; The `swbuff-exclude-buffer-regexps' defines a list of regular
-;; expressions for excluded buffers. The default setting excludes
-;; buffers whose name begin with a blank character. To exclude all the
+;; expressions for excluded buffers.  The default setting excludes
+;; buffers whose name begin with a blank character.  To exclude all the
 ;; internal buffers (that is *scratch*, *Message*, etc...) you could
 ;; use the following regexps '("^ .*" "^\\*.*\\*").
 ;;
 ;; Switching buffers pops-up a status window at the bottom of the
-;; selected window. The status window shows the list of switchable
+;; selected window.  The status window shows the list of switchable
 ;; buffers where the switched one is hilighted using
-;; `swbuff-current-buffer-face'. This window is automatically
+;; `swbuff-current-buffer-face'.  This window is automatically
 ;; discarded after any command is executed or after the delay
 ;; specified by `swbuff-clear-delay'.
 ;;
-;; The bufferlist is sorted by how recently the buffers were used. If
+;; The bufferlist is sorted by how recently the buffers were used.  If
 ;; you prefer a fixed (cyclic) order set `swbuff-recent-buffers-first'
 ;; to nil.
 ;;
 ;; When the status window disappears because of the clear-delay you
-;; still stay in switching mode. The timeout is only a visual
-;; thing. If you want it to have the same effect as using the buffer,
+;; still stay in switching mode.  The timeout is only a visual
+;; thing.  If you want it to have the same effect as using the buffer,
 ;; set `swbuff-clear-delay-ends-switching' to t.
-;; 
+;;
 ;; The leftmost item in the status window is the active buffer before
-;; switching started. If you want the buffer /after/ switching started
+;; switching started.  If you want the buffer /after/ switching started
 ;; there, set `swbuff-display-original-buffer-first' to nil.
 ;;
 ;; To install and use, put this file on your Emacs-Lisp load path and
@@ -82,7 +82,7 @@
 (defcustom swbuff-status-window-layout nil
   "*Method used to ensure the switched buffer is always visible.
 This occurs when the buffer list is larger than the status window
-width. The possible choices are:
+width.  The possible choices are:
 
 - - 'Default' If there is only one window in the frame (ignoring the
               minibuffer one and the status window itself) the status
@@ -98,20 +98,20 @@ width. The possible choices are:
 (defcustom swbuff-clear-delay 3
   "*Time in seconds to delay before discarding the status window."
   :group 'swbuff
-  :type '(number :tag "seconds")) 
+  :type '(number :tag "seconds"))
 
 (defcustom swbuff-clear-delay-ends-switching nil
   "*Should switching end after the clear-delay expired?
 If nil, you stay in switching mode and the selected buffer does not
 count as used just because the status window disappeared after the
-timeout. But if you prefer so set it to t."
+timeout.  But if you prefer so set it to t."
   :group 'swbuff
   :type 'boolean)
 
 (defcustom swbuff-display-original-buffer-first t
   "*Should the old buffer be first in the list?
 If non-nil, the buffer where switching started will be the leftmost in
-the list. Otherwise it will be the buffer the first command switched
+the list.  Otherwise it will be the buffer the first command switched
 to."
   :group 'swbuff
   :type 'boolean)
@@ -119,8 +119,8 @@ to."
 (defcustom swbuff-recent-buffers-first t
   "*Show recent buffers first?
 If non-nil the buffer list is sorted by how recently the buffers were
-used. If nil, it is as a cyclic list with fixed order. Note that other
-commands (switch-to-buffer) still change the order."
+used.  If nil, it is as a cyclic list with fixed order.  Note that
+other commands (switch-to-buffer) still change the order."
   :group 'swbuff
   :type 'boolean)
 
@@ -252,7 +252,7 @@ value."
  ;; GNU Emacs 21
  ((and (not (featurep 'xemacs))
        (> emacs-major-version 20))
-  
+
   (defun swbuff-scroll-window (position)
     "Adjust horizontal scrolling to ensure that POSITION is visible."
     (setq truncate-lines t)
@@ -275,14 +275,14 @@ value."
       'swbuff-switch-to-next-buffer))
 
   )
- 
+
  ;; GNU Emacs 20 or XEmacs
  (t
 
   (defconst swbuff-extra-space 3
     "Extra space left in a line of the status window.
 The default value correspond to the truncated glyphs + one space.")
-  
+
   (defun swbuff-scroll-window (position)
     "Adjust horizontal scrolling to ensure that POSITION is visible."
     (setq truncate-lines t)
@@ -296,7 +296,7 @@ The default value correspond to the truncated glyphs + one space.")
           (set-window-hscroll window (- (+ position swbuff-extra-space) wdth))
         (if (< position hscr)
             (set-window-hscroll window (- position swbuff-extra-space))))))
-  
+
   ))
 
 (defun swbuff-one-window-p (window)
@@ -370,7 +370,7 @@ BCURR is the buffer name to highlight."
 (defun swbuff-show-status-window ()
   "Pop-up a status window at the bottom of the selected window.
 The status window shows the list of switchable buffers where the
-switched one is hilighted using `swbuff-current-buffer-face'. It is
+switched one is hilighted using `swbuff-current-buffer-face'.  It is
 automatically discarded after any command is executed or after the
 delay specified by `swbuff-clear-delay'."
   (swbuff-start-switching)
@@ -398,12 +398,12 @@ delay specified by `swbuff-clear-delay'."
     (and w (delete-window w))
     (and b (kill-buffer b))))
 
-(defun swbuff-start-switching () 
+(defun swbuff-start-switching ()
   "Make sure swbuff-buffer-list-holder is set before proceeding."
   (or swbuff-buffer-list-holder
       (setq swbuff-buffer-list-holder (swbuff-buffer-list))))
 
-(defun swbuff-end-switching () 
+(defun swbuff-end-switching ()
   "Called when the buffer finally is choosen."
   (if swbuff-recent-buffers-first
       (let ((bcurr (current-buffer))
