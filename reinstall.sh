@@ -1,19 +1,17 @@
 #!/bin/sh
 
-if [ ! -d $HOME/elisp ] ; then
-  echo "Put those things into ~/elisp !"
+if [ ! -d $HOME/config ] ; then
+  echo "Put those things into ~/config !"
   exit 1
 fi
 
-echo "This will delete your ~/.emacs and your ~/.viper!"
-echo "Ctrl-C abbort, RETURN continue."
-read
-
-# well, he has been warned.
+set -x
 cd $HOME
-rm .emacs .viper
 ln -s config/elisp/emacs.el .emacs
 ln -s config/elisp/viper.el .viper
+
+ln -s config/xmodmap .xmodmap
+ln -s config/fvwm .fvwm
 
 echo "Symlinks done."
 
