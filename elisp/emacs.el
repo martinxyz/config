@@ -193,3 +193,5 @@
 ;(setq x-select-enable-clipboard t)
 
 
+
+(put 'narrow-to-region 'disabled nil)

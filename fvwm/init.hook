@@ -1,7 +1,5 @@
 + "I" Style "*" SkipMapping
 + "I" Exec Esetroot -scale ~/grafik/background/default
-#+ "I" Exec Eterm --geometry 79x25+0-0
-#+ "I" Exec Eterm --geometry 79x25+0+0
 + "I" Exec aterm +sb -e /home/martin/bin/startupreport --minimal
 + "I" Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
 + "I" Style "Galeon" SkipMapping,StartsOnPage 1 0
@@ -15,8 +13,4 @@
 + "I" Style "XMMS*" SkipMapping,StartsOnPage 2 0
 + "I" Exec /home/martin/bin/startgaleon
 + "I" Exec emacs -geometry 114x49
-#+ "I" Exec /home/martin/bin/m s
-#+ "I" Exec xterm /home/martin/bin/startupreport
-
-#+ "I" Exec xchat
 

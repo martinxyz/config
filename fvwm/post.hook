@@ -1,6 +1,6 @@
 # by Martin Renold
 
-DesktopSize 5 3
+DesktopSize 4 3
 
 Style "*" MinOverlapPercentPlacement
 #Style * TileCascadePlacement
@@ -31,20 +31,15 @@ AddToFunc MakeMBGM
 
 AddToMenu MartinMenu "Martin" Title
 + "&Background" Popup MBGM
-+ "&FvwmConsole" Module FvwmConsole
 + "&Emacs" Exec exec emacs
 + "Gnome&Cal" Exec exec gnomecal
 + "&ZKB Onlinebank" Exec exec zkb
 + "&Galeon" Exec exec /home/martin/bin/startgaleon
 + "&Konqueror" Exec exec konqueror
-+ "&Netscape" Exec exec netscape
-+ "&Descent II" Exec exec descent2
 + "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec xchat
 + "&Abiword" Exec exec abiword
 + "&OpenOffice" Exec exec openoffice
-+ "&StarCraft" Exec exec /home/martin/bin/starcraft
-+ "P&yddr" Exec exec /home/martin/bin/pyddr
 
 DestroyMenu Window-Ops
 AddToMenu Window-Ops "Alt-F1: Window Ops" Title
@@ -84,17 +79,6 @@ DestroyModuleConfig FvwmEvent: *
 *FvwmEvent: focus_change FocusHasChangedFunc
 *FvwmEvent: new_page CurrentPageFocusFunc
 Module FvwmEvent
-
-# State3 Debugging
-AddToFunc DelmeFunc7
-+ I All (State 3) State 3 False
-AddToFunc DelmeFunc8
-+ I State 3 True
-AddToFunc DelmeFunc9
-+ I All (State 3) Maximize
-Key 7 A 2 DelmeFunc7
-Key 8 A 2 DelmeFunc8
-Key 9 A 2 DelmeFunc9
 
 # Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
@@ -227,11 +211,4 @@ DestroyMenuStyle WindowList
 MenuStyle WindowList SelectOnRelease Meta_L
 #Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
 #Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
-
-
-# TODO: lower/raise function with keyboard (Super-Space)
-#Key f A 2 RaiseLower
-# TODO: more keyboard resizing functions
-# TODO: mouseless operation --> no mouse pointer, no mouse focus.
-
 
