@@ -87,6 +87,13 @@
   ;; (setq c-basic-offset 1)
   )
 
+(defun stratagus-c-mode ()
+  "Stratagus C coding style"
+  (interactive)
+  (c-mode)
+  (c-set-style "stroustrup")
+  )
+
 ;; Programmierstil. 
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
@@ -94,7 +101,7 @@
       (cons '("/usr/src/linux.*/.*\\.[ch]$" . linux-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*/freecraft/.*/.*\\.[ch]$" . linux-c-mode)
+      (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
