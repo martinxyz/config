@@ -58,20 +58,20 @@ AddToMenu Window-Ops "Alt-F1: Window Ops" Title
 
 #### Focus stuff based on http://rvb.dyndns.org/FvwmWiki/Tips_2fRememberFocus
 AddToFunc CurrentPageFocusFunc
-+ I Next (CurrentPage, State 2) Focus
-+ I None (CurrentPage, Focused) Prev (CurrentPage, !Iconified) Focus
++ I Next (CurrentPage, State 2, !Sticky) Focus
++ I None (CurrentPage, Focused) Prev (CurrentPage,!Iconified,!Sticky) Focus
 AddToFunc HandleState3Func
 + I State 3 False
 + I CurrentPageFocusFunc
 AddToFunc FocusHasChangedFunc
 + I Current (State 3) HandleState3Func
-+ I Current (!Iconified) All (CurrentPage, !Focused) State 2 False
++ I Current (!Iconified) All (CurrentPage,!Focused) State 2 False
 + I Current (!Iconified) State 2 True
 AddToFunc PageHasChangedFunc
 # mark the window that will receive the focus in a moment
-+ I Next (HasPointer,!Iconified) State 3 True
++ I Next (HasPointer,!Iconified,!Sticky) State 3 True
 AddToFunc DestroyWindowFunc
-+ I Prev (CurrentPage, !Iconified) Focus
++ I Prev (CurrentPage,!Iconified,!Sticky) Focus
 + I Current Raise
 DestroyModuleConfig FvwmEvent: *
 *FvwmEvent: Cmd Function
@@ -79,6 +79,8 @@ DestroyModuleConfig FvwmEvent: *
 *FvwmEvent: focus_change FocusHasChangedFunc
 *FvwmEvent: new_page CurrentPageFocusFunc
 Module FvwmEvent
+## FIXME: a window with overlapping part into another page makes
+## switching to that other page impossible
 
 # Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
@@ -98,7 +100,11 @@ Key b A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 +tr +sb -sh 0 -fn 10
 # bound to maximize: Key m W 2 Move
 Key q WTSF 2 Close
 Key k W 2 Destroy
-Key s WTSF 2 Stick
+AddToFunc StickAndStay
++ I Current Stick
++ I Current (Sticky) Layer 6
++ I Current (!Sticky) Layer default
+Key s WTSF 2 StickAndStay
 #Key w W 2 MoveToPage 2, 1
 AddToFunc Move-or-Raise I Raise
 + M Move
