@@ -175,7 +175,8 @@
 (add-hook 'c-mode-common-hook
   (lambda () 
     ; keine automatischen newlines wenn man ; drueckt
-    (c-toggle-auto-newline-state -1)
+    ;(c-toggle-auto-newline-state -1)
+    (c-toggle-auto-state -1)
     ; hungry delete loescht alle leerzeichen auf einmal
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")))
@@ -183,3 +184,8 @@
 (auto-compression-mode t)
 
 (global-set-key "\M- " 'pop-global-mark)
+
+(column-number-mode t)
+
+(setq x-select-enable-clipboard t)
+

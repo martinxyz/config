@@ -15,7 +15,7 @@
 + "I" Style "XMMS*" SkipMapping,StartsOnPage 2 0
 + "I" Exec /home/martin/bin/startgaleon
 + "I" Exec emacs -geometry 114x49
-+ "I" Exec /home/martin/bin/m -s
+#+ "I" Exec /home/martin/bin/m s
 #+ "I" Exec xterm /home/martin/bin/startupreport
 
 #+ "I" Exec xchat

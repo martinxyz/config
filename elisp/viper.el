@@ -206,8 +206,11 @@
   ;; (viper-change-state-to-insert)))
 ;(define
 
-;; walk through mark ring with space
-;(define-key viper-vi-local-user-map " " 'pop-global-mark)
+(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
+(define-key viper-vi-local-user-map "-" 'hs-hide-all)
+(define-key viper-vi-local-user-map "+" 'hs-show-all)
+(define-key viper-vi-local-user-map "*" 'pop-tag-mark)
+(define-key viper-vi-local-user-map "," 'tags-search)
 
 ;; always use viper for a buffer if appropriate
 (setq viper-always t)
