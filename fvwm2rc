@@ -28,22 +28,20 @@ DesktopSize 4 3
 # Misc things from the old debian default
 EdgeScroll 100 100
 EdgeResistance 250 100
-Style "default-style" Font -*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*
-Style "default-style" HilightFore white
-Style "default-style" HilightBack steelblue
-Style "default-style" BorderWidth 6
-Style "default-style" HandleWidth 6
-Style "default-style" MWMFunctions
-Style "default-style" MWMBorder
-Style "default-style" MWMDecor
-Style "default-style" DecorateTransient
-# Style "default-style" SmartPlacement
-# Style "default-style" RandomPlacement
-Style "default-style" ActivePlacement
-Style "default-style" NoPPosition
-Style "default-style" CaptureHonorsStartsOnPage
-Style "default-style" IconBox 0 0 50 -1
-Style "default-style" Icon default.xbm
+Style "*" Font -*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*
+Style "*" HilightFore white
+Style "*" HilightBack steelblue
+Style "*" BorderWidth 6
+Style "*" HandleWidth 6
+Style "*" MWMFunctions
+Style "*" MWMBorder
+Style "*" MWMDecor
+Style "*" DecorateTransient
+Style "*" ActivePlacement
+Style "*" NoPPosition
+Style "*" CaptureHonorsStartsOnPage
+Style "*" IconBox 0 0 50 -1
+Style "*" Icon default.xbm
 DestroyDecor default-decor
 AddToDecor default-decor
 + ButtonStyle Reset
@@ -54,7 +52,7 @@ AddToDecor default-decor
 + ButtonStyle 4 Vector 5 25x75@0 75x75@0 75x25@0 25x25@1 25x75@1
 + ButtonStyle 6 Vector 4 50x75@1 25x25@1 75x25@1 50x75@0
 # make the default decor the default:
-Style "default-style" UseDecor default-decor, Color Black/DarkGrey
+Style * UseDecor default-decor, Color Black/DarkGrey
 
 # Configure the FvwmPager module (from the old debian default)
 *FvwmPagerBack SlateGrey
@@ -157,9 +155,8 @@ Module FvwmEvent
 # Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
 Key i A 2 Module FvwmIdent
-# FIXME: no such key
-#Key Menu A N Popup MartinMenu
-#Key Menu A 2 Popup /Debian
+Key Menu A N Popup MartinMenu
+Key Menu A 2 Popup /Debian
 Key section A N Exec exec m n
 Key section A S Exec exec m p
 Key section A C Exec exec m s
