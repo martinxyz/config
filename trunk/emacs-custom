@@ -22,7 +22,7 @@
  '(inhibit-local-menu-bar-menus t)
  '(line-number-mode t)
  '(mouse-avoidance-animation-delay 0)
- '(mouse-avoidance-mode (quote banish) nil (avoid))
+ '(mouse-avoidance-mode (quote none) nil (avoid))
  '(mouse-avoidance-nudge-dist 40)
  '(mouse-avoidance-threshold 8)
  '(mouse-wheel-mode t nil (mwheel))
