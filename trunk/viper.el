@@ -206,6 +206,9 @@
   ;; (viper-change-state-to-insert)))
 (define-key viper-vi-local-user-map " " 'martin-insert-comment)
 
+;; walk through mark ring with space
+;(define-key viper-vi-local-user-map " " 'pop-global-mark)
+
 ;; always use viper for a buffer if appropriate
 (setq viper-always t)
 
