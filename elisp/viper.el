@@ -193,32 +193,4 @@
 ;;;; pertaining to it.  No warranty is expressed or implied, use at
 ;;;; your own risk, etc.
 
-;; Additions by Martin Renold follow.
-
-;; Buffer Wechseln mit Tastatur
-(define-key viper-vi-local-user-map "q" 'swbuff-switch-to-next-buffer)
-(define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
-
-;; set mark with q
-;(define-key viper-vi-local-user-map "q" 'set-mark-command)
-
-;; insert a new comment with space
-(defun martin-insert-comment ()
-  (interactive)
-  (comment-dwim nil)
-  (viper-insert nil))
-  ;; (viper-change-state-to-insert)))
-;(define
-
-(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
-(define-key viper-vi-local-user-map "-" 'hs-hide-all)
-(define-key viper-vi-local-user-map "+" 'hs-show-all)
-(define-key viper-vi-local-user-map "*" 'pop-tag-mark)
-(define-key viper-vi-local-user-map "," 'tags-search)
-
-;; always use viper for a buffer if appropriate
-(setq viper-always t)
-
-;; indent new lines (return, o, O...)
-(custom-set-variables
- '(viper-auto-indent t))
+;; Additions by Martin Renold moved to emacs config file.
