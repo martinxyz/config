@@ -11,10 +11,12 @@
 + "I" Style "startgaleon" SkipMapping,StartsOnPage 1 0
 + "I" Style "Emacs*" SkipMapping,StartsOnPage 0 1
 + "I" Style "X-Chat*" SkipMapping,StartsOnPage 2 1
-+ "I" Style "xmms" SkipMapping,StartsOnPage 2 0
++ "I" Style "xmms*" SkipMapping,StartsOnPage 2 0
++ "I" Style "XMMS*" SkipMapping,StartsOnPage 2 0
 + "I" Exec /home/martin/bin/startgaleon
 + "I" Exec emacs -geometry 114x49
 + "I" Exec /home/martin/bin/m -s
 #+ "I" Exec xterm /home/martin/bin/startupreport
 
 #+ "I" Exec xchat
+
