@@ -127,6 +127,10 @@ keycode 125 =
 keycode 126 =
 keycode 127 =
 
+! keycode  20 = apostrophe   question dead_acute   questiondown
+!          ^ID  ^no modifier ^shift   ^mode_switch ^both shift and mode_switch
+! note, AltGr = mode_switch
+
 ! use Caps Lock as Escape
 clear lock
 keycode 66 = Escape

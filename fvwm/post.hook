@@ -70,7 +70,7 @@ Key section A N Exec exec m n
 Key section A S Exec exec m p
 Key section A C Exec exec m s
 Key print A N Exec cd /home/martin/screenshots; scrot
-Key print A 2 Exec cd /home/martin/screenshots; scrot -s
+Key print A 2 Exec cd /home/martin/screenshots; xterm -iconic -e 'scrot -s'
 #Key e A 2 Exec exec Eterm --geometry 79x25
 #Key e A 2 Exec exec aterm -bg black -fg white -tr +sb -sh 30 -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-iso10646-1
 Key e A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 30 -fn 10x20
