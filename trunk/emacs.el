@@ -7,8 +7,8 @@
 (load "~/elisp/emacs-custom" t t)
 
 ;; ??
-(add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
-(setq  dired-omit-files-p  t)
+;(add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
+;(setq  dired-omit-files-p  t)
 
 ;;(global-set-key  [f1]  'dired)
 ;; F1 zeigt die Manpage zum Wort unter dem cursor
@@ -51,7 +51,7 @@
 (add-hook 'c-mode-common-hook
           '(lambda () 
 	     (c-set-style "gnu")
-	     (c-toggle-auto-state 0)                  
+	     (c-toggle-auto-state -1)
 	     (c-toggle-hungry-state 1)))                  
 
 ;;setq compile-command '("gmake"))
