@@ -180,3 +180,5 @@
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")))
 
+(auto-compression-mode t)
+
