@@ -96,6 +96,15 @@
   (c-set-style "stroustrup")
   )
 
+(defun gtk-gnutella-c-mode ()
+  "Gtk-gnutella C coding style"
+  (interactive)
+  (c-mode)
+  (setq tab-width 4)
+  (set-variable 'tab-width 4)
+  (setq c-tab-width 4)
+  )
+
 (defun nil-c-mode ()
   "nil C coding style"
   (interactive)
@@ -128,7 +137,13 @@
       (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*/gtk-gnutella.*/.*/.*\\.[ch]$" . gtk-gnutella-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/nil/.*(cpp|h)$" . nil-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*\\.mas$" . python-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.

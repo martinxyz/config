@@ -97,7 +97,7 @@ Style "xterm" BorderWidth 1, HandleWidth 1, NoTitle
 Style "uxterm" BorderWidth 1, HandleWidth 1, NoTitle
 Style "urxvt" BorderWidth 1, HandleWidth 1, NoTitle
 Style "rxvt" BorderWidth 1, HandleWidth 1, NoTitle
-Style "Emacs" BorderWidth 1, HandleWidth 1, NoTitle
+Style "Emacs" BorderWidth 0, HandleWidth 0, NoTitle
 # When a Etern has the focus, do not grab it for a newly created window.
 #Style "Eterm" OverrideGrabFocus
 Style MPlayer NoTitle
@@ -115,10 +115,10 @@ AddToFunc MakeMBGM
 + I PipeRead 'for i in $HOME/grafik/background/*; do echo AddToMenu MBGM "`basename $i`" Exec ln -s -f $i $HOME/grafik/background/default "&&" Esetroot -scale ~/grafik/background/default; done'
 
 AddToMenu MartinMenu "Martin" Title
++ "&Window List" WindowList
 + "&Background" Popup MBGM
 + "&Emacs" Exec exec emacs
 + "Gnome&Cal" Exec exec gnomecal
-+ "&ZKB Onlinebank" Exec exec zkb
 + "&Galeon" Exec exec galeon
 + "&Konqueror" Exec exec konqueror
 + "G&imp" Exec exec /home/martin/bin/gimp
