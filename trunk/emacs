@@ -2,13 +2,9 @@
 ;; Aus verschiedenen Quellen zusammenkopiert,
 ;; neuere Dinge am Schluss.
 
-(if (file-readable-p "~/.gnu-emacs")
-    (load "~/.gnu-emacs" nil t)
-  (if (file-readable-p "/etc/skel/.gnu-emacs")
-      (load "/etc/skel/.gnu-emacs" nil t)))
-
-(setq custom-file "~/.gnu-emacs-custom")
-(load "~/.gnu-emacs-custom" t t)
+;; wohin die "customize"-Einstellungen gespeichert werden
+(setq custom-file "~/elisp/emacs-custom")
+(load "~/elisp/emacs-custom" t t)
 
 ;; ??
 (add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
