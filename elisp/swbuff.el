@@ -61,6 +61,13 @@
 ;;; Change Log:
 
 ;; $Log: swbuff.el,v $
+;;
+;; - Restore order of unselected buffers after switching is done.
+;; - The buffer where switching started is always to the left now,
+;;   instead of the one switched to.
+;; - New custom variable `swbuff-clear-delay-ends-switching'.
+;; - TODO: switch for old behaviour? Does it make sense at all?
+;;
 ;; Revision 1.18  2002/01/09 11:45:23  ponce
 ;; Version 3.1.
 ;;
@@ -221,6 +228,14 @@ width. The possible choices are:
   "*Time in seconds to delay before discarding the status window."
   :group 'swbuff
   :type '(number :tag "seconds")) 
+
+(defcustom swbuff-clear-delay-ends-switching t
+  "*Should switching stop after the clear-delay expired?
+If non-nil, the selected buffer will get the most recently visited one
+after the clear-delay expired. Otherwise this happens only if a
+non-switching command is executed in that buffer."
+  :group 'swbuff
+  :type 'boolean)
 
 (defcustom swbuff-separator ", "
   "*String used to separate buffer names in the status line."
@@ -468,8 +483,7 @@ status window shows the list of switchable buffers where the switched
 one is hilighted using `swbuff-current-buffer-face'. It is
 automatically discarded after any command is executed or after the
 delay specified by `swbuff-clear-delay'."
-  (if (or swbuff-buffer-list-holder
-          (setq swbuff-buffer-list-holder (swbuff-buffer-list)))
+  (if swbuff-buffer-list-holder
       (let ((bcurr (buffer-name))
             (window-min-height 1)
             cursor-in-non-selected-windows)
@@ -483,7 +497,7 @@ delay specified by `swbuff-clear-delay'."
                 (cancel-timer swbuff-timer))
             (setq swbuff-timer (run-with-timer
                                 swbuff-clear-delay nil
-                                #'swbuff-discard-status-window)))))
+                                #'swbuff-clear-delay-hook)))))
     (message "No buffers eligible for switching.")))
 
 (defun swbuff-discard-status-window ()
@@ -493,6 +507,26 @@ delay specified by `swbuff-clear-delay'."
     (and w (delete-window w))
     (and b (kill-buffer b))))
 
+(defun swbuff-start-switching () 
+  "Make sure swbuff-buffer-list-holder is set before proceeding."
+  (or swbuff-buffer-list-holder
+      (setq swbuff-buffer-list-holder (swbuff-buffer-list))))
+
+(defun swbuff-end-switching () 
+  "Called when the buffer finally is choosen."
+  ; restore previous order of unselected buffers
+  (let ((bcurr (current-buffer))
+        (l (nreverse swbuff-buffer-list-holder)))
+    (while l
+      (switch-to-buffer (car l))
+      (setq l (cdr l)))
+    (switch-to-buffer bcurr))
+  (setq swbuff-buffer-list-holder nil))
+
+(defun swbuff-clear-delay-hook ()
+  (swbuff-discard-status-window)
+  (and swbuff-clear-delay-ends-switching (swbuff-end-switching)))
+
 (defun swbuff-pre-command-hook ()
   "`pre-command-hook' used to track successive calls to switch commands."
   (if (memq this-command '(swbuff-switch-to-previous-buffer
@@ -501,7 +535,7 @@ delay specified by `swbuff-clear-delay'."
                            swbuff-ignore))
       nil
     (swbuff-discard-status-window)
-    (setq swbuff-buffer-list-holder nil))
+    (swbuff-end-switching))
   (if (timerp swbuff-timer)
       (cancel-timer swbuff-timer))
   (setq swbuff-timer nil)
@@ -530,6 +564,7 @@ delay specified by `swbuff-clear-delay'."
   "\\[swbuff-switch-to-previous-buffer] switch to the previous buffer
 in the buffer list."
   (interactive)
+  (swbuff-start-switching)
   (swbuff-previous-buffer)
   (swbuff-show-status-window))
 
@@ -538,6 +573,7 @@ in the buffer list."
   "\\[swbuff-switch-to-next-buffer] switch to the next buffer in the
 buffer list."
   (interactive)
+  (swbuff-start-switching)
   (swbuff-next-buffer)
   (swbuff-show-status-window))
 
