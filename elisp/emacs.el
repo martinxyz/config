@@ -16,10 +16,10 @@
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
 ;; ??, scheint nicht zu funktionnieren.
-(global-set-key [(f2)] (lambda () (interactive) 
-                         (let ((word-at-point (current-word))) 
-                                 (Info-query "libc")
-                                 (Info-index word-at-point))))
+;(global-set-key [(f2)] (lambda () (interactive) 
+;                         (let ((word-at-point (current-word))) 
+;                                 (Info-query "libc")
+;                                 (Info-index word-at-point))))
 
 ;;(global-set-key  [f3]  'find-file)
 
@@ -27,10 +27,10 @@
 (global-set-key  [f4]  'next-error)
 (global-set-key  [f5]  'delete-other-windows)
 (global-set-key  [f6]  'next-multiframe-window)
-(global-set-key  [f7]  'switch-to-other-buffer)
+;(global-set-key  [f7]  'switch-to-other-buffer)
 (global-set-key  [f8]  'compile)
 (global-set-key  [f9]  'recompile)
-(global-set-key  [f12]  'add-change-log-entry-other-window)
+;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
 ;(global-set-key "\C-z" 'undo)
 
@@ -274,3 +274,12 @@
   (interactive)
   "paste w3m link location into kill ring"
   (kill-new (w3m-anchor)) )
+
+(autoload 'wikipedia-mode "wikipedia-mode.el"
+  "Major mode for editing documents in Wikipedia markup." t)
+
+; UTF-8 files:
+; C-x RET c runs the command universal-coding-system-argument
+;    Execute an I/O command using the specified coding system.
+
+

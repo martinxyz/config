@@ -18,7 +18,7 @@ AddToFunc InitFunction
 # Note: galeon needs --noraise for this to work
 + "I" Style "Galeon" SkipMapping,StartsOnPage 1 0
 + "I" Exec /home/martin/bin/startgaleon
-#+ "I" Exec emacs -geometry 114x49
++ "I" Exec emacs -geometry 114x49
 
 # Wenn ein zweiter galeon auf einem anderen desk offen ist
 # kommt das Suchfenster (Ctrl-F) auf dem startdesk, sehr mühsem.
@@ -87,6 +87,10 @@ Style "*" SkipMapping
 
 Style "Eterm" BorderWidth 1, HandleWidth 1, NoTitle
 Style "aterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "xterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "uxterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "urxvt" BorderWidth 1, HandleWidth 1, NoTitle
+Style "rxvt" BorderWidth 1, HandleWidth 1, NoTitle
 Style "Emacs" BorderWidth 1, HandleWidth 1, NoTitle
 # When a Etern has the focus, do not grab it for a newly created window.
 #Style "Eterm" OverrideGrabFocus
@@ -109,7 +113,7 @@ AddToMenu MartinMenu "Martin" Title
 + "&Emacs" Exec exec emacs
 + "Gnome&Cal" Exec exec gnomecal
 + "&ZKB Onlinebank" Exec exec zkb
-+ "&Galeon" Exec exec /home/martin/bin/startgaleon
++ "&Galeon" Exec exec galeon
 + "&Konqueror" Exec exec konqueror
 + "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec xchat
@@ -168,9 +172,11 @@ Key print A N Exec cd /home/martin/screenshots; scrot
 Key print A 2 Exec cd /home/martin/screenshots; xterm -iconic -e 'scrot -s'
 #Key e A 2 Exec exec Eterm --geometry 79x25
 #Key e A 2 Exec exec aterm -bg black -fg white -tr +sb -sh 30 -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-iso10646-1
-Key e A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 30 -fn 10x20
+#Key e A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 30 -fn 10x20
+#Key e A 2 Exec exec xterm -bg black -fg gray80 -sl 9999 -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-iso10646-1
+Key e A 2 Exec exec urxvt -bg black -fg gray80 -sl 9999 -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-iso10646-1
+Key b A 2 Exec exec urxvt -bg black -fg gray80 -sl 9999 -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-iso10646-1
 Key a A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 70 -fn 10x20
-Key b A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 +tr +sb -sh 0 -fn 10x20
 # bound to maximize: Key m W 2 Move
 Key q WTSF 2 Close
 Key k W 2 Destroy

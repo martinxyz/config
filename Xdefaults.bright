@@ -1,0 +1,20 @@
+XTerm*Background:  black
+XTerm*foreground:  gray
+XTerm*cursorColor: yellow
+XTerm*color0:      #000000
+XTerm*color1:      #aa0000
+XTerm*color2:      #00d200
+XTerm*color3:      #aa5522
+XTerm*color4:      #0000aa
+XTerm*color5:      #aa00aa
+XTerm*color6:      #00aaaa
+XTerm*color7:      #aaaaaa
+XTerm*color8:      #444444
+XTerm*color9:      #ff4444
+XTerm*color10:     #44ff44
+XTerm*color11:     #ffff44
+XTerm*color12:     #4444ff
+XTerm*color13:     #ff44ff
+XTerm*color14:     #44ffff
+XTerm*color15:     #ffffff
+
