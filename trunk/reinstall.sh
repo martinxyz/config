@@ -12,8 +12,8 @@ read i
 # well, he has been warned.
 cd ~
 rm .emacs .viper
-ln -s elisp/emacs .emacs
-ln -s elisp/viper .viper
+ln -s elisp/emacs.el .emacs
+ln -s elisp/viper.el .viper
 
 echo "Symlinks done."
 
