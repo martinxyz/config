@@ -262,8 +262,7 @@
 (global-set-key "\M-j"  'pager-row-down)
 (define-key c-mode-base-map "\M-j"  'pager-row-down)
 
-; TODO: ausprobieren, soll zuletzt geöffnete dateien speichern
-; Klappt mit eigenem interface, aber es muss auch einfacher gehen.
+; speichert liste von zuletzt geoeffneten dateien beim Beenden
 (require 'recentf)
 (recentf-mode 1)
 

@@ -32,19 +32,32 @@
 ;; This package provides the commands `swbuff-switch-to-next-buffer'
 ;; and `swbuff-switch-to-previous-buffer' to respectively switch to
 ;; the next or previous buffer in the buffer list.
-
+;;
 ;; The `swbuff-exclude-buffer-regexps' defines a list of regular
 ;; expressions for excluded buffers. The default setting excludes
 ;; buffers whose name begin with a blank character. To exclude all the
 ;; internal buffers (that is *scratch*, *Message*, etc...) you could
 ;; use the following regexps '("^ .*" "^\\*.*\\*").
-
+;;
 ;; Switching buffers pops-up a status window at the bottom of the
 ;; selected window. The status window shows the list of switchable
 ;; buffers where the switched one is hilighted using
 ;; `swbuff-current-buffer-face'. This window is automatically
 ;; discarded after any command is executed or after the delay
 ;; specified by `swbuff-clear-delay'.
+;;
+;; The bufferlist is sorted by how recently the buffers were used. If
+;; you prefer a fixed (cyclic) order set `swbuff-recent-buffers-first'
+;; to nil.
+;;
+;; When the status window disappears because of the clear-delay you
+;; still stay in switching mode. The timeout is only a visual
+;; thing. If you want it to have the same effect as using the buffer,
+;; set `swbuff-clear-delay-ends-switching' to t.
+;; 
+;; The leftmost item in the status window is the active buffer before
+;; switching started. If you want the buffer /after/ switching started
+;; there, set `swbuff-display-original-buffer-first' to nil.
 ;;
 ;; To install and use, put this file on your Emacs-Lisp load path and
 ;; add the following into your ~/.emacs startup file:
@@ -88,9 +101,10 @@ width. The possible choices are:
   :type '(number :tag "seconds")) 
 
 (defcustom swbuff-clear-delay-ends-switching nil
-  "*Should switching stop after the clear-delay expired? 
-If non-nil, buffer switching ends after the clear-delay. Otherwise, it
-ends only when you start using the buffer."
+  "*Should switching end after the clear-delay expired?
+If nil, you stay in switching mode and the selected buffer does not
+count as used just because the status window disappeared after the
+timeout. But if you prefer so set it to t."
   :group 'swbuff
   :type 'boolean)
 
@@ -103,10 +117,10 @@ to."
   :type 'boolean)
 
 (defcustom swbuff-recent-buffers-first t
-  "*Reorder buffers so recently used ones are first?
-If non-nil, buffer order will be restored when switching ends,
-except that the current buffer becomes the first one.
-If nil, think of the buffers as a cyclic list with fixed order."
+  "*Show recent buffers first?
+If non-nil the buffer list is sorted by how recently the buffers were
+used. If nil, it is as a cyclic list with fixed order. Note that other
+commands (switch-to-buffer) still change the order."
   :group 'swbuff
   :type 'boolean)
 
