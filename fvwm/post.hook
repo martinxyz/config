@@ -4,7 +4,8 @@ DesktopSize 5 3
 
 Style "*" MinOverlapPercentPlacement
 #Style * TileCascadePlacement
-Style "*" MouseFocus
+#Style "*" MouseFocus
+Style "*" SloppyFocus
 Style "*" GrabFocus
 Style "*" GrabFocusTransient
 Style "*" SkipMapping
@@ -14,7 +15,7 @@ Style "aterm" BorderWidth 1, HandleWidth 1, NoTitle
 Style "Emacs" BorderWidth 1, HandleWidth 1, NoTitle
 # When a Etern has the focus, do not grab it for a newly created window.
 #Style "Eterm" OverrideGrabFocus
-
+Style MPlayer NoTitle
 
 # Background images
 AddToMenu MBGM "Background" Title
@@ -41,7 +42,7 @@ AddToMenu MartinMenu "Martin" Title
 + "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec xchat
 + "&Abiword" Exec exec abiword
-+ "&OpenOffice" Exec exec /home/martin/bin/soffice
++ "&OpenOffice" Exec exec openoffice
 + "&StarCraft" Exec exec /home/martin/bin/starcraft
 + "P&yddr" Exec exec /home/martin/bin/pyddr
 
@@ -60,8 +61,42 @@ AddToMenu Window-Ops "Alt-F1: Window Ops" Title
 + "Close"                       Close
 + "Destroy"                     Destroy
 
-# Keybindings
-# Modifiers:
+#### Focus stuff based on http://rvb.dyndns.org/FvwmWiki/Tips_2fRememberFocus
+AddToFunc CurrentPageFocusFunc
++ I Next (CurrentPage, State 2) Focus
++ I None (CurrentPage, Focused) Prev (CurrentPage, !Iconified) Focus
+AddToFunc HandleState3Func
++ I State 3 False
++ I CurrentPageFocusFunc
+AddToFunc FocusHasChangedFunc
++ I Current (State 3) HandleState3Func
++ I Current (!Iconified) All (CurrentPage, !Focused) State 2 False
++ I Current (!Iconified) State 2 True
+AddToFunc PageHasChangedFunc
+# mark the window that will receive the focus in a moment
++ I Next (HasPointer,!Iconified) State 3 True
+AddToFunc DestroyWindowFunc
++ I Prev (CurrentPage, !Iconified) Focus
++ I Current Raise
+DestroyModuleConfig FvwmEvent: *
+*FvwmEvent: Cmd Function
+*FvwmEvent: destroy_window DestroyWindowFunc
+*FvwmEvent: focus_change FocusHasChangedFunc
+*FvwmEvent: new_page CurrentPageFocusFunc
+Module FvwmEvent
+
+# State3 Debugging
+AddToFunc DelmeFunc7
++ I All (State 3) State 3 False
+AddToFunc DelmeFunc8
++ I State 3 True
+AddToFunc DelmeFunc9
++ I All (State 3) Maximize
+Key 7 A 2 DelmeFunc7
+Key 8 A 2 DelmeFunc8
+Key 9 A 2 DelmeFunc9
+
+# Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
 Key i A 2 Module FvwmIdent
 Key Menu A N Popup MartinMenu
@@ -94,22 +129,18 @@ Key c A 2 CursorStyle DEFAULT
 # TODO: remove title bar and maximize, minimize and add title bar
 Key m A 2 Maximize toggle 100 100
 # jumping around
-AddToFunc FocusIfNone
+#AddToFunc FocusIfNone
 #+ I Current (!CurrentPage) Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
 #+ I Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-Key t A 2 FocusIfNone
+#Key t A 2 FocusIfNone
 AddToFunc JumpH
 + I GotoPage -1p +0p
-+ I FocusIfNone
 AddToFunc JumpL
 + I GotoPage +1p +0p
-+ I FocusIfNone
 AddToFunc JumpK
 + I GotoPage +0p -1p
-+ I FocusIfNone
 AddToFunc JumpJ
 + I GotoPage +0p +1p
-+ I FocusIfNone
 Key Right A M Nop
 Key Left A M Nop
 Key Up A M Nop
@@ -122,30 +153,25 @@ Key h A 2 JumpH
 Key l A 2 JumpL
 Key k A 2 JumpK
 Key j A 2 JumpJ
-AddToFunc FocusRaise
-+ I FlipFocus NoWarp
-+ I Raise
-AddToFunc MoSwiH
-+ I Direction West (AcceptsFocus !Shaded CurrentPage) FocusRaise
-AddToFunc MoSwiJ
-+ I Direction South (AcceptsFocus !Shaded CurrentPage) FocusRaise
-AddToFunc MoSwiK
-+ I Direction North (AcceptsFocus !Shaded CurrentPage) FocusRaise
-AddToFunc MoSwiL
-+ I Direction East (AcceptsFocus !Shaded CurrentPage) FocusRaise
 
-#AddToFunc MoSwiH
-#+ I Direction West (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-#AddToFunc MoSwiJ
-#+ I Direction South (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-#AddToFunc MoSwiK
-#+ I Direction North (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-#AddToFunc MoSwiL
-#+ I Direction East (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
+AddToFunc MoSwiH
++ I Direction West (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiJ
++ I Direction South (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiK
++ I Direction North (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiL
++ I Direction East (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
 Key h A 2M MoSwiH
 Key l A 2M MoSwiL
 Key k A 2M MoSwiK
 Key j A 2M MoSwiJ
+Key space A 2M RaiseLower
+
 # remove unused keybindings
 Key F1 A M Nop
 Key F2 A M Nop
@@ -159,6 +185,7 @@ Key F9 A M Nop
 Key F10 A M Nop
 Key F11 A M Nop
 Key F12 A M Nop
+Key Tab A M -
 
 AddToFunc Naked
 + I Style NoTitle
@@ -199,10 +226,12 @@ AddToFunc WindowListFunc
 DestroyMenuStyle WindowList
 MenuStyle WindowList SelectOnRelease Meta_L
 #Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
-Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+#Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
 
 
 # TODO: lower/raise function with keyboard (Super-Space)
 #Key f A 2 RaiseLower
 # TODO: more keyboard resizing functions
 # TODO: mouseless operation --> no mouse pointer, no mouse focus.
+
+
