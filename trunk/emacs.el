@@ -151,6 +151,13 @@
 (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
 
-;; TODO: Enter soll im c-modus auto-indent machen
-
+;; Enter soll im c-modus auto-indent machen
 (setq viper-auto-indent t)
+
+;; Neuerdings druecke ich Ctrl-x-c aus versehen...
+(defun ask-before-quit ()
+  "Ask if the user really wants to quit Emacs."
+  (interactive)
+  (yes-or-no-p "Really quit emacs? "))
+(add-hook 'kill-emacs-query-functions 'ask-before-quit)
+
