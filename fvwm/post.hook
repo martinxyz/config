@@ -150,10 +150,26 @@ AddToFunc MoSwiK
 AddToFunc MoSwiL
 + I Direction East (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
 + I Current Raise
+AddToFunc MoSwiU
++ I Direction NorthEast (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiZ
++ I Direction NorthWest (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiN
++ I Direction SouthEast (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiB
++ I Direction SouthWest (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
 Key h A 2M MoSwiH
 Key l A 2M MoSwiL
 Key k A 2M MoSwiK
 Key j A 2M MoSwiJ
+Key u A 2M MoSwiU
+Key z A 2M MoSwiZ
+Key n A 2M MoSwiN
+Key b A 2M MoSwiB
 Key space A 2M RaiseLower
 
 # remove unused keybindings

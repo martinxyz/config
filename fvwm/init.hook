@@ -2,11 +2,7 @@
 + "I" Exec Esetroot -scale ~/grafik/background/default
 + "I" Exec aterm +sb -e /home/martin/bin/startupreport --minimal
 + "I" Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
-+ "I" Style "Galeon" SkipMapping,StartsOnPage 1 0
 + "I" Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
-+ "I" Style "galeon" SkipMapping,StartsOnPage 1 0
-+ "I" Style "galeon-bin" SkipMapping,StartsOnPage 1 0
-+ "I" Style "startgaleon" SkipMapping,StartsOnPage 1 0
 + "I" Style "Emacs*" SkipMapping,StartsOnPage 0 1
 + "I" Style "X-Chat*" SkipMapping,StartsOnPage 2 1
 + "I" Style "xmms*" SkipMapping,StartsOnPage 2 0
