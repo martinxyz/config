@@ -62,11 +62,14 @@
 
 ;; $Log: swbuff.el,v $
 ;;
+;; Some new features 2004-10-11 by Martin Renold:
 ;; - Restore order of unselected buffers after switching is done.
-;; - The buffer where switching started is always to the left now,
-;;   instead of the one switched to.
-;; - New custom variable `swbuff-clear-delay-ends-switching'.
-;; - TODO: switch for old behaviour? Does it make sense at all?
+;;   Variable: `swbuff-recent-buffers-first'
+;; - The buffer where switching started is always to the left, instead 
+;;   of the one switched to.
+;;   Variable:`swbuff-display-original-buffer-first'
+;; - Choose which buffer is displayed first in the list.
+;;   Variable: `swbuff-clear-delay-ends-switching'
 ;;
 ;; Revision 1.18  2002/01/09 11:45:23  ponce
 ;; Version 3.1.
@@ -230,10 +233,25 @@ width. The possible choices are:
   :type '(number :tag "seconds")) 
 
 (defcustom swbuff-clear-delay-ends-switching t
-  "*Should switching stop after the clear-delay expired?
-If non-nil, the selected buffer will get the most recently visited one
-after the clear-delay expired. Otherwise this happens only if a
-non-switching command is executed in that buffer."
+  "*Should switching stop after the clear-delay expired? 
+If non-nil, buffer switching ends after the clear-delay. Otherwise, it
+ends only when you start using the buffer."
+  :group 'swbuff
+  :type 'boolean)
+
+(defcustom swbuff-display-original-buffer-first nil
+  "*Should the old buffer be first in the list?
+If non-nil, the buffer where switching started will be the leftmost in
+the list. Otherwise it will be the buffer the first command switched
+to."
+  :group 'swbuff
+  :type 'boolean)
+
+(defcustom swbuff-recent-buffers-first t
+  "*Reorder buffers so recently used ones are first?
+If non-nil, the old buffer order will be restored when switching
+ends, except that the current buffer becomes the first one.
+If nil, think of the buffers as a cyclic list with fixed order."
   :group 'swbuff
   :type 'boolean)
 
@@ -483,6 +501,7 @@ status window shows the list of switchable buffers where the switched
 one is hilighted using `swbuff-current-buffer-face'. It is
 automatically discarded after any command is executed or after the
 delay specified by `swbuff-clear-delay'."
+  (swbuf-start-switching)
   (if swbuff-buffer-list-holder
       (let ((bcurr (buffer-name))
             (window-min-height 1)
@@ -514,13 +533,13 @@ delay specified by `swbuff-clear-delay'."
 
 (defun swbuff-end-switching () 
   "Called when the buffer finally is choosen."
-  ; restore previous order of unselected buffers
-  (let ((bcurr (current-buffer))
-        (l (nreverse swbuff-buffer-list-holder)))
-    (while l
-      (switch-to-buffer (car l))
-      (setq l (cdr l)))
-    (switch-to-buffer bcurr))
+  (if swbuff-recent-buffers-first
+      (let ((bcurr (current-buffer))
+            (l (nreverse swbuff-buffer-list-holder)))
+        (while l
+          (switch-to-buffer (car l))
+          (setq l (cdr l)))
+        (switch-to-buffer bcurr)))
   (setq swbuff-buffer-list-holder nil))
 
 (defun swbuff-clear-delay-hook ()
@@ -564,7 +583,7 @@ delay specified by `swbuff-clear-delay'."
   "\\[swbuff-switch-to-previous-buffer] switch to the previous buffer
 in the buffer list."
   (interactive)
-  (swbuff-start-switching)
+  (and swbuff-display-original-buffer-first (swbuff-start-switching))
   (swbuff-previous-buffer)
   (swbuff-show-status-window))
 
@@ -573,7 +592,7 @@ in the buffer list."
   "\\[swbuff-switch-to-next-buffer] switch to the next buffer in the
 buffer list."
   (interactive)
-  (swbuff-start-switching)
+  (and swbuff-display-original-buffer-first (swbuff-start-switching))
   (swbuff-next-buffer)
   (swbuff-show-status-window))
 
