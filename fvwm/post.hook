@@ -56,31 +56,30 @@ AddToMenu Window-Ops "Alt-F1: Window Ops" Title
 + "Close"                       Close
 + "Destroy"                     Destroy
 
-#### Focus stuff based on http://rvb.dyndns.org/FvwmWiki/Tips_2fRememberFocus
+## Focus stuff from:
+## http://rvb.dyndns.org/FvwmWiki/Tips_2fRememberFocus
+
+DestroyFunc CurrentPageFocusFunc
 AddToFunc CurrentPageFocusFunc
-+ I Next (CurrentPage, State 2, !Sticky) Focus
-+ I None (CurrentPage, Focused) Prev (CurrentPage,!Iconified,!Sticky) Focus
-AddToFunc HandleState3Func
-+ I State 3 False
-+ I CurrentPageFocusFunc
-AddToFunc FocusHasChangedFunc
-+ I Current (State 3) HandleState3Func
-+ I Current (!Iconified) All (CurrentPage,!Focused) State 2 False
++ I Next (CurrentPage, State 2) Focus
++ I None (CurrentPage, Focused) Next (CurrentPage, !Iconified, !Sticky) Focus
+
+DestroyFunc CurrentDeskFocusFunc
+AddToFunc CurrentDeskFocusFunc
++ I Current FlipFocus
+
+DestroyFunc MarkWindowAsActiveFunc
+AddToFunc MarkWindowAsActiveFunc
++ I Current (!Iconified) All (CurrentPage, !Focused) State 2 False
 + I Current (!Iconified) State 2 True
-AddToFunc PageHasChangedFunc
-# mark the window that will receive the focus in a moment
-+ I Next (HasPointer,!Iconified,!Sticky) State 3 True
-AddToFunc DestroyWindowFunc
-+ I Prev (CurrentPage,!Iconified,!Sticky) Focus
-+ I Current Raise
+
 DestroyModuleConfig FvwmEvent: *
 *FvwmEvent: Cmd Function
-*FvwmEvent: destroy_window DestroyWindowFunc
-*FvwmEvent: focus_change FocusHasChangedFunc
 *FvwmEvent: new_page CurrentPageFocusFunc
+*FvwmEvent: new_desk CurrentDeskFocusFunc
+*FvwmEvent: destroy_window CurrentPageFocusFunc
+*FvwmEvent: focus_change MarkWindowAsActiveFunc
 Module FvwmEvent
-## FIXME: a window with overlapping part into another page makes
-## switching to that other page impossible
 
 # Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
