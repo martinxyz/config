@@ -282,32 +282,32 @@
 ;    Execute an I/O command using the specified coding system.
 
 ; From the Unicode-HOWTO:
-(if (not (string-match "XEmacs" emacs-version))
-  (progn
-    (require 'unicode)
-    ;(setq unicode-data-path "..../UnicodeData-3.0.0.txt")
-    (if (eq window-system 'x)
-      (progn
-        (setq fontset12
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-12-*-*-*-*-*-fontset-standard"))
-        (setq fontset13
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-13-*-*-*-*-*-fontset-standard"))
-        (setq fontset14
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-14-*-*-*-*-*-fontset-standard"))
-        (setq fontset15
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-15-*-*-*-*-*-fontset-standard"))
-        (setq fontset16
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-16-*-*-*-*-*-fontset-standard"))
-        (setq fontset18
-          (create-fontset-from-fontset-spec
-            "-misc-fixed-medium-r-normal-*-18-*-*-*-*-*-fontset-standard"))
-       ; (set-default-font fontset15)
-        ))))
+;; (if (not (string-match "XEmacs" emacs-version))
+;;   (progn
+;;     (require 'unicode)
+;;     ;(setq unicode-data-path "..../UnicodeData-3.0.0.txt")
+;;     (if (eq window-system 'x)
+;;       (progn
+;;         (setq fontset12
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-12-*-*-*-*-*-fontset-standard"))
+;;         (setq fontset13
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-13-*-*-*-*-*-fontset-standard"))
+;;         (setq fontset14
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-14-*-*-*-*-*-fontset-standard"))
+;;         (setq fontset15
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-15-*-*-*-*-*-fontset-standard"))
+;;         (setq fontset16
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-16-*-*-*-*-*-fontset-standard"))
+;;         (setq fontset18
+;;           (create-fontset-from-fontset-spec
+;;             "-misc-fixed-medium-r-normal-*-18-*-*-*-*-*-fontset-standard"))
+;;        ; (set-default-font fontset15)
+;;         ))))
 
 ; from http://www.tbray.org/ongoing/When/200x/2003/09/27/UniEmacs
 ;you can force it to use UTF-8 when it saves, like so:
