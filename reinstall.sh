@@ -12,6 +12,7 @@ ln -s config/elisp/viper.el .viper
 
 ln -s config/xmodmap .xmodmap
 ln -s config/fvwm2rc .fvwm2rc
+ln -s config/vimrc .vimrc
 
 echo "Symlinks done."
 
