@@ -68,13 +68,16 @@
        "C mode with adjusted defaults for use with the Linux kernel."
        (interactive)
        (c-mode)
+       (setq c-basic-offset 8)
        (setq c-indent-level 8)
        (setq c-brace-imaginary-offset 0)
        (setq c-brace-offset -8)
        (setq c-argdecl-indent 8)
        (setq c-label-offset -8)
        (setq c-continued-statement-offset 8)
-       (setq indent-tabs-mode nil)
+       (setq indent-tabs-mode t)
+       ;; Note: figure those out with C-c C-o (o=offset)
+       (c-set-offset 'substatement-open 0)
        (setq tab-width 8))
 
 ;; Martin C mode (??)
@@ -98,7 +101,7 @@
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
-      (cons '("/usr/src/linux.*/.*\\.[ch]$" . linux-c-mode)
+      (cons '(".*/linux.*/.*\\.[ch]$" . linux-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
