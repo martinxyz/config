@@ -179,11 +179,17 @@
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")))
 
+(add-hook 'octave-mode-hook
+  (lambda () 
+    (viper-mode) ))
+
 (auto-compression-mode t)
 
 (global-set-key "\M- " 'pop-global-mark)
 
 (column-number-mode t)
 
-(setq x-select-enable-clipboard t)
+; macht nur dass cut&paste von einem xterm nicht mehr geht
+;(setq x-select-enable-clipboard t)
+
 
