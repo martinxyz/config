@@ -166,4 +166,10 @@
 ;; set C-tab to switch frames
 (global-set-key [(control tab)] `other-window)
 
+(load "regadhoc")
+(global-set-key "\C-xrj" 'regadhoc-jump-to-registers)
+(global-set-key "\C-x/" 'regadhoc-register)
+;;; (setq regadhoc-register-char-list (list ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)) ;; optional
+;;; 'regadhoc-register-char-list is list of your "favorite" register's char.
+
 
