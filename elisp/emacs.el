@@ -316,3 +316,12 @@
 
 ; ... funktionniert alles nicht. Egal, ich lasse es mal da.
 
+;; Transparentes editieren über ssh, sudo, ftp, samba, ...
+;; Einfach eine Datei mit folgendem Namen oeffnen:
+;; ssh   /remotehost:filename
+;; sudo  /sudo::/etc/X11/XF86Config-4
+;; sonst /method:user@remotehost:filename
+; ACHTUNG: macht scheinbar wegen history immer ssh-verbindungen
+; nur schon beim emacs-start auf...
+;(require 'tramp)
+
