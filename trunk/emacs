@@ -55,7 +55,7 @@
 ;;setq compile-command '("gmake" . 4))
 
 ;; highlight matching parenthesis
-;;show-paren-mode t)
+(show-paren-mode t)
 
 ;; start viper on startup (vim keybindings)
 (setq viper-mode t)
