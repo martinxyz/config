@@ -137,3 +137,12 @@
 ;; Disable menu bar
 (menu-bar-mode 0)
 
+;; Viper... trying some programming myself :)
+(define-key viper-vi-local-user-map "q" 'set-mark-command)
+(defun martin-insert-comment ()
+  (interactive)
+  (indent-for-comment)
+  (viper-insert nil))
+  ;; (viper-change-state-to-insert)))
+(define-key viper-vi-local-user-map " " 'martin-insert-comment)
+
