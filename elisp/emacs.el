@@ -136,8 +136,6 @@
 (setq default-major-mode 'text-mode)
 (setq text-mode-hook
       '(lambda () (auto-fill-mode 1) ) )
-(setq c-mode-hook
-      '(lambda () (auto-fill-mode 1) ) )
 
 ;; Disable menu bar
 (menu-bar-mode 0)

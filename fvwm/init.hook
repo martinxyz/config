@@ -2,7 +2,7 @@
 + "I" Exec Esetroot -scale ~/grafik/background/default
 #+ "I" Exec Eterm --geometry 79x25+0-0
 #+ "I" Exec Eterm --geometry 79x25+0+0
-+ "I" Exec xterm -e /home/martin/bin/startupreport --minimal
++ "I" Exec aterm +sb -e /home/martin/bin/startupreport --minimal
 + "I" Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
 + "I" Style "Galeon" SkipMapping,StartsOnPage 1 0
 + "I" Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
