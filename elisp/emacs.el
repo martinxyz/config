@@ -228,7 +228,7 @@
 ; Paket swbuff von: http://perso.wanadoo.fr/david.ponce/more-elisp.html
 (require 'swbuff)
 ; keine internen buffer *scratch* *help* etc. (regex aus doku)
-(setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*"))
+(setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
 (define-key viper-vi-local-user-map "q" 'swbuff-switch-to-next-buffer)
 (define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
 
@@ -269,3 +269,8 @@
 
 ; damit hungry delete auch in viper-insert mode geht
 (define-key viper-insert-global-user-map [backspace] 'c-electric-backspace)
+
+(defun w3m-copy-url-as-kill ()
+  (interactive)
+  "paste w3m link location into kill ring"
+  (kill-new (w3m-anchor)) )

@@ -161,11 +161,13 @@ keycode  91 = KP_Decimal
 ! hm...
 keycode 113 = Mode_switch Alt_R Meta_R
 keycode  64 = Alt_L Meta_L
-keycode 115 = Multi_key
 
 ! use windows keys as Mod2
 keycode 115 = Super_L
 keycode 116 = Super_R
 add Mod2 = Super_L
 add Mod2 = Super_R
+
+! scroll-lock
+keycode 78 = Multi_key
 

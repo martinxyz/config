@@ -194,3 +194,6 @@
 ;;;; your own risk, etc.
 
 ;; Additions by Martin Renold moved to emacs config file.
+
+
+(viper-record-kbd-macro "www" 'vi-state [o f o o b a r escape] 't)

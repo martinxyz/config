@@ -3,6 +3,8 @@
 # ignore no modifiers
 IgnoreModifiers
 
+DesktopSize 4 3
+
 DestroyFunc InitFunction
 AddToFunc InitFunction
 + "I" Style "*" SkipMapping
@@ -14,20 +16,18 @@ AddToFunc InitFunction
 + "I" Style "xmms*" SkipMapping,StartsOnPage 2 0
 + "I" Style "XMMS*" SkipMapping,StartsOnPage 2 0
 # Note: galeon needs --noraise for this to work
-+ "I" Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
++ "I" Style "Galeon" SkipMapping,StartsOnPage 1 0
 + "I" Exec /home/martin/bin/startgaleon
-+ "I" Exec emacs -geometry 114x49
+#+ "I" Exec emacs -geometry 114x49
 
 # Wenn ein zweiter galeon auf einem anderen desk offen ist
 # kommt das Suchfenster (Ctrl-F) auf dem startdesk, sehr mühsem.
-Key g A 2 Style "Galeon-bin" ShowMapping,StartsAnyWhere
+Key g A 2 Style "Galeon" ShowMapping,StartsAnyWhere
 
 #DestroyFunc RestartFunction
 #AddToFunc RestartFunction
 #+ "I" Wait FvwmPager
 #+ "I" KillModule FvwmPager
-
-DesktopSize 4 3
 
 # Misc things from the old debian default
 EdgeScroll 100 100
