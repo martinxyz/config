@@ -51,8 +51,8 @@
 (add-hook 'c-mode-common-hook
           '(lambda () (c-toggle-hungry-state 1)))                  
 
-;(setq compile-command '("make"))
-;(setq compile-command '("make" . 4))
+;(setq compile-command '("gmake"))
+;(setq compile-command '("gmake" . 4))
 
 ;syntax highlighting
 ;(cond (window-system
@@ -86,9 +86,9 @@
 (defun martin-c-mode ()
   "Linux C coding style"
   (interactive)
-  (c-mode)
+  ;; (c-mode)
   (c-set-style "K&R")
-  ;;(setq c-basic-offset 2)
+  ;; (setq c-basic-offset 1)
   )
 
 ;; Programmierstil. 
