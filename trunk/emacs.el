@@ -49,7 +49,9 @@
 ;; hungry delete, DEL loescht beim C programmieren
 ;; gleich alle Leerschlaege
 (add-hook 'c-mode-common-hook
-          '(lambda () (c-toggle-hungry-state 1)))                  
+          '(lambda () 
+	     (c-set-style "gnu")
+	     (c-toggle-hungry-state 1)))                  
 
 ;;setq compile-command '("gmake"))
 ;;setq compile-command '("gmake" . 4))
