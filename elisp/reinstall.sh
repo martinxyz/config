@@ -7,13 +7,13 @@ fi
 
 echo "This will delete your ~/.emacs and your ~/.viper!"
 echo "Ctrl-C abbort, RETURN continue."
-read i
+read
 
 # well, he has been warned.
 cd $HOME
 rm .emacs .viper
-ln -s elisp/emacs.el .emacs
-ln -s elisp/viper.el .viper
+ln -s config/elisp/emacs.el .emacs
+ln -s config/elisp/viper.el .viper
 
 echo "Symlinks done."
 
