@@ -56,6 +56,8 @@
 (setq viper-mode t)
 (require 'viper)
 
+;; Programmierstil. 
+
 (defun linux-c-mode ()
        "C mode with adjusted defaults for use with the Linux kernel."
        (interactive)
@@ -72,16 +74,6 @@
        (c-set-offset 'substatement-open 0)
        (setq tab-width 8))
 
-;; Martin C mode (??)
-;; TODO: irgendwie funktionniert das nicht so richtig...
-(defun martin-c-mode ()
-  "Linux C coding style"
-  (interactive)
-  ;; (c-mode)
-;  (c-set-style "K&R")
-  ;; (setq c-basic-offset 1)
-  )
-
 (defun stratagus-c-mode ()
   "Stratagus C coding style"
   (interactive)
@@ -89,7 +81,27 @@
   (c-set-style "stroustrup")
   )
 
-;; Programmierstil. 
+(defun nil-c-mode ()
+  "nil C coding style"
+  (interactive)
+  (c-mode)
+  ;; Help! Does all not work, only manually "M-x set-variable tab-with 2" does
+  (set-variable 'tab-width 2)
+  (set-variable 'tab-width 2)
+  (setq-default tab-width 2)
+  ;(set-variable tab-width 2)
+
+  (setq tab-stop 2 t)
+  (setq tab-stop-list (quote (2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32)))
+  (setq tab-width 2)
+
+  (setq c-basic-offset 2)
+  (setq c-indent-level 2)
+  (setq indent-tabs-mode t)
+  (setq tab-width 2)
+  (setq c-tab-width 2)
+  )
+
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
@@ -97,6 +109,9 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/nil/.*(cpp|h)$" . nil-c-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -192,6 +207,18 @@
 ; macht nur dass cut&paste von einem xterm nicht mehr geht
 ;(setq x-select-enable-clipboard t)
 
-
-
 (put 'narrow-to-region 'disabled nil)
+
+; indent with spaces, never tabs (for details google "emacs tabs")
+(setq-default indent-tabs-mode nil)
+
+; TODO: ausprobieren, soll zuletzt geöffnete dateien speichern
+; Klappt mit eigenem interface, aber es muss auch einfacher gehen.
+(require 'recentf)
+(recentf-mode 1)
+
+; in buffers herumswitchen 
+; Paket swbuff von: http://perso.wanadoo.fr/david.ponce/more-elisp.html
+(require 'swbuff)
+; keine internen buffer *scratch* *help* etc. (regex aus doku)
+(setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*"))

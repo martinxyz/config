@@ -195,8 +195,12 @@
 
 ;; Additions by Martin Renold follow.
 
+;; Buffer Wechseln mit Tastatur
+(define-key viper-vi-local-user-map "q" 'swbuff-switch-to-next-buffer)
+(define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
+
 ;; set mark with q
-(define-key viper-vi-local-user-map "q" 'set-mark-command)
+;(define-key viper-vi-local-user-map "q" 'set-mark-command)
 
 ;; insert a new comment with space
 (defun martin-insert-comment ()
