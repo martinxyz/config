@@ -192,3 +192,23 @@
 ;;;; will try to be supportive of comments, requests, and so on,
 ;;;; pertaining to it.  No warranty is expressed or implied, use at
 ;;;; your own risk, etc.
+
+;; Additions by Martin Renold follow.
+
+;; set mark with q
+(define-key viper-vi-local-user-map "q" 'set-mark-command)
+
+;; insert a new comment with space
+(defun martin-insert-comment ()
+  (interactive)
+  (comment-dwim nil)
+  (viper-insert nil))
+  ;; (viper-change-state-to-insert)))
+(define-key viper-vi-local-user-map " " 'martin-insert-comment)
+
+;; always use viper for a buffer if appropriate
+(setq viper-always t)
+
+;; indent new lines (return, o, O...)
+(custom-set-variables
+ '(viper-auto-indent t))

@@ -139,12 +139,10 @@
 ;; Disable menu bar
 (menu-bar-mode 0)
 
-;; Viper... trying some programming myself :)
-(define-key viper-vi-local-user-map "q" 'set-mark-command)
-(defun martin-insert-comment ()
-  (interactive)
-  (indent-for-comment)
-  (viper-insert nil))
-  ;; (viper-change-state-to-insert)))
-(define-key viper-vi-local-user-map " " 'martin-insert-comment)
+;; groessere Schrift
+(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
+
+;; TODO: Enter soll im c-modus auto-indent machen
+
+(setq viper-auto-indent t)
