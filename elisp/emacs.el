@@ -3,8 +3,8 @@
 ;; neuere Dinge am Schluss.
 
 ;; wohin die "customize"-Einstellungen gespeichert werden
-(setq custom-file "~/elisp/emacs-custom")
-(load "~/elisp/emacs-custom" t t)
+(setq custom-file "~/config/elisp/emacs-custom")
+(load "~/config/elisp/emacs-custom" t t)
 
 ;; ??
 ;(add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
@@ -101,7 +101,7 @@
 
 ;; Add my directories to load-path.
 (setq load-path (append
-                 '("~/elisp")
+                 '("~/config/elisp")
                  load-path))
 
 ; Color-themes package.  Headers in source file:
