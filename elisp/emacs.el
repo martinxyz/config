@@ -267,3 +267,5 @@
 (require 'recentf)
 (recentf-mode 1)
 
+; damit hungry delete auch in viper-insert mode geht
+(define-key viper-insert-global-user-map [backspace] 'c-electric-backspace)

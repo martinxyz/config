@@ -18,6 +18,10 @@ AddToFunc InitFunction
 + "I" Exec /home/martin/bin/startgaleon
 + "I" Exec emacs -geometry 114x49
 
+# Wenn ein zweiter galeon auf einem anderen desk offen ist
+# kommt das Suchfenster (Ctrl-F) auf dem startdesk, sehr mühsem.
+Key g A 2 Style "Galeon-bin" ShowMapping,StartsAnyWhere
+
 #DestroyFunc RestartFunction
 #AddToFunc RestartFunction
 #+ "I" Wait FvwmPager
@@ -303,4 +307,8 @@ DestroyMenuStyle WindowList
 MenuStyle WindowList SelectOnRelease Meta_L
 #Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
 #Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+
+# title bar close button
+Mouse 0 2       A   Close
+
 
