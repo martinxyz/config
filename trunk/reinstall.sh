@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if ! [ -d ~/elisp ] ; then
+if [ ! -d $HOME/elisp ] ; then
   echo "Put those things into ~/elisp !"
   exit 1
 fi
