@@ -232,14 +232,14 @@ width. The possible choices are:
   :group 'swbuff
   :type '(number :tag "seconds")) 
 
-(defcustom swbuff-clear-delay-ends-switching t
+(defcustom swbuff-clear-delay-ends-switching nil
   "*Should switching stop after the clear-delay expired? 
 If non-nil, buffer switching ends after the clear-delay. Otherwise, it
 ends only when you start using the buffer."
   :group 'swbuff
   :type 'boolean)
 
-(defcustom swbuff-display-original-buffer-first nil
+(defcustom swbuff-display-original-buffer-first t
   "*Should the old buffer be first in the list?
 If non-nil, the buffer where switching started will be the leftmost in
 the list. Otherwise it will be the buffer the first command switched
@@ -249,8 +249,8 @@ to."
 
 (defcustom swbuff-recent-buffers-first t
   "*Reorder buffers so recently used ones are first?
-If non-nil, the old buffer order will be restored when switching
-ends, except that the current buffer becomes the first one.
+If non-nil, buffer order will be restored when switching ends,
+except that the current buffer becomes the first one.
 If nil, think of the buffers as a cyclic list with fixed order."
   :group 'swbuff
   :type 'boolean)
@@ -501,7 +501,7 @@ status window shows the list of switchable buffers where the switched
 one is hilighted using `swbuff-current-buffer-face'. It is
 automatically discarded after any command is executed or after the
 delay specified by `swbuff-clear-delay'."
-  (swbuf-start-switching)
+  (swbuff-start-switching)
   (if swbuff-buffer-list-holder
       (let ((bcurr (buffer-name))
             (window-min-height 1)
