@@ -311,7 +311,7 @@
 
 ; from http://www.tbray.org/ongoing/When/200x/2003/09/27/UniEmacs
 ;you can force it to use UTF-8 when it saves, like so:
-(set-language-environment "UTF-8")
+;(set-language-environment "UTF-8")
 ; try M-x ucs-insert
 
 ; ... funktionniert alles nicht. Egal, ich lasse es mal da.
