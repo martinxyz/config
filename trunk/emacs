@@ -99,14 +99,14 @@
                  '("~/elisp")
                  load-path))
 
-;; Color-themes package.  Headers in source file:
-;; Author: Jonadab the Unsightly One <jonadab@bright.net>
-;; Maintainer: Alex Schroeder <alex@gnu.org>
-;; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?ColorTheme
-;;
-;;require 'color-theme)
-;;(color-theme-sitaramv-solaris)
-;;color-theme-dark-laptop)
+; Color-themes package.  Headers in source file:
+; Author: Jonadab the Unsightly One <jonadab@bright.net>
+; Maintainer: Alex Schroeder <alex@gnu.org>
+; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?ColorTheme
+
+(require 'color-theme)
+;(color-theme-sitaramv-solaris)
+(color-theme-dark-laptop)
 
 ;;yntax highlighting
 ;;cond (window-system
