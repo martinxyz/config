@@ -150,7 +150,6 @@
 ;; groessere Schrift
 (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
-
 ;; Enter soll im c-modus auto-indent machen
 (setq viper-auto-indent t)
 
@@ -160,4 +159,11 @@
   (interactive)
   (yes-or-no-p "Really quit emacs? "))
 (add-hook 'kill-emacs-query-functions 'ask-before-quit)
+
+;; disable the cursed startup message
+(setq inhibit-startup-message t)
+
+;; set C-tab to switch frames
+(global-set-key [(control tab)] `other-window)
+
 
