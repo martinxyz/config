@@ -1,6 +1,79 @@
 # by Martin Renold
 
+# ignore no modifiers
+IgnoreModifiers
+
+DestroyFunc InitFunction
+AddToFunc InitFunction
++ "I" Style "*" SkipMapping
++ "I" Exec Esetroot -scale ~/grafik/background/default
++ "I" Exec aterm +sb -e /home/martin/bin/startupreport --minimal
++ "I" Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
++ "I" Style "Emacs*" SkipMapping,StartsOnPage 0 1
++ "I" Style "X-Chat*" SkipMapping,StartsOnPage 2 1
++ "I" Style "xmms*" SkipMapping,StartsOnPage 2 0
++ "I" Style "XMMS*" SkipMapping,StartsOnPage 2 0
+# Note: galeon needs --noraise for this to work
++ "I" Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
++ "I" Exec /home/martin/bin/startgaleon
++ "I" Exec emacs -geometry 114x49
+
+#DestroyFunc RestartFunction
+#AddToFunc RestartFunction
+#+ "I" Wait FvwmPager
+#+ "I" KillModule FvwmPager
+
 DesktopSize 4 3
+
+# Misc things from the old debian default
+EdgeScroll 100 100
+EdgeResistance 250 100
+Style "default-style" Font -*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*
+Style "default-style" HilightFore white
+Style "default-style" HilightBack steelblue
+Style "default-style" BorderWidth 6
+Style "default-style" HandleWidth 6
+Style "default-style" MWMFunctions
+Style "default-style" MWMBorder
+Style "default-style" MWMDecor
+Style "default-style" DecorateTransient
+# Style "default-style" SmartPlacement
+# Style "default-style" RandomPlacement
+Style "default-style" ActivePlacement
+Style "default-style" NoPPosition
+Style "default-style" CaptureHonorsStartsOnPage
+Style "default-style" IconBox 0 0 50 -1
+Style "default-style" Icon default.xbm
+DestroyDecor default-decor
+AddToDecor default-decor
++ ButtonStyle Reset
++ ButtonStyle 2 Vector 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 \
+                           60x50@0 80x70@0 80x80@0 70x80@0 50x60@0 30x80@0 \
+                           20x80@0 20x70@1 40x50@1 20x30@0 20x20@1
+
++ ButtonStyle 4 Vector 5 25x75@0 75x75@0 75x25@0 25x25@1 25x75@1
++ ButtonStyle 6 Vector 4 50x75@1 25x25@1 75x25@1 50x75@0
+# make the default decor the default:
+Style "default-style" UseDecor default-decor, Color Black/DarkGrey
+
+# Configure the FvwmPager module (from the old debian default)
+*FvwmPagerBack SlateGrey
+*FvwmPagerFore Black
+*FvwmPagerFont none
+*FvwmPagerHilight SlateBlue4
+*FvwmPagerGeometry -0-0
+*FvwmPagerSmallFont -*-times-medium-r-*-*-*-80-*-*-*-*-*-*
+*FvwmPagerDeskTopScale 32
+
+# Some special stuff for Fvwm modules (from old debian default)
+Style "Fvwm*" NoTitle
+Style "Fvwm*" WindowListSkip
+Style "Fvwm*" CirculateSkip
+Style "FvwmPager"   Sticky, StaysOnTop, Handles, HandleWidth 5
+Style "FvwmIdent" Title
+Style "FvwmIdent" WindowListHit
+Style "FvwmIdent" CirculateHit
+
 
 Style "*" MinOverlapPercentPlacement
 #Style * TileCascadePlacement
@@ -84,8 +157,9 @@ Module FvwmEvent
 # Keybindings;  Modifiers:
 # N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
 Key i A 2 Module FvwmIdent
-Key Menu A N Popup MartinMenu
-Key Menu A 2 Popup /Debian
+# FIXME: no such key
+#Key Menu A N Popup MartinMenu
+#Key Menu A 2 Popup /Debian
 Key section A N Exec exec m n
 Key section A S Exec exec m p
 Key section A C Exec exec m s
