@@ -83,7 +83,7 @@
   "Linux C coding style"
   (interactive)
   ;; (c-mode)
-  (c-set-style "K&R")
+;  (c-set-style "K&R")
   ;; (setq c-basic-offset 1)
   )
 

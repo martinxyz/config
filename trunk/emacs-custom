@@ -38,7 +38,8 @@
  '(toolbar-captioned-p nil)
  '(toolbar-visible-p nil)
  '(truncate-lines t)
- '(user-mail-address "martinxyz@gmx.ch"))
+ '(user-mail-address "martinxyz@gmx.ch")
+ '(viper-auto-indent t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
   ;; Your init file should contain only one such instance.
