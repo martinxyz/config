@@ -1,13 +1,14 @@
-;; swbuff.el --- Quick switch between Emacs buffers.
+;;; swbuff.el --- Quick switch between Emacs buffers.
 
-;; Copyright (C) 1998, 2000, 2001 by David Ponce
+;; Copyright (C) 1998, 2000, 2001, 2003 by David Ponce
 
 ;; Author: David Ponce <david@dponce.com>
 ;; Maintainer: David Ponce <david@dponce.com>
 ;; Created: 12 Nov 1998
-;; Version: 3.1
 ;; Keywords: extensions convenience
-;; VC: $Id: swbuff.el,v 1.18 2002/01/09 11:45:23 ponce Exp $
+;; Revision: $Id: swbuff.el,v 1.19 2003/04/25 11:31:22 ponced Exp $
+
+(defconst swbuff-version "3.2")
 
 ;; This file is not part of Emacs
 
@@ -27,7 +28,7 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-
+;;
 ;; This package provides the commands `swbuff-switch-to-next-buffer'
 ;; and `swbuff-switch-to-previous-buffer' to respectively switch to
 ;; the next or previous buffer in the buffer list.
@@ -44,167 +45,21 @@
 ;; `swbuff-current-buffer-face'. This window is automatically
 ;; discarded after any command is executed or after the delay
 ;; specified by `swbuff-clear-delay'.
+;;
+;; To install and use, put this file on your Emacs-Lisp load path and
+;; add the following into your ~/.emacs startup file:
+;;
+;; (require 'swbuff)
+;;
 
-;; Installation
-
-;; Put this file on your Emacs-Lisp load path and add following into
-;; your ~/.emacs startup file
-;;
-;;   (require 'swbuff)
-
-;; Support
-;;
-;; This program is available at <http://www.dponce.com/>. Any
-;; comments, suggestions, bug reports or upgrade requests are welcome.
-;; Please send them to David Ponce <david@dponce.com>.
-
-;;; Change Log:
-
-;; $Log: swbuff.el,v $
-;;
-;; Some new features 2004-10-11 by Martin Renold:
-;; - Restore order of unselected buffers after switching is done.
-;;   Variable: `swbuff-recent-buffers-first'
-;; - The buffer where switching started is always to the left, instead 
-;;   of the one switched to.
-;;   Variable:`swbuff-display-original-buffer-first'
-;; - Choose which buffer is displayed first in the list.
-;;   Variable: `swbuff-clear-delay-ends-switching'
-;;
-;; Revision 1.18  2002/01/09 11:45:23  ponce
-;; Version 3.1.
-;;
-;; Revision 1.17  2001/09/19 11:13:00  ponce
-;; (swbuff-window-lines): Use `swbuff-count-lines' instead of
-;; `count-lines'.
-;;
-;; (swbuff-ignore): Alias of `ignore' used to prevent discarding the
-;; status window on some mouse event.
-;;
-;; In compatibility code: Use mouse-1, mouse-3 on mode line buffer
-;; identification to respectively switch to previous or next buffer.  And
-;; mouse-2 to kill the current buffer.
-;;
-;; (swbuff-timer): New variable.  Timer used to discard the status
-;; window.
-;;
-;; (swbuff-show-status-window, swbuff-pre-command-hook):  Use timer to
-;; discard the status window.
-;;
-;; (swbuff-pre-command-hook):  Added `swbuff-kill-this-buffer' and
-;; `swbuff-ignore' to the list of commands that do not discard the status
-;; window.
-;;
-;; (swbuff-kill-this-buffer): New command to kill the current buffer.
-;;
-;; Revision 1.16  2001/03/26 06:09:56  ponce
-;; `swbuff-layout-status-line' hide Emacs 21 header line.
-;;
-;; Revision 1.15  2001/03/06 12:16:24  ponce
-;; New major version 3.0.
-;; Now works with FSF Emacs 20.7, 21.1 and XEmacs 21.1.
-;; New `swbuff-window-min-text-height' option to specify the minimum text
-;; height of the status window.
-;; New default face `swbuff-default-face' used for buffer names not
-;; highlighted.
-;; Simplified faces definitions.
-;; New improved status window layout code.
-;;
-;; Revision 1.14  2000/05/12 15:23:59  david_ponce
-;; Version 2.1.
-;;
-;; New options to customize the buffer list display (suggested by
-;; "Shan-leung Maverick WOO" <sw77@cornell.edu>):
-;;
-;; - `swbuff-separator' defines a string used to separate buffer names.
-;; - `swbuff-header' and `swbuff-trailer' define strings to enclose
-;;   the buffer names list.
-;; - `swbuff-separator-face' defines the face used to display the above
-;;   separators.
-;;
-;; The default `swbuff-current-buffer-face' is now underlined.
-;; Minor code improvements.
-;;
-;; Revision 1.13  2000/04/21 10:32:08  david_ponce
-;; Version 2.0 released.
-;;
-;; Revision 1.12  2000/04/20 16:00:24  david_ponce
-;; Added a new customizable variable `swbuff-status-window-layout' to
-;; control the method used to ensure the switched buffer is always
-;; visible when the buffer list is larger than the status window width.
-;;
-;; Revision 1.11  2000/04/19 14:00:03  david_ponce
-;; Updated to use standard Emacs conventions for comments.
-;;
-;; Revision 1.10  2000/04/18 14:05:26  david_ponce
-;; New major version.
-;;  * swbuff now uses its own status window to display the buffer list.
-;;    This fixes problem using the minibuffer with multiple frames.
-;;  * Code cleanup:
-;;    No more require cl.
-;;    `swbuff-display-version' removed (use C-hv swbuff-version instead)
-;;  * Documentation update.
-;;
-;; Revision 1.9  2000/01/17 10:56:57  ebat311
-;; Fixed a little problem when switching to next buffer and current buffer
-;; is excluded from the list of ones eligible for switching.
-;;
-;; Thanks to "Joe Casadonte" <joc@netaxs.com> who has reported this.
-;;
-;; Revision 1.8  1999-07-26 18:54:30+02  ebat311
-;; Use Emacs/XEmacs compatible key mapping in `swbuff-default-load-hook'.
-;;
-;; Revision 1.7  1999-05-17 11:28:45+02  ebat311
-;; Improved buffer list display:
-;;   - The current highlighted buffer name is always visible.
-;;     Previously, when the buffer list exceeded the size
-;;     of the mini-buffer window the highlighted buffer name
-;;     could be outside the displayed area.
-;;   - New buffer name regexp handling to avoid bad highlighting
-;;     of buffers which have a common part in their names.
-;;
-;; Revision 1.6  1999-05-07 13:48:31+02  ebat311
-;; Removed a message displayed for debugging purpose.
-;;
-;; Revision 1.5  1999-05-07 13:45:33+02  ebat311
-;; Improved buffer list display - the filenames list is kept static
-;; (i.e., not shifting), while the current buffer highlight moves in
-;; response to `swbuff-switch-to-next-buffer' and
-;; `swbuff-switch-to-previous-buffer'.
-;; No switching occurs if the eligible buffer list is empty.
-;; Minor typo changes.
-;;
-;; Revision 1.4  1999-05-07 09:43:02+02  ebat311
-;; Fixed a problem when no buffers are eligible for switching.
-;; Added (require 'cl) to avoid problem using `mapcan' and
-;; `notany' from `cl-extra'.
-;; Simplified default exclude regexp from "^ .*" to "^ "
-;; Thank you so much to "Paul Ford" <pford@chi.navtech.com>
-;; for these fixes.
-;;
-;; Revision 1.3  1999-05-06 12:13:09+02  ebat311
-;; Added a new customisable feature to exclude buffers whose
-;; name matches a given list of regular expressions.
-;;
-;; Fixed - default key binding now works with XEmacs.
-;;
-;; Revision 1.2  1999-02-01 12:30:30+01  ebat311
-;; No more use of `other-buffer' and `bury-buffer' so it
-;; can now switch to any buffer in the `buffer-list'.
-;;
-;; Revision 1.1  1998/11/27 09:12:12  ebat311
-;; Initial revision
+;;; History:
 ;;
 
 ;;; Code:
 (require 'timer)
-
-(defconst swbuff-version "3.0 $Date: 2002/01/09 11:45:23 $"
-  "swbuff version information.")
-
-(defconst swbuff-status-buffer-name "*swbuff*"
-  "Name of the working buffer used to display the buffer list.")
-
+
+;;; Options
+;;
 (defgroup swbuff nil
   "Quick switch between Emacs buffers."
   :group 'extensions
@@ -297,10 +152,15 @@ character.  To exclude all the internal buffers (that is *scratch*,
   :type '(repeat (regexp :format "%v")))
 
 (defcustom swbuff-load-hook '(swbuff-default-load-hook)
-  "*Hook run when package has been loaded.
+  "Hook run when package has been loaded.
 See also `swbuff-default-load-hook'."
   :group 'swbuff
   :type 'hook)
+
+;;; Internals
+;;
+(defconst swbuff-status-buffer-name "*swbuff*"
+  "Name of the working buffer used to display the buffer list.")
 
 (defun swbuff-include-p (name)
   "Return non-nil if buffer NAME can be included.
@@ -426,13 +286,11 @@ The default value correspond to the truncated glyphs + one space.")
   ))
 
 (defun swbuff-one-window-p (window)
-  "Return non-nil if there is only one window in this frame ignoring
-WINDOW and the minibuffer window."
+  "Return non-nil if there is only one window in this frame.
+Ignore WINDOW and the minibuffer window."
   (let ((count 0))
-    (walk-windows (function
-                   (lambda (w)
-                     (or (eq w window)
-                         (setq count (1+ count))))))
+    (walk-windows #'(lambda (w)
+                      (or (eq w window) (setq count (1+ count)))))
     (= count 1)))
 
 (defvar swbuff-buffer-list-holder nil
@@ -496,9 +354,9 @@ BCURR is the buffer name to highlight."
   "Timer used to discard the status window.")
 
 (defun swbuff-show-status-window ()
-  "Pop-up a status window at the bottom of the selected window. The
-status window shows the list of switchable buffers where the switched
-one is hilighted using `swbuff-current-buffer-face'. It is
+  "Pop-up a status window at the bottom of the selected window.
+The status window shows the list of switchable buffers where the
+switched one is hilighted using `swbuff-current-buffer-face'. It is
 automatically discarded after any command is executed or after the
 delay specified by `swbuff-clear-delay'."
   (swbuff-start-switching)
@@ -547,7 +405,8 @@ delay specified by `swbuff-clear-delay'."
   (and swbuff-clear-delay-ends-switching (swbuff-end-switching)))
 
 (defun swbuff-pre-command-hook ()
-  "`pre-command-hook' used to track successive calls to switch commands."
+  "Track successive calls to switch commands.
+Run as a `pre-command-hook'."
   (if (memq this-command '(swbuff-switch-to-previous-buffer
                            swbuff-switch-to-next-buffer
                            swbuff-kill-this-buffer
@@ -571,17 +430,13 @@ delay specified by `swbuff-clear-delay'."
     (while (cdr l)
       (switch-to-buffer (car l))
       (setq l (cdr l)))))
-
-;;;###autoload
-(defun swbuff-customize ()
-  "Show the swbuff customization options panel."
-  (interactive)
-  (customize-group "swbuff"))
+
+;;; Commands
+;;
 
 ;;;###autoload
 (defun swbuff-switch-to-previous-buffer ()
-  "\\[swbuff-switch-to-previous-buffer] switch to the previous buffer
-in the buffer list."
+  "Switch to the previous buffer in the buffer list."
   (interactive)
   (and swbuff-display-original-buffer-first (swbuff-start-switching))
   (swbuff-previous-buffer)
@@ -589,8 +444,7 @@ in the buffer list."
 
 ;;;###autoload
 (defun swbuff-switch-to-next-buffer ()
-  "\\[swbuff-switch-to-next-buffer] switch to the next buffer in the
-buffer list."
+  "Switch to the next buffer in the buffer list."
   (interactive)
   (and swbuff-display-original-buffer-first (swbuff-start-switching))
   (swbuff-next-buffer)
@@ -606,13 +460,14 @@ And update the status window if showing."
        (swbuff-show-status-window)))
 
 (defun swbuff-default-load-hook ()
-  "Default hook run when package has been loaded.  Map the global keys
-`C-f6' and `C-S-f6' respectively to the `swbuff-switch-to-next-buffer'
-and `swbuff-switch-to-previous-buffer' commands."
+  "Default hook run when package has been loaded.
+Define keyboard shortcut [C-f6] for `swbuff-switch-to-next-buffer' and
+\[C-S-f6] for `swbuff-switch-to-previous-buffer'."
   (global-set-key [(control f6)]       'swbuff-switch-to-next-buffer)
   (global-set-key [(control shift f6)] 'swbuff-switch-to-previous-buffer))
 
 (provide 'swbuff)
+
 (run-hooks 'swbuff-load-hook)
 
 ;;; swbuff.el ends here
