@@ -46,14 +46,6 @@
 ;;(setq-default font-lock-maximum-decoration t)
 ;;(setq-default font-menu-ignore-scaled-fonts nil)
 
-;; hungry delete, DEL loescht beim C programmieren
-;; gleich alle Leerschlaege
-(add-hook 'c-mode-common-hook
-          '(lambda () 
-	     (c-set-style "gnu")
-	     (c-toggle-auto-state -1)
-	     (c-toggle-hungry-state 1)))                  
-
 ;;setq compile-command '("gmake"))
 ;;setq compile-command '("gmake" . 4))
 
@@ -175,4 +167,16 @@
 ;;; (setq regadhoc-register-char-list (list ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)) ;; optional
 ;;; 'regadhoc-register-char-list is list of your "favorite" register's char.
 
+
+;(c-set-style "gnu")
+;(c-toggle-auto-state -1)
+;(c-toggle-hungry-state 1)
+
+(add-hook 'c-mode-common-hook
+  (lambda () 
+    ; keine automatischen newlines wenn man ; drueckt
+    (c-toggle-auto-newline-state -1)
+    ; hungry delete loescht alle leerzeichen auf einmal
+    (c-toggle-hungry-state 1)
+    (c-set-style "gnu")))
 
