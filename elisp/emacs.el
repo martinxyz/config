@@ -245,7 +245,10 @@
 ; keine internen buffer *scratch* *help* etc. (regex aus doku)
 (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
 (define-key viper-vi-local-user-map "q" 'swbuff-switch-to-next-buffer)
+;(define-key viper-vi-local-user-map "f" 'swbuff-switch-to-next-buffer)
 (define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
+;(define-key viper-vi-local-user-map "F" 'swbuff-switch-to-previous-buffer)
+;(define-key viper-vi-local-user-map "s" 'swbuff-switch-to-previous-buffer)
 
 ;; insert a new comment with space
 (defun martin-insert-comment ()
@@ -256,12 +259,20 @@
 ;(define
 
 ; for outline-mode
-(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
-(define-key viper-vi-local-user-map "-" 'hs-hide-all)
-(define-key viper-vi-local-user-map "+" 'hs-show-all)
+;(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
+;(define-key viper-vi-local-user-map "-" 'hs-hide-all)
+;(define-key viper-vi-local-user-map "+" 'hs-show-all)
 
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 (define-key viper-vi-local-user-map "," 'tags-search)
+
+;(define-key viper-vi-local-user-map "W" 'kill-region)
+(define-key viper-vi-local-user-map "W" 'copy-region-as-kill)
+(define-key viper-vi-local-user-map " " 'set-mark-command)
+;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
+(define-key viper-vi-local-user-map "M" 'delete-other-windows)
+(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
+(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
@@ -338,5 +349,14 @@
 ;; sonst /method:user@remotehost:filename
 ; ACHTUNG: macht scheinbar wegen history immer ssh-verbindungen
 ; nur schon beim emacs-start auf...
-;(require 'tramp)
+; ... passiert auch ohne (require 'tramp), also nur rein damit.
+(require 'tramp)
 
+;; ; not a mode, but I search for tramp-mode anyway when I want it
+;; (defun tramp-mode ()
+;;        "Load tramp mode, display helptext."
+;;        (interactive)
+;;        (require 'tramp)
+;;        (message "now open /remotehost:filename"))
+
+(put 'upcase-region 'disabled nil)

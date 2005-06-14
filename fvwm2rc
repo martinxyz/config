@@ -120,9 +120,10 @@ AddToMenu MartinMenu "Martin" Title
 + "&Emacs" Exec exec emacs
 + "Gnome&Cal" Exec exec gnomecal
 + "&Galeon" Exec exec galeon
++ "&Rss (blam)" Exec exec blam
 + "&Konqueror" Exec exec konqueror
 + "G&imp" Exec exec /home/martin/bin/gimp
-+ "&Xchat" Exec exec xchat
++ "&Xchat" Exec exec /home/martin/bin/xchat
 + "&Abiword" Exec exec abiword
 + "&OpenOffice" Exec exec openoffice
 

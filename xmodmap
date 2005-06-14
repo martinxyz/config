@@ -141,6 +141,10 @@ clear mod2
 ! ö = slash
 keycode  47 = slash odiaeresis dead_acute dead_doubleacute
 
+! "no dead keys" fuer die Tasten ^ ` ~
+!keycode  21 = dead_circumflex dead_grave dead_tilde dead_ogonek
+keycode  21 = asciicircum grave asciitilde ogonek
+
 ! PC keyboard
 keycode 22 = BackSpace
 keycode 107 = Delete
