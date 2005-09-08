@@ -125,6 +125,7 @@ AddToMenu MartinMenu "Martin" Title
 + "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec /home/martin/bin/xchat
 + "&Abiword" Exec exec abiword
+#+ "&OpenOffice" Exec exec oowriter
 + "&OpenOffice" Exec exec openoffice
 
 DestroyMenu Window-Ops
@@ -156,6 +157,7 @@ AddToFunc CurrentDeskFocusFunc
 
 DestroyFunc MarkWindowAsActiveFunc
 AddToFunc MarkWindowAsActiveFunc
++ I Echo Focus Changed
 + I Current (!Iconified) All (CurrentPage, !Focused) State 2 False
 + I Current (!Iconified) State 2 True
 
@@ -318,7 +320,105 @@ MenuStyle WindowList SelectOnRelease Meta_L
 #Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
 #Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
 
+#Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
+
+# bury current
+Key t A 2 Lower
+
 # title bar close button
 Mouse 0 2       A   Close
 
+
+# focus on click in window
+#DestroyFunc FocusAndClick
+#AddToFunc FocusAndClick
+#+ I Focus
+#+ I FakeClick press
+## Mouse [(window)] Button Context Modifiers Function
+#Mouse 1 W       N   FocusAndClick
+
+
+### gtk-menu-beep: notes about the problem ####
+
+# beep-demo
+
+#AddToFunc MarkWindowAsActiveFunc
+#+ I echo XXXX
+#*FvwmEvent: focus_change Current (!Iconified) State 2 True #MarkWindowAsActiveFunc
+*FvwmEvent: focus_change Echo XXXX
+Module FvwmEvent
+
+
+# Feststellungen:
+# - Titelbar wird hell während das Menu gedrückt ist
+# - Titelbar wird wieder dunkel wenn Menu weg ist
+# - Beim Konqueror-Menu passiert das nicht und alles ist OK
+
+# - Der Pipser kommt mit Verzoegerung von 1s
+# ???
+#
+
+# execute_function* ==> execute_complex_function ==> beep
+
+# SET_FOCUS_CHANGE_BROADCAST_PENDING(fw, 0);
+# events.c 2320
+
+# Ein aktives menu hat vermutlich einen mouse-grab.
+# Denn es ist nicht möglich bei offenem Menu den Desktop zu wechseln,
+# oder etwas anderes zu fokusieren. Es verschwindet bei einem Klick,
+# egal wohin er geht.
+#
+# Konqueror hat auch einen mouse-grab, aber er lässt den Klick der ihn
+# beendet zur Anwendung durch der er gehoert.
+
+# - Warum funktionniert es wenn das Fenster schon fokusiert ist?
+#   - weil gar kein Fokuswechsel besteht so?
+
+# 
+
+
+# - Ich kriege ZWEI events wenn ich vor dem Pipser schliesse
+# - und EINEN event wenn es gepipst hat.
+# ==> piser steht für "event dropped, too late now"?
+
+# - Der Pipser kommt BEVOR meine Funktion ausgefuehrt wird
+#   - er kommt WEIL die Funktion nicht ausgefuehrt werden kann
+#   - (functions.c:996)
+#     /* we have to grab buttons before executing immediate actions because
+#      * these actions can move the window away from the pointer so that a
+#      * button release would go to the application below. */
+
+# - Meine Funktion wird aber nur einmal am Schluss ausgefuehrt
+#   - Der Pipser zeigt an dass er verzichten musste
+
+# - Der Pipser kommt nicht wenn das Menu rechtzeitig zugeht
+#   - Weil dann die Funktion ausgefuehrt werden kann.
+#   ==> der "mouse grab" muss dadurch verschwunden sein.
+
+# - Der Pipser kommt nicht ohne meine Funktion
+#   - weil der "mouse grab" nicht gemacht wird da keine Funktion
+#     aufgerufen wird
+
+
+ 
+# <theBlackDragon> maxy: you should ask taviso , I think he had lots of
+# issues with mousegrab stuff and beeping
+
+# <taviso> maxy: uhh, that is the most annoying thing ever..i will be
+# very happy when they hack that Xbell() out
+# I already asked for it to be removed, but apparently they decided not to :)
+
+# <maxy> taviso: you happen to know how/where a focus event might get
+# delayed by one second?
+# Reproduce: Open GTK application, move focus away (by opening dialog
+# that pops up elsewhere), open menu (and keep open) ==> beep
+
+#Sep 08 22:02:13 <taviso>	maxy: ahh, it's this annoying grab-fail thing...when functions with + I components cant grab the server
+#Sep 08 22:02:34 <taviso>	maxy: it's a bug, but apparently obscure anough that theres no rush to fix it :(
+#Sep 08 22:03:59 <maxy>	yes, execute_complex_function fails to grab the mouse and abborts :-\
+#Sep 08 22:04:01 <taviso>	maxy: you just have to avoid functoins with +I on events that might be triggered during a grab
+#Sep 08 22:04:02 <maxy>	any workarounds?
+#Sep 08 22:04:44 <maxy>	+I ... what's the matter with this? *look up in manual*
+#Sep 08 22:05:00 <taviso>	not that i know of, but i'd like to see it fixed as well, maybe i'll try to take a look...or thomas_adam is the resident xlib expert, maybe he will :)
+#Sep 08 22:13:49 <maxy>	I see... thanks.
 

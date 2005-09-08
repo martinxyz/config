@@ -273,10 +273,26 @@
 (define-key viper-vi-local-user-map "M" 'delete-other-windows)
 (define-key viper-vi-local-user-map "D" 'kill-this-buffer)
 (define-key viper-vi-local-user-map "K" 'kill-this-buffer)
+;(define-key viper-vi-local-user-map "P" 'yank-pop)
+;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
 (require 'pager)
+
+(defun pager-some-rows-down ()
+  (interactive)
+  (pager-row-down)
+  (pager-row-down)
+  (pager-row-down)
+  )
+(defun pager-some-rows-up ()
+  (interactive)
+  (pager-row-up)
+  (pager-row-up)
+  (pager-row-up)
+  )
+
 (define-key viper-vi-basic-map "\C-u" 'pager-page-up)
 (define-key viper-vi-basic-map "\C-d" 'pager-page-down)
 
@@ -284,9 +300,9 @@
 (global-set-key [prior]	   'pager-page-up)
 
 ; scroll text (cursor fixed)
-(global-set-key "\M-k"  'pager-row-up)
-(global-set-key "\M-j"  'pager-row-down)
-(define-key c-mode-base-map "\M-j"  'pager-row-down)
+(global-set-key "\M-k"  'pager-some-rows-up)
+(global-set-key "\M-j"  'pager-some-rows-down)
+(define-key c-mode-base-map "\M-j"  'pager-some-rows-down)
 
 ; speichert liste von zuletzt geoeffneten dateien beim Beenden
 (require 'recentf)
@@ -360,3 +376,6 @@
 ;;        (message "now open /remotehost:filename"))
 
 (put 'upcase-region 'disabled nil)
+
+;; TODO: try to configure "semantic" / "cedet" to work fast enough here
+;;   it reparses the buffer automatically on changes, cool! but too slow.
