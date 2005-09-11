@@ -1,0 +1,42 @@
+# by Martin Renold
+# Modifications for working without distraction.
+Read /home/martin/config/fvwm2rc
+
+# ignore no modifiers
+IgnoreModifiers
+
+DesktopSize 4 3
+
+DestroyFunc InitFunction_autostart
+AddToFunc InitFunction_autostart
++ I GotoPage 1 1
++ I Style "Emacs*" SkipMapping,StartsOnPage 1 1
++ I Exec aterm +sb -e /home/martin/bin/startupreport --minimal
++ I Exec Esetroot -scale ~/grafik/background/work
++ I Exec /home/martin/bin/startgaleon
++ I Exec emacs -geometry 114x49
+
+# see /usr/X11R6/lib/X11/rgb.txt
+
+#*FvwmPagerBack DarkGreen
+#*FvwmPagerHilight green3
+
+*FvwmPagerBack gray45
+*FvwmPagerHilight gray50
+*FvwmPagerFore black # the grid
+*FvwmPagerWindowColors black gray60 black AntiqueWhite3
+
+Style * ForeColor black, BackColor gray60
+Style * HilightFore black, HilightBack AntiqueWhite3
+
+DestroyMenu MartinMenu recreate
+AddToMenu MartinMenu "Martin" Title
++ "&Window List" WindowList
++ "&Emacs" Exec exec emacs
++ "Gnome&Cal" Exec exec gnomecal
++ "&Galeon" Exec exec galeon
++ "&Konqueror" Exec exec konqueror
++ "G&imp" Exec exec /home/martin/bin/gimp
++ "&Abiword" Exec exec abiword
++ "&OpenOffice" Exec exec openoffice
+
