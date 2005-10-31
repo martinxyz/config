@@ -1,0 +1,447 @@
+# 37 "system.fvwm2rc.cpp"
+ImagePath /usr/pack/fvwm-2.4.3-to/icons
+
+AddToDecor flatness
+               + BorderStyle -- HiddenHandles NoInset
+               + ButtonStyle 1 (Pixmap menu-u.xpm -- Flat Top)
+               + ButtonStyle 1 - MWMDecorMenu
+
+               + ButtonStyle 2 (Pixmap full-u.xpm -- Flat Top)
+               + ButtonStyle 2 - MWMDecorMax
+
+               + ButtonStyle 3 (Pixmap nail-u.xpm -- Flat Top)
+
+               + ButtonStyle 4 (Pixmap icon-u.xpm -- Flat Top)
+               + ButtonStyle 4 - MWMDecorMin
+
+               + ButtonStyle 5 (Pixmap vert-u.xpm -- Flat Top)
+               + ButtonStyle 5 - MWMDecorMax
+
+               + ButtonStyle 6 (Pixmap cross-u.xpm -- Flat Top)
+
+               + ButtonStyle 7 (Pixmap hori-u.xpm -- Flat Top)
+               + ButtonStyle 7 - MWMDecorMax
+
+               + AddButtonStyle All ActiveDown (Pixmap glob-d.xpm -- Flat Top)
+
+
+
+
+               + TitleStyle LeftJustified
+               + TitleStyle Height 14
+               + TitleStyle -- flat
+               + BorderStyle -- HiddenHandles NoInset
+# 78 "system.fvwm2rc.cpp"
+IconFont -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1
+
+
+
+
+
+ClickTime 230
+
+
+
+ColormapFocus FollowsFocus
+
+
+
+OpaqueMoveSize 100
+
+
+
+
+
+XORValue 255
+# 107 "system.fvwm2rc.cpp"
+MenuStyle * PopupImmediately, TrianglesSolid
+MenuStyle * HilightBack, TitleWarp, PopupOffset -3 100
+MenuStyle * Hilight3DOff, TitleUnderlines2, SeparatorsShort
+MenuStyle * Animation, Foreground White, Background Grey50
+MenuStyle * Font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1, Greyed Grey70
+
+
+
+
+DeskTopSize 1x1
+
+
+EdgeScroll 100 100
+
+
+
+
+
+
+EdgeResistance 250 10
+# 142 "system.fvwm2rc.cpp"
+Style "*" UseDecor flatness
+
+
+
+Style "*" BorderWidth 4, HandleWidth 4
+# 159 "system.fvwm2rc.cpp"
+Style "*" Color White/CadetBlue4
+Style "*" HilightFore Black
+Style "*" HilightBack CadetBlue3
+Style "*" Font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1
+Style "*" MinOverlapPlacement
+# 177 "system.fvwm2rc.cpp"
+Style "*" FvwmButtons, FvwmBorder, MWMFunctions, HintOverride
+# 195 "system.fvwm2rc.cpp"
+Style "*" SmartPlacement, RandomPlacement
+
+
+
+
+Style "*" DecorateTransient
+
+
+
+
+Style "*" SkipMapping
+# 219 "system.fvwm2rc.cpp"
+Style "*" Title, Handles, WindowListHit, CirculateHit
+Style "*" StaysPut, Slippery, StartNormal
+Style "*" StartsAnyWhere, IconTitle
+# 230 "system.fvwm2rc.cpp"
+Style "Fvwm*" WindowListSkip, CirculateSkip
+Style "*" NoIcon
+
+Style "knotes" Sticky,NoIcon,NoTitle,NoHandles,BorderWidth 1
+Style "xmms" Sticky,NoIcon,NoTitle,NoHandles,BorderWidth 1
+Style "tuXeyes" Sticky,NoIcon,NoTitle,NoHandles,BorderWidth 0
+Style "FvwmButtons" Sticky,NoTitle, NoHandles, BorderWidth 0,WindowListHit,IconBox 1 1 100 100
+
+Style "FvwmButtons" Icon HAL-Eye.xpm
+Style "FvwmIdent" NoTitle, BorderWidth 5
+Style "xconsole" Sticky
+# 250 "system.fvwm2rc.cpp"
+Key F1 A M Popup Root-Menu
+Key F2 A M Raise
+Key F3 A M Lower
+Key F4 A M Delete
+
+Key F5 A M Iconify
+Key F6 A M Stick
+Key F7 A M Move
+Key F8 A M Resize
+Key F9 A M Maximize
+
+Key F12 A M Refresh
+
+Key F15 A N RaiseLower
+
+Key F17 A N Iconify
+
+
+
+
+
+Key space A M Menu Window-Ops
+
+Key Escape A C Menu Root-Menu
+
+Key Escape A M WindowList
+# 290 "system.fvwm2rc.cpp"
+Mouse 1 R A Popup Root-Menu
+Mouse 2 R A Popup Window-Ops
+Mouse 3 R A WindowList Alphabetic
+# 308 "system.fvwm2rc.cpp"
+Mouse 1 1 A Menu Window-Ops-Small
+Mouse 2 1 A Menu Window-Ops-Small
+Mouse 3 1 A Module FvwmIdent
+Mouse 1 5 A Maximize 0 90
+Mouse 2 5 A Maximize 0 90
+Mouse 3 5 A Maximize 0 100
+Mouse 1 7 A Maximize 90 0
+Mouse 2 7 A Maximize 93 0
+Mouse 3 7 A Maximize 100 0
+Mouse 1 3 A Stick
+Mouse 2 3 A Stick
+Mouse 3 3 A Stick
+Mouse 1 6 A Delete
+Mouse 2 6 A Delete
+Mouse 3 6 A Delete
+Mouse 1 4 A Iconify 1
+Mouse 2 4 A Iconify 1
+Mouse 3 4 A Iconify 1
+Mouse 1 2 A Maximize 90 90
+Mouse 2 2 A Maximize 93 100
+Mouse 3 2 A Maximize 100 100
+
+
+
+
+
+Mouse 1 T A Function Mouse-1-T-A
+AddToFunc Mouse-1-T-A
++ I Raise
++ D RaiseLower
++ M Move
+Mouse 2 T A Mouse-2-T-A
+AddToFunc Mouse-2-T-A
++ I WindowShade
++ D RaiseLower
++ M Move
+Mouse 3 T A Mouse-3-T-A
+AddToFunc Mouse-3-T-A
++ I Lower
++ D RaiseLower
++ M Move
+
+
+
+
+
+Mouse 1 SF A Function Mouse-1-SF-A
+AddToFunc Mouse-1-SF-A
++ I Raise
++ D Lower
++ M Resize
+Mouse 2 SF A Function Mouse-2-SF-A
+AddToFunc Mouse-2-SF-A
++ I Raise
++ D Lower
++ M Move
+Mouse 3 SF A Menu Window-Ops-Small
+
+
+
+
+
+
+Mouse 1 I A Function Mouse-1-I-A
+AddToFunc Mouse-1-I-A
++ C Iconify -1
++ M Move
+Mouse 2 I A Iconify -1
+Mouse 3 I A Menu Window-Ops
+
+
+
+
+
+
+
+AddToMenu Root-Menu "Root Menu" Title
++ "xlock (Lockscreen)" Exec exec xlock -nice 19 -mode random
++ "xterm (Shell)" Exec exec xterm
++ "communictor (WWW)" Exec FVB_WWW=${FVB_WWW:-${WEBBROWSER:-'communicator -install'}}; exec ${FVB_WWW}
++ "calctool (Rechner)" Exec exec calctool
++ "" Nop
++ "Screen Shot" Popup Screen
++ "" Nop
++ "Editors" Popup Editors
++ "Graphics" Popup Graphics
++ "Mathematics" Popup MathMenu
++ "Fun" Popup Fun
++ "" Nop
++ "Window Ops" Popup Window-Ops
++ "" Nop
++ "Control Animation" Popup MenuFvwmAnimate
++ "" Nop
++ "Exit Fvwm" Popup Exit-Fvwm
+
+AddToMenu Editors "Editors" Title
++ "emacs" Exec exec emacs
++ "nedit (Nice Menus)" Exec exec nedit
++ "joe" Exec exec xterm -e joe
++ "jmacs (Emacs)" Exec exec xterm -e jmacs
++ "jpico (Pico)" Exec exec xterm -e jpico
++ "jstar (WordStar)" Exec exec xterm -e jstar
+
+AddToMenu Screen "Screen Shots" Title
++ "to Printer" Exec exec import -page 515x762+40+40 -rotate 90\> -descend PS:- |lp -dvpp
++ "to ~/screen.ps" Exec exec import -page 515x762+40+40 -rotate 90\> -descend PS:screen.ps
++ "to ~/screen.eps" Exec exec import -page 515x762+40+40 -rotate 90\> -descend EPS:screen.eps
++ "to ~/screen.gif" Exec exec import -descend -compress lzw screen.gif
+
+
+AddToMenu Graphics "Graphics" Title
++ "The Gimp (Painting)" Exec exec gimp
++ "xfig (Drawing)" Exec exec xfig
++ "tgif (Drawing)" Exec exec tgif
++ "gv (Postscript Viewer)" Exec exec gv
+
+AddToMenu MathMenu "Math" Title
++ "mathematica" Exec exec mathematica
++ "xmaple" Exec exec xmaple
++ "matlab" Exec exec xterm -T matlab -e matlab
+
+AddToMenu Fun "Fun" Title
++ "xcrafty (Chess)" Exec exec xcrafty
++ "Curses" Exec exec xinfocom curses.z5
++ "Jigsaw" Exec exec xinfocom Jigsaw.z8
++ "Christminister" Exec exec xinfocom christminster.z5
+
+AddToMenu Exit-Fvwm "Exit FVWM" Title
++ "Restart fvwm2" Restart
++ "" Nop
++ "Normal Exit" Exec exec kill -TERM -1
++ "Quit Fvwm" Quit
++ "********************" Nop
+
+AddToMenu Window-Ops "Window Ops" Title
++ "Refresh screen" Refresh
++ "Recapture screen" Recapture
++ "" Nop
++ "Move" Move
++ "Resize" Resize
++ "Raise" Raise
++ "Lower" Lower
++ "(Un)Maximize" Maximize
++ "(De)Iconify" Iconify
++ "(Un)Stick" Stick
++ "" Nop
++ "Identify" Module FvwmIdent
++ "Scroll Bar" Module FvwmScroll 2 2
++ "" Nop
++ "Delete" Delete
++ "Close" Close
++ "Destroy" Destroy
+
+AddToMenu Window-Ops-Small "Window Ops" Title
++ "M-F2 Raise" Raise
++ "M-F3 Lower" Lower
++ "M-F5 Iconfiy" Iconify
++ "M-F6 (Un)Stick" WindowShade
++ "M-F7 Move" Move
++ "M-F8 Resize" Resize
++ "M-F9 Maximize" Maximize 0 90
++ "" Nop
++ "Identify" Module FvwmIdent
++ "" Nop
++ "M-F4 Close" Delete
++ "Destroy" Destroy
+
+
+
+
+
+AddToFunc Init-And-Restart-Function
+#+ I Module FvwmButtons
+#+ I Module FvwmAnimate
++ I Exec if [ -f $HOME/.background ] ; then sleep 5; xli -colors 32 -onroot $HOME/.background; else if [ -f $HOME/.backfull ] ; then sleep 5; xli -colors 32 -onroot -fullscreen $HOME/.backfull; else xsetroot -solid Grey30; fi; fi
+
+
+
+
+
+
+AddToFunc InitFunction
++ I Exec exec xterm -C -name xconsole -T xconsole -fn 6x13 -fg black -bg grey -geometry 93x8+0+0 -e /usr/bin/tcsh -f
+
++ I Wait xconsole
++ I Exec sleep 10; xautolock -time 5 -corners ++-- -locker "${FVB_LOCK:-xlock -nice 19 -mode random}"
++ I Function Init-And-Restart-Function
+#+ I Exec exec xterm -geometry 80x25+0+128
++ I Exec if [ -f $HOME/.fvwmstart.sh ] ; then . $HOME/.fvwmstart.sh; fi
+
+AddToFunc RestartFunction
++ I KillModule Fvwm*
++ I Function Init-And-Restart-Function
+
+AddToFunc ExitFunction
++ I KillModule Fvwm*
+
+
+
+
+
+
+
+*FvwmButtonsBack Grey50
+*FvwmButtonsFore White
+#*FvwmButtonsGeometry -2+0
+*FvwmButtonsGeometry -0+0
+*FvwmButtonsColumns 2
+*FvwmButtonsBoxSize fixed
+
+*FvwmButtons(2x4, Size 56 56, Padding 14 10,Frame 2 , Swallow(UseOld) "asclock" `Exec exec asclock -shape`)
+
+
+
+
+*FvwmButtons(2x2, Back Grey50, Padding 4 2, Swallow(UseOld) "xcpustate" `Exec exec xcpustate -disk -shorten 0 -fn -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1 -bg Grey50 -fg White -colors White,CadetBlue4,CadetBlue3`)
+
+
+
+*FvwmButtons(2x4, Size 78 78, Frame 2 , Padding 4 4, Swallow(UseOld) "coolmail" `Exec ml=${MAILER-pine}; case "$ml" in *elm|*pine|*mail|*mutt) ml="xterm -T $ml -e $ml" ;; esac ; if [ -f $HOME/.mailsound ] ; then exec coolmail -af $HOME/.mailsound -e "${FVB_MAIL:-$ml}" ; else exec coolmail -e "${FVB_MAIL:-$ml}"; fi `)
+# 537 "system.fvwm2rc.cpp"
+*FvwmButtons(2x6, Size 78 117, Frame 0, Padding 0 0, Container(Columns 2))
+
+
+
+*FvwmButtons(Size 39 39,Padding 0 0, Frame 2, Icon tis-netscape.xpm, Action `Exec FVB_WWW=${FVB_WWW:-${WEBBROWSER:-'communicator -install'}}; exec ${FVB_WWW} `)
+
+*FvwmButtons(Size 39 39,Padding 0 0,Frame 2, Icon tis-lock.xpm, Action `Exec FVB_LOCK=${FVB_LOCK:-'xlock -nice 19 -mode random'}; exec ${FVB_LOCK} `)
+
+*FvwmButtons(Size 39 39,Padding 0 0,Frame 2, Icon tis-news.xpm, Action `Exec FVB_NEWS=${FVB_NEWS:-"xterm -T News -e ${NEWSREADER:-slrn}"}; exec ${FVB_NEWS} `)
+
+*FvwmButtons(Size 39 39,Padding 0 0,Frame 2, Icon tis-filemgr.xpm, Action `Exec FVB_FILEMGR=${FVB_FILEMGR:-'xterm -T MC -e mc -c'}; exec ${FVB_FILEMGR}`)
+
+
+*FvwmButtons(Size 39 39,Padding 0 0,Frame 2, Icon tis-xterm.xpm, Action `Exec exec ${FVB_TERM:-xterm} `)
+
+*FvwmButtons(Size 39 39,Padding 0 0,Frame 2, Icon tis-editor.xpm, Action `Exec ed=${EDITOR:-emacs}; ed=${VISUAL-$ed}; case "$ed" in *vi|*pico|*jmacs|*joe|*jstar) ed="xterm -T $ed -e $ed" ;; esac ; exec ${FVB_EDIT:-$ed} `)
+
+
+
+
+*FvwmButtons(End)
+
+*FvwmButtons(2x12, Padding 1 1, Frame 2, Container)
+*FvwmButtons(1x1, Frame -1, Padding 0 0, Swallow FvwmPager `Module FvwmPager 0 1`)
+
+*FvwmButtons(End)
+
+
+
+
+
+
+
+*FvwmButtons(2x13, Padding 1 1, Frame 2, Container)
+
+
+*FvwmButtons(1x1,Frame -1, Padding 0 0, Swallow(NoHints) FvwmIconBox FvwmIconBox)
+
+*FvwmButtons(End)
+
+
+*FvwmIdentFore White
+*FvwmIdentBack Grey50
+
+
+*FvwmPagerBack Grey50
+*FvwmPagerFore White
+*FvwmPagerHilight Grey30
+*FvwmPagerFont -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1
+*FvwmPagerSmallFont -schumacher-clean-medium-r-normal--6-60-75-75-c-40-iso8859-1
+*FvwmPagerBalloons
+*FvwmPagerBalloonFore Grey30
+*FvwmPagerBalloonBack CadetBlue1
+*FvwmPagerBalloonFont -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1
+*FvwmPagerColumns 1
+*FvwmPagerRows 3
+
+*FvwmIconBoxPlacement left top
+*FvwmIconBoxHilightFocusWin
+*FvwmIconBoxBack Grey50
+*FvwmIconBoxIconBack CadetBlue4
+*FvwmIconBoxIconFore White
+*FvwmIconBoxIconHiBack CadetBlue3
+*FvwmIconBoxIconHiFore Black
+*FvwmIconBoxHideSC horizontal
+*FvwmIconBoxSortIcons IconName
+*FvwmIconBoxMaxIconSize 63x0
+*FvwmIconBoxSetWMIconSize 32x32
+*FvwmIconBoxLines 1
+*FvwmIconBoxPadding 0
+*FvwmIconBoxSBWidth 6
+*FvwmIconBox "Fvwm*" -
+*FvwmIconBoxFont -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1
+*FvwmIconBoxMouse 1 Click Iconify -1, MoveToDesk, Raise
+*FvwmIconBoxMouse 1 DoubleClick Iconify 1
+*FvwmIconBoxFrameWidth 0 0
