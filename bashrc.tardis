@@ -1,0 +1,60 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+if (uname -a | grep -i linux > /dev/null) ; then
+    export arch=i686-debian-linux3.0
+else
+    export arch=sun4u-sun-solaris2.8
+fi
+
+if [ "$PS1" ]; then
+    if ! (uname -a | grep -i linux > /dev/null) ; then
+      #echo "Setting GNU aliases."
+      # Farbiges GNU ls, standardmaessig nach Zeit sortiert.
+      alias ls='gls --color=auto -r -t '
+      # GNU-Version erfuellt normalerweise die entsprechende Aufgabe besser.
+      for i in du sleep find date cat cp ln awk echo egrep \
+      make true false grep calc tr tac test tar sort pwd \
+      patch paste mv man id ftp env df cut ctags \
+      ar file diff echo; do
+        # GNU-Version benutzen
+        alias $i="g$i"
+      done
+    else
+      alias ls='ls --color=auto -r -t '
+    fi
+    # simpler prompt
+    PS1='\u@\h:\w\$ '
+    shopt -s checkwinsize
+fi
+
+export MAILCHECK=60
+
+export SHELL=bash
+export EDITOR=vim
+export VISUAL=vim
+export CVS_EDITOR=vim
+export CVS_RSH=ssh
+export RSYNC_RSH=ssh
+
+export PATH=/home/mrenold/apps/games:/home/mrenold/bin:/home/mrenold/scripts:/home/mrenold/installed/bin:$PATH
+# for etags
+export PATH=$PATH:/usr/pack/emacs-21.3-to/$arch/bin
+export LD_LIBRARY_PATH=/home/mrenold/installed/lib
+export LIBRARY_PATH=/home/mrenold/installed/lib
+export CPATH=/home/mrenold/installed/include
+export C_INCLUDE_PATH=$CPATH
+export CPLUS_INCLUDE_PATH=$CPATH
+export OBJC_INCLUDE_PATH=$CPATH
+
+export CFLAGS="-I/home/mrenold/installed/include/SDL"
+export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:/home/mrenold/apps/lib/python2.3/site-packages/:/home/mrenold/apps/lib/python2.3/site-packages/PIL"
+
+# allow core dumps
+ulimit -c unlimited
+
+# purify licence
+export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map
+
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/pack/gtk-2.4.13-mo/$arch/lib/pkgconfig
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/pack/gtk-2.4.13-mo/$arch/lib
+
