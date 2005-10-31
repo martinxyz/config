@@ -1,0 +1,124 @@
+#Read "/usr/pack/fvwm-2.4.7-hps/template/system.fvwm2rc"
+Read "/home/mrenold/.fvwm2rcMySystem"
+
+# by Martin Renold
+DeskTopSize 3x3
+*FvwmPagerRows 1
+Style "FvwmPager" NoTitle, StaysOnTop, Sticky
+*FvwmPagerGeometry -0-0
+Module FvwmPager
+
+Style "*" MinOverlapPercentPlacement
+#Style * TileCascadePlacement
+Style "*" SloppyFocus
+Style "*" GrabFocus
+Style "*" GrabFocusTransient
+#Style "xterm" NoTitle
+#Style "Eterm" NoTitle, NoBorder
+#Style "Emacs" NoTitle, NoBorder
+# When a Etern has the focus, do not grab it for a newly created window.
+#Style "Eterm" OverrideGrabFocus
+
+
+AddToMenu MartinMenu "Martin" Title
++ "&Background" Popup MBGM
++ "&FvwmConsole" Module FvwmConsole
++ "&Emacs" Exec exec emacs
++ "Gnome&Cal" Exec exec gnomecal
++ "&ZKB Onlinebank" Exec exec zkb
++ "&SMB Client (tksmb)" Exec exec tksmb
++ "&Galeon" Exec exec galeon
++ "&Konqueror" Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
++ "&Netscape" Exec exec netscape
++ "&Descent II" Exec exec descent2
++ "G&imp" Exec exec gimp
++ "&Xchat" Exec exec xchat
+
+# Keybindings
+# Modifiers:
+# N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
+#Key Menu A N Popup MartinMenu
+#Key Menu A 4 Popup /Debian
+#Key print A N Exec cd /home/martin/screenshots; scrot
+Key e A 4 Exec exec xterm +sb -fg white -bg black -fn -misc-fixed-*-*-*-*-*-200-*-*-*-*-*-*
+Key b A 4 Exec exec xterm +sb -fg white -bg black -fn -misc-fixed-*-*-*-*-*-200-*-*-*-*-*-*
+# bound to maximize: Key m W 4 Move
+Key q W 4 Close
+Key k W 4 Destroy
+AddToFunc Move-or-Raise I Raise
++ M Move
++ D Lower
+Mouse 1 W 4 Move-or-Raise
+Mouse 2 W 4 Lower
+Mouse 3 W 4 Resize
+Key p A 4 Module FvwmPager *
+Key space A 4 KillModule FvwmPager
+Key x A 4 CursorStyle DEFAULT None
+Key c A 4 CursorStyle DEFAULT
+# TODO: remove title bar and maximize, minimize and add title bar
+Key m A 4 Maximize toggle 100 100
+# jumping around
+Key Left A M Nop
+Key Left A 4 GotoPage -1p +0p
+Key h A 4 GotoPage -1p +0p
+Key Right A M Nop
+Key Right A 4 GotoPage +1p +0p
+Key l A 4 GotoPage +1p +0p
+Key Up A M Nop
+Key Up A 4 GotoPage +0p -1p
+Key k A 4 GotoPage +0p -1p
+Key Down A M Nop
+Key Down A 4 GotoPage +0p +1p
+Key j A 4 GotoPage +0p +1p
+# windows
+Key Tab A 4 WindowList
+# remove unused keybindings
+Key F1 A M Nop
+Key F2 A M Nop
+Key F3 A M Nop
+Key F4 A M Nop
+Key F5 A M Nop
+Key F6 A M Nop
+Key F7 A M Nop
+Key F8 A M Nop
+Key F9 A M Nop
+Key F10 A M Nop
+Key F11 A M Nop
+Key F12 A M Nop
+
+AddToFunc Naked
++ I Style (NoTitle)
++ I Style (NoBorder)
+Key b A 4 Naked
+
+Key r A 4 Restart
+
+AddToFunc Eterm1
++ I Maximize true 100 80
+AddToFunc Eterm2
++ I Maximize true 100 80
++ I Move 0 -0
+AddToFunc Eterm3
++ I Maximize true 96 80
++ I Move 2 0
+AddToFunc Eterm4
++ I Maximize true 96 20
++ I Move 2 -2
+Key 1 A 4 Eterm1
+Key 2 A 4 Eterm2
+Key 3 A 4 Eterm3
+Key 4 A 4 Eterm4
+# TODO: lower/raise function with keyboard (Super-Space)
+# TODO: more keyboard resizing functions
+# TODO: black background when maximized (no border...: black maximized window)
+# TODO: mouseless operation --> no mouse pointer, no mouse focus.
+
+#Exec exec xmodmap /home/mrenold/.xmodmap
+
+Style Konqueror StartsOnPage 1 0
+Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
+# Doesn't work :-(
+Style emacs StartsOnPage 0 1
+Style Emacs StartsOnPage 0 1
+#Exec exec emacs
+
