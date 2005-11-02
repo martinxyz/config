@@ -1,0 +1,6 @@
+! Martin's tardis xmodmap
+! Ctrl ==> Esc
+! Caps ==> Ctrl
+
+keycode  66 = Escape
+
