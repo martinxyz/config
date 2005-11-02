@@ -7,6 +7,7 @@ else
 fi
 
 if [ "$PS1" ]; then
+    cd $HOME/sa
     if ! (uname -a | grep -i linux > /dev/null) ; then
       #echo "Setting GNU aliases."
       # Farbiges GNU ls, standardmaessig nach Zeit sortiert.
@@ -36,18 +37,18 @@ export CVS_EDITOR=vim
 export CVS_RSH=ssh
 export RSYNC_RSH=ssh
 
-export PATH=/home/mrenold/apps/games:/home/mrenold/bin:/home/mrenold/scripts:/home/mrenold/installed/bin:$PATH
+export PATH=$HOME/apps/games:$HOME/bin:$HOME/scripts:$HOME/installed/bin:$PATH
 # for etags
 export PATH=$PATH:/usr/pack/emacs-21.3-to/$arch/bin
-export LD_LIBRARY_PATH=/home/mrenold/installed/lib
-export LIBRARY_PATH=/home/mrenold/installed/lib
-export CPATH=/home/mrenold/installed/include
+export LD_LIBRARY_PATH=$HOME/installed/lib
+export LIBRARY_PATH=$HOME/installed/lib
+export CPATH=$HOME/installed/include
 export C_INCLUDE_PATH=$CPATH
 export CPLUS_INCLUDE_PATH=$CPATH
 export OBJC_INCLUDE_PATH=$CPATH
 
-export CFLAGS="-I/home/mrenold/installed/include/SDL"
-export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:/home/mrenold/apps/lib/python2.3/site-packages/:/home/mrenold/apps/lib/python2.3/site-packages/PIL"
+export CFLAGS="-I$HOME/installed/include/SDL"
+export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:$HOME/apps/lib/python2.3/site-packages/:$HOME/apps/lib/python2.3/site-packages/PIL"
 
 # allow core dumps
 ulimit -c unlimited

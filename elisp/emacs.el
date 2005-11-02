@@ -366,7 +366,7 @@
 ; ACHTUNG: macht scheinbar wegen history immer ssh-verbindungen
 ; nur schon beim emacs-start auf...
 ; ... passiert auch ohne (require 'tramp), also nur rein damit.
-(require 'tramp)
+;(require 'tramp)
 
 ;; ; not a mode, but I search for tramp-mode anyway when I want it
 ;; (defun tramp-mode ()

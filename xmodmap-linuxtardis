@@ -1,0 +1,10 @@
+! use Caps Lock as Escape
+clear lock
+keycode 66 = Escape
+
+! clear mod5
+! clear mod2
+
+! keycode 113 = Mode_switch Alt_R Meta_R
+keycode  64 = Alt_L Meta_L
+
