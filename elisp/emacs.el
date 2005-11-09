@@ -145,6 +145,9 @@
 (setq auto-mode-alist 
       (cons '(".*\\.mas$" . python-mode)
           auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*\\.java$" . java-mode)
+          auto-mode-alist))
 
 ;; Add my directories to load-path.
 (setq load-path (append
