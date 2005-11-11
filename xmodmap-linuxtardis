@@ -7,4 +7,8 @@ keycode 66 = Escape
 
 ! keycode 113 = Mode_switch Alt_R Meta_R
 keycode  64 = Alt_L Meta_L
+keycode 115 = Super_L
 
+
+!add Mod2 = Super_L
+!add Mod2 = Super_R

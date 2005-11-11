@@ -1,5 +1,6 @@
 #Read "/usr/pack/fvwm-2.4.7-hps/template/system.fvwm2rc"
-Read "/home/mrenold/.fvwm2rcMySystem"
+#Read /disks/isidor.lhome/isi/stud/renold/.fvwm2rcMySystem
+Read .fvwm2rcMySystem
 
 # by Martin Renold
 DeskTopSize 3x3
@@ -120,5 +121,5 @@ Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
 # Doesn't work :-(
 Style emacs StartsOnPage 0 1
 Style Emacs StartsOnPage 0 1
-#Exec exec emacs
+Exec exec emacs
 

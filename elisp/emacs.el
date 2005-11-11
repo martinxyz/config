@@ -218,6 +218,13 @@
   (lambda () 
     (viper-mode) ))
 
+; Tabs fuer eclipse java zeugs
+(add-hook 'java-mode-hook
+  (lambda () 
+    (setq indent-tabs-mode t)
+    (setq tab-width 4)))
+
+
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
 
