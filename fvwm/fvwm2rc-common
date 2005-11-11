@@ -65,6 +65,7 @@ Style * UseDecor default-decor, Color Black/DarkGrey
 *FvwmPagerFont none
 *FvwmPagerHilight SlateBlue4
 *FvwmPagerGeometry -0-0
+*FvwmPagerRows 1
 *FvwmPagerSmallFont -*-times-medium-r-*-*-*-80-*-*-*-*-*-*
 *FvwmPagerDeskTopScale 32
 

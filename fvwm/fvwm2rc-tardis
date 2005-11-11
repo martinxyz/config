@@ -1,9 +1,11 @@
 #Read "/usr/pack/fvwm-2.4.7-hps/template/system.fvwm2rc"
-#Read /disks/isidor.lhome/isi/stud/renold/.fvwm2rcMySystem
 Read fvwm2rc-tardis-system
 Read fvwm2rc-common
+Read fvwm2rc-work-colors
+Read fvwm2rc-tardis-colors
 
 DeskTopSize 3x3
+Module FvwmPager
 
 Style Konqueror StartsOnPage 1 0
 Exec exec konqueror http://people.ee.ethz.ch/~mrenold/

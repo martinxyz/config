@@ -1,0 +1,13 @@
+# see /usr/X11R6/lib/X11/rgb.txt
+
+#*FvwmPagerBack DarkGreen
+#*FvwmPagerHilight green3
+
+*FvwmPagerBack gray45
+*FvwmPagerHilight gray50
+*FvwmPagerFore black # the grid
+*FvwmPagerWindowColors black gray60 black AntiqueWhite3
+
+Style * ForeColor black, BackColor gray60
+Style * HilightFore black, HilightBack AntiqueWhite3
+

@@ -1,0 +1,21 @@
+# copied from fvwm2rc-tardis-system
+
+#*FvwmIdentFore White
+#*FvwmIdentBack Grey50
+
+#*FvwmPagerBack Grey50
+#*FvwmPagerFore White
+#*FvwmPagerHilight Grey30
+*FvwmPagerFont -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1
+*FvwmPagerSmallFont -schumacher-clean-medium-r-normal--6-60-75-75-c-40-iso8859-1
+#*FvwmPagerBalloons
+#*FvwmPagerBalloonFore Grey30
+#*FvwmPagerBalloonBack CadetBlue1
+#*FvwmPagerBalloonFont -schumacher-clean-medium-r-normal--8-80-75-75-c-50-iso8859-1
+
+Style * ForeColor black, BackColor gray60
+Style * HilightFore white, HilightBack steelblue
+
+#Style "*" HilightFore white
+#Style "*" HilightBack steelblue
+
