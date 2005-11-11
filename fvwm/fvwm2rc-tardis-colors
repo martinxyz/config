@@ -19,3 +19,10 @@ Style * HilightFore white, HilightBack steelblue
 #Style "*" HilightFore white
 #Style "*" HilightBack steelblue
 
+
+Style "Eterm" BorderWidth 3, HandleWidth 3, NoTitle
+Style "aterm" BorderWidth 3, HandleWidth 3, NoTitle
+Style "xterm" BorderWidth 3, HandleWidth 3, NoTitle
+Style "uxterm" BorderWidth 3, HandleWidth 3, NoTitle
+Style "urxvt" BorderWidth 3, HandleWidth 3, NoTitle
+Style "rxvt" BorderWidth 3, HandleWidth 3, NoTitle
