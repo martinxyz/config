@@ -1,6 +1,6 @@
 # by Martin Renold
 # Modifications for working without distraction.
-Read /home/martin/config/fvwm2rc
+Read /home/martin/config/fvwm2rc-bazaar
 
 # ignore no modifiers
 IgnoreModifiers

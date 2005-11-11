@@ -1,0 +1,14 @@
+#Read "/usr/pack/fvwm-2.4.7-hps/template/system.fvwm2rc"
+#Read /disks/isidor.lhome/isi/stud/renold/.fvwm2rcMySystem
+Read fvwm2rc-tardis-system
+Read fvwm2rc-common
+
+DeskTopSize 3x3
+
+Style Konqueror StartsOnPage 1 0
+Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
+# Doesn't work :-(
+Style emacs StartsOnPage 0 1
+Style Emacs StartsOnPage 0 1
+Exec exec emacs
+

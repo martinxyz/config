@@ -1,0 +1,8 @@
+if uname -a | grep -i linux ; then
+    xmodmap /home/mrenold/xmodmap/ctrl-esc-linux
+else
+    xmodmap /home/mrenold/xmodmap/ctrl-esc-nocaps
+fi
+fvwm2
+#/usr/sepp/bin/xterm
+

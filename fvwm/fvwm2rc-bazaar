@@ -1,0 +1,41 @@
+Read fvwm2rc-common
+
+DestroyFunc InitFunction_autostart
+AddToFunc InitFunction_autostart
++ I Exec aterm +sb -e /home/martin/bin/startupreport --minimal
++ I Exec Esetroot -scale ~/grafik/background/default
++ I Exec /home/martin/bin/startgaleon
++ I Exec emacs -geometry 114x49
+
+# Background images
+AddToMenu MBGM "Background" Title
++ DynamicPopupAction Function MakeMBGM
+AddToFunc MakeMBGM
++ I DestroyMenu recreate MBGM
++ I AddToMenu MBGM Pictures Title
++ I AddToMenu MBGM "&Black" Exec Esetroot ~/grafik/background/black.png
++ I AddToMenu MBGM "&Default" Exec Esetroot -scale ~/grafik/background/default
++ I AddToMenu MBGM "&Random" Exec /home/martin/bin/randombackground
++ I AddToMenu MGBM "" Nop
++ I PipeRead 'for i in $HOME/grafik/background/*; do echo AddToMenu MBGM "`basename $i`" Exec ln -s -f $i $HOME/grafik/background/default "&&" Esetroot -scale ~/grafik/background/default; done'
+
+
+AddToMenu MartinMenu "Martin" Title
++ "&Window List" WindowList
++ "&Background" Popup MBGM
++ "&Emacs" Exec exec emacs
++ "Gnome&Cal" Exec exec gnomecal
++ "&Galeon" Exec exec galeon
++ "&Rss (blam)" Exec exec blam
++ "&Konqueror" Exec exec konqueror
++ "G&imp" Exec exec /home/martin/bin/gimp
++ "&Xchat" Exec exec /home/martin/bin/xchat
++ "&Abiword" Exec exec abiword
+#+ "&OpenOffice" Exec exec oowriter
++ "&OpenOffice" Exec exec openoffice
+
+Key section A N Exec exec m n
+Key section A S Exec exec m p
+Key section A C Exec exec m s
+Key print A N Exec cd /home/martin/screenshots; scrot
+Key print A 2 Exec cd /home/martin/screenshots; xterm -iconic -e 'scrot -s'

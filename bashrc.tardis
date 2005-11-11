@@ -7,7 +7,7 @@ else
 fi
 
 if [ "$PS1" ]; then
-    cd $HOME/sa
+    cd $HOME/sa 2>/dev/null
     if ! (uname -a | grep -i linux > /dev/null) ; then
       #echo "Setting GNU aliases."
       # Farbiges GNU ls, standardmaessig nach Zeit sortiert.
@@ -50,8 +50,9 @@ export OBJC_INCLUDE_PATH=$CPATH
 export CFLAGS="-I$HOME/installed/include/SDL"
 export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:$HOME/apps/lib/python2.3/site-packages/:$HOME/apps/lib/python2.3/site-packages/PIL"
 
-# allow core dumps
-ulimit -c unlimited
+# allow core dumps up to 20 MB
+ulimit -c 20000
+#ulimit -c unlimited
 
 # purify licence
 export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map

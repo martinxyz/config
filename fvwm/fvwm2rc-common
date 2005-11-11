@@ -1,0 +1,388 @@
+# ignore no modifiers
+IgnoreModifiers
+
+DesktopSize 4 3
+
+DestroyFunc InitFunction
+AddToFunc InitFunction
++ I Style "*" SkipMapping
++ I Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
++ I Style "Emacs*" SkipMapping,StartsOnPage 0 1
++ I Style "X-Chat*" SkipMapping,StartsOnPage 2 1
++ I Style "xmms*" SkipMapping,StartsOnPage 2 0
++ I Style "XMMS*" SkipMapping,StartsOnPage 2 0
+# Note: galeon needs --noraise for this to work
++ I Style "Galeon"     SkipMapping,StartsOnPage 1 0
++ I Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
++ I Style "galeon-bin" SkipMapping,StartsOnPage 1 0
++ I InitFunction_autostart
+
+# Wenn ein zweiter galeon auf einem anderen desk offen ist
+# kommt das Suchfenster (Ctrl-F) auf dem startdesk, sehr mühsem.
+AddToFunc GaleonOtherDesk
++ I Style "Galeon"     ShowMapping,StartsAnyWhere
++ I Style "Galeon-bin" ShowMapping,StartsAnyWhere
++ I Style "galeon-bin" ShowMapping,StartsAnyWhere
+Key g A 2 GaleonOtherDesk
+
+#DestroyFunc RestartFunction
+#AddToFunc RestartFunction
+#+ "I" Wait FvwmPager
+#+ "I" KillModule FvwmPager
+
+# Misc things from the old debian default
+EdgeScroll 100 100
+EdgeResistance 250 100
+Style "*" Font -*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*
+Style "*" HilightFore white
+Style "*" HilightBack steelblue
+Style "*" BorderWidth 6
+Style "*" HandleWidth 6
+Style "*" MWMFunctions
+Style "*" MWMBorder
+Style "*" MWMDecor
+Style "*" DecorateTransient
+Style "*" ActivePlacement
+Style "*" NoPPosition
+Style "*" CaptureHonorsStartsOnPage
+Style "*" IconBox 0 0 50 -1
+Style "*" Icon default.xbm
+DestroyDecor default-decor
+AddToDecor default-decor
++ ButtonStyle Reset
++ ButtonStyle 2 Vector 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 \
+                           60x50@0 80x70@0 80x80@0 70x80@0 50x60@0 30x80@0 \
+                           20x80@0 20x70@1 40x50@1 20x30@0 20x20@1
+
++ ButtonStyle 4 Vector 5 25x75@0 75x75@0 75x25@0 25x25@1 25x75@1
++ ButtonStyle 6 Vector 4 50x75@1 25x25@1 75x25@1 50x75@0
+# make the default decor the default:
+Style * UseDecor default-decor, Color Black/DarkGrey
+
+# Configure the FvwmPager module (from the old debian default)
+*FvwmPagerBack SlateGrey
+*FvwmPagerFore Black
+*FvwmPagerFont none
+*FvwmPagerHilight SlateBlue4
+*FvwmPagerGeometry -0-0
+*FvwmPagerSmallFont -*-times-medium-r-*-*-*-80-*-*-*-*-*-*
+*FvwmPagerDeskTopScale 32
+
+# Some special stuff for Fvwm modules (from old debian default)
+Style "Fvwm*" NoTitle
+Style "Fvwm*" WindowListSkip
+Style "Fvwm*" CirculateSkip
+Style "FvwmPager"   Sticky, StaysOnTop, Handles, HandleWidth 5
+Style "FvwmIdent" Title
+Style "FvwmIdent" WindowListHit
+Style "FvwmIdent" CirculateHit
+
+
+Style "*" MinOverlapPercentPlacement
+#Style * TileCascadePlacement
+#Style "*" MouseFocus
+Style "*" SloppyFocus
+Style "*" GrabFocus
+Style "*" GrabFocusTransient
+Style "*" SkipMapping
+
+Style "Eterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "aterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "xterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "uxterm" BorderWidth 1, HandleWidth 1, NoTitle
+Style "urxvt" BorderWidth 1, HandleWidth 1, NoTitle
+Style "rxvt" BorderWidth 1, HandleWidth 1, NoTitle
+Style "Emacs" BorderWidth 0, HandleWidth 0, NoTitle
+# When a Etern has the focus, do not grab it for a newly created window.
+#Style "Eterm" OverrideGrabFocus
+Style MPlayer NoTitle
+
+DestroyMenu Window-Ops
+AddToMenu Window-Ops "Alt-F1: Window Ops" Title
++ "Window List"                 WindowList
++ "Previous"                    Prev
++ "Next"                        Next
++ "(De)Iconify"                 Iconify
++ "(Un)Stick"                   Stick        
++ "(Un)Shade"                   WindowShade
++ ""                            Nop
++ "Identify"                    Module FvwmIdent
++ ""                            Nop
++ "ScrollBar"                   Module FvwmScroll 2 2
++ "Close"                       Close
++ "Destroy"                     Destroy
+
+## Focus stuff from:
+## http://rvb.dyndns.org/FvwmWiki/Tips_2fRememberFocus
+
+DestroyFunc CurrentPageFocusFunc
+AddToFunc CurrentPageFocusFunc
++ I Next (CurrentPage, State 2) Focus
++ I None (CurrentPage, Focused) Next (CurrentPage, !Iconified, !Sticky) Focus
+
+DestroyFunc CurrentDeskFocusFunc
+AddToFunc CurrentDeskFocusFunc
++ I Current FlipFocus
+
+DestroyFunc MarkWindowAsActiveFunc
+AddToFunc MarkWindowAsActiveFunc
++ I Echo Focus Changed
++ I Current (!Iconified) All (CurrentPage, !Focused) State 2 False
++ I Current (!Iconified) State 2 True
+
+DestroyModuleConfig FvwmEvent: *
+*FvwmEvent: Cmd Function
+*FvwmEvent: new_page CurrentPageFocusFunc
+*FvwmEvent: new_desk CurrentDeskFocusFunc
+*FvwmEvent: destroy_window CurrentPageFocusFunc
+*FvwmEvent: focus_change MarkWindowAsActiveFunc
+Module FvwmEvent
+
+# Keybindings;  Modifiers:
+# N none A any C control S shift M meta L Caps-Lock 1-5 mod1-mod5
+Key i A 2 Module FvwmIdent
+Key Menu A N Popup MartinMenu
+Key Menu A 2 Popup /Debian
+Key e A 2 Exec exec rxvt -bg black -fg gray80 -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1
+Key b A 2 Exec exec rxvt -bg black -fg gray80 -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1
+Key u A 2 Exec exec urxvt -bg black -fg gray80 -sl 9999 -j -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1
+Key a A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 70 -fn 10x20
+# bound to maximize: Key m W 2 Move
+Key q WTSF 2 Close
+Key k W 2 Destroy
+AddToFunc StickAndStay
++ I Current Stick
++ I Current (Sticky) Layer 6
++ I Current (!Sticky) Layer default
+Key s WTSF 2 StickAndStay
+#Key w W 2 MoveToPage 2, 1
+AddToFunc Move-or-Raise I Raise
++ M Move
++ D Lower
+Mouse 1 W 2 Move-or-Raise
+Mouse 2 W 2 Lower
+Mouse 3 W 2 Resize
+Key p A 2 Module FvwmPager *
+Key space A 2 KillModule FvwmPager
+Key x A 2 CursorStyle DEFAULT None
+Key c A 2 CursorStyle DEFAULT
+# TODO: remove title bar and maximize, minimize and add title bar
+Key m A 2 Maximize toggle 100 100
+# jumping around
+#AddToFunc FocusIfNone
+#+ I Current (!CurrentPage) Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
+#+ I Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
+#Key t A 2 FocusIfNone
+AddToFunc JumpH
++ I GotoPage -1p +0p
+AddToFunc JumpL
++ I GotoPage +1p +0p
+AddToFunc JumpK
++ I GotoPage +0p -1p
+AddToFunc JumpJ
++ I GotoPage +0p +1p
+Key Right A M Nop
+Key Left A M Nop
+Key Up A M Nop
+Key Down A M Nop
+Key Left A 2 GotoPage -1p +0p
+Key Right A 2 GotoPage +1p +0p
+Key Down A 2 GotoPage +0p +1p
+Key Up A 2 GotoPage +0p -1p
+Key h A 2 JumpH
+Key l A 2 JumpL
+Key k A 2 JumpK
+Key j A 2 JumpJ
+
+AddToFunc MoSwiH
++ I Direction West (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiJ
++ I Direction South (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiK
++ I Direction North (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiL
++ I Direction East (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiU
++ I Direction NorthEast (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiZ
++ I Direction NorthWest (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiN
++ I Direction SouthEast (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+AddToFunc MoSwiB
++ I Direction SouthWest (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp
++ I Current Raise
+Key h A 2M MoSwiH
+Key l A 2M MoSwiL
+Key k A 2M MoSwiK
+Key j A 2M MoSwiJ
+Key u A 2M MoSwiU
+Key z A 2M MoSwiZ
+Key n A 2M MoSwiN
+Key b A 2M MoSwiB
+Key space A 2M RaiseLower
+
+# remove unused keybindings
+Key F1 A M Nop
+Key F2 A M Nop
+Key F3 A M Nop
+Key F4 A M Nop
+Key F5 A M Nop
+Key F6 A M Nop
+Key F7 A M Nop
+Key F8 A M Nop
+Key F9 A M Nop
+Key F10 A M Nop
+Key F11 A M Nop
+Key F12 A M Nop
+Key Tab A M -
+
+AddToFunc Naked
++ I Style NoTitle
++ I Style !Borders
+Key n A 2 Naked
+
+Key r A 2 Restart
+
+AddToFunc Eterm1
++ I Maximize true 100 80
+AddToFunc Eterm2
++ I Maximize true 100 80
++ I Move 0 -0
+AddToFunc Eterm3
++ I Resize 80c 25c
+#+ I Maximize true 96 80
+#+ I Move 2 0
+AddToFunc Eterm4
++ I Maximize true 96 20
++ I Move 2 -2
+Key 1 A 2 Eterm1
+Key 2 A 2 Eterm2
+Key 3 A 2 Eterm3
+Key 4 A 2 Eterm4
+
+AddToFunc TestFunc
++ I FlipFocus NoWarp
++ I Raise
+DestroyFunc WindowListFunc
+AddToFunc WindowListFunc
+#+ I WindowId $0 TestFunc
++ I WindowId $0 FlipFocus NoWarp
++ I WindowId $0 Raise
+
+# windows
+#Key Tab A 2 WindowList
+#Key d A 2 WindowList (CurrentPage) SelectOnRelease,CurrentAtEnd Mod2_d
+DestroyMenuStyle WindowList
+MenuStyle WindowList SelectOnRelease Meta_L
+#Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
+#Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+
+#Key Tab A 2 Next (AcceptsFocus !Shaded CurrentDesc) Focus
+
+# bury current
+Key t A 2 Lower
+
+# title bar close button
+Mouse 0 2       A   Close
+
+
+# focus on click in window
+#DestroyFunc FocusAndClick
+#AddToFunc FocusAndClick
+#+ I Focus
+#+ I FakeClick press
+## Mouse [(window)] Button Context Modifiers Function
+#Mouse 1 W       N   FocusAndClick
+
+
+### gtk-menu-beep: notes about the problem ####
+
+# beep-demo
+
+#AddToFunc MarkWindowAsActiveFunc
+#+ I echo XXXX
+#*FvwmEvent: focus_change Current (!Iconified) State 2 True #MarkWindowAsActiveFunc
+*FvwmEvent: focus_change Echo XXXX
+Module FvwmEvent
+
+
+# Feststellungen:
+# - Titelbar wird hell während das Menu gedrückt ist
+# - Titelbar wird wieder dunkel wenn Menu weg ist
+# - Beim Konqueror-Menu passiert das nicht und alles ist OK
+
+# - Der Pipser kommt mit Verzoegerung von 1s
+# ???
+#
+
+# execute_function* ==> execute_complex_function ==> beep
+
+# SET_FOCUS_CHANGE_BROADCAST_PENDING(fw, 0);
+# events.c 2320
+
+# Ein aktives menu hat vermutlich einen mouse-grab.
+# Denn es ist nicht möglich bei offenem Menu den Desktop zu wechseln,
+# oder etwas anderes zu fokusieren. Es verschwindet bei einem Klick,
+# egal wohin er geht.
+#
+# Konqueror hat auch einen mouse-grab, aber er lässt den Klick der ihn
+# beendet zur Anwendung durch der er gehoert.
+
+# - Warum funktionniert es wenn das Fenster schon fokusiert ist?
+#   - weil gar kein Fokuswechsel besteht so?
+
+# 
+
+
+# - Ich kriege ZWEI events wenn ich vor dem Pipser schliesse
+# - und EINEN event wenn es gepipst hat.
+# ==> piser steht für "event dropped, too late now"?
+
+# - Der Pipser kommt BEVOR meine Funktion ausgefuehrt wird
+#   - er kommt WEIL die Funktion nicht ausgefuehrt werden kann
+#   - (functions.c:996)
+#     /* we have to grab buttons before executing immediate actions because
+#      * these actions can move the window away from the pointer so that a
+#      * button release would go to the application below. */
+
+# - Meine Funktion wird aber nur einmal am Schluss ausgefuehrt
+#   - Der Pipser zeigt an dass er verzichten musste
+
+# - Der Pipser kommt nicht wenn das Menu rechtzeitig zugeht
+#   - Weil dann die Funktion ausgefuehrt werden kann.
+#   ==> der "mouse grab" muss dadurch verschwunden sein.
+
+# - Der Pipser kommt nicht ohne meine Funktion
+#   - weil der "mouse grab" nicht gemacht wird da keine Funktion
+#     aufgerufen wird
+
+
+ 
+# <theBlackDragon> maxy: you should ask taviso , I think he had lots of
+# issues with mousegrab stuff and beeping
+
+# <taviso> maxy: uhh, that is the most annoying thing ever..i will be
+# very happy when they hack that Xbell() out
+# I already asked for it to be removed, but apparently they decided not to :)
+
+# <maxy> taviso: you happen to know how/where a focus event might get
+# delayed by one second?
+# Reproduce: Open GTK application, move focus away (by opening dialog
+# that pops up elsewhere), open menu (and keep open) ==> beep
+
+#Sep 08 22:02:13 <taviso>	maxy: ahh, it's this annoying grab-fail thing...when functions with + I components cant grab the server
+#Sep 08 22:02:34 <taviso>	maxy: it's a bug, but apparently obscure anough that theres no rush to fix it :(
+#Sep 08 22:03:59 <maxy>	yes, execute_complex_function fails to grab the mouse and abborts :-\
+#Sep 08 22:04:01 <taviso>	maxy: you just have to avoid functoins with +I on events that might be triggered during a grab
+#Sep 08 22:04:02 <maxy>	any workarounds?
+#Sep 08 22:04:44 <maxy>	+I ... what's the matter with this? *look up in manual*
+#Sep 08 22:05:00 <taviso>	not that i know of, but i'd like to see it fixed as well, maybe i'll try to take a look...or thomas_adam is the resident xlib expert, maybe he will :)
+#Sep 08 22:13:49 <maxy>	I see... thanks.
+
