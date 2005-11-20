@@ -9,5 +9,4 @@
 *FvwmPagerWindowColors black gray60 black AntiqueWhite3
 
 Style * ForeColor black, BackColor gray60
-Style * HilightFore black, HilightBack AntiqueWhite3
-
+Style * HilightFore black, HilightBack rgb:79/AD/A2
