@@ -5,6 +5,7 @@
  '(c-strict-syntax-p nil)
  '(case-fold-search t)
  '(column-number-mode nil)
+ '(compilation-ask-about-save nil)
  '(complex-buffers-menu-p t)
  '(current-language-environment "German")
  '(default-input-method "german-postfix")
@@ -29,12 +30,15 @@
  '(mouse-yank-at-point t)
  '(octave-auto-indent t)
  '(paren-mode (quote paren) nil (paren))
+ '(ps-paper-type (quote a4))
+ '(ps-print-color-p nil)
  '(py-continuation-offset 2)
  '(query-user-mail-address nil)
  '(save-place t nil (saveplace))
  '(scroll-bar-mode nil)
  '(scrollbars-visible-p nil)
  '(show-paren-mode t nil (paren))
+ '(speedbar-tag-hierarchy-method nil)
  '(standard-indent 2)
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
@@ -43,7 +47,23 @@
  '(toolbar-visible-p nil)
  '(truncate-lines t)
  '(user-mail-address "martinxyz@gmx.ch")
- '(viper-auto-indent t))
+ '(vhdl-actual-port-name (quote ("\\(.*\\)[IO]$" . "\\1")))
+ '(vhdl-company-name "Integrated Systems Laboratory, ETH Zurich")
+ '(vhdl-compiler "ModelSim")
+ '(vhdl-compiler-alist (quote (("Cadence" "cv -file" "" "make -f \\1" nil "./" "work/" "Makefile" "cadence" ("duluth: \\*E,[0-9]+
+(\\(.+\\),\\([0-9]+\\)):" 1 2) ("" 0) nil) ("ModelSim" "vcom" "" "make
+-f \\1" "vmake > Makefile" "../modelsim/" "work/" "Makefile" "modelsim" ("\\(ERROR\\|WARNING\\)[^:]*: \\(.+\\)(\\([0-9]+\\)):" 2 3) ("" 0) nil) ("Synopsys" "synopsys vhdlan" "" "make -f \\1" nil "../synopsys/" "work/" "Makefile" "synopsys" ("\\*\\*Error: vhdlan,[0-9]+
+\\(.+\\)(\\([0-9]+\\)):" 1 2) ("" 0) nil))))
+ '(vhdl-highlight-case-sensitive t)
+ '(vhdl-highlight-signals t)
+ '(vhdl-highlight-special-words t)
+ '(vhdl-platform-spec "ModelSim (simulation), Synopsys (synthesis)")
+ '(vhdl-special-syntax-alist (quote (("constant" "[A-Z][A-Z0-9_]+" "Gold3" "BurlyWood1") ("signal-clock" "[A-Z][A-Za-z0-9]*xC[A-Za-z0-9]*" "LimeGreen" "Green") ("signal-reset" "[A-Z][A-Za-z0-9]*xR[A-Za-z0-9]*" "Tomato" "Coral") ("signal-enable" "[A-Z][A-Za-z0-9]*xE[A-Za-z0-9]*" "LightSeaGreen" "AquaMarine2") ("signal-control" "[A-Z][A-Za-z0-9]*xS[A-Za-z0-9]*" "DodgerBlue" "LightSkyBlue1") ("signal-data" "[A-Z][A-Za-z0-9]*xD[A-Za-z0-9]*" "Grey50" "Grey80") ("signal-test" "[A-Z][A-Za-z0-9]*xT[A-Za-z0-9]*" "Gold" "Yellow") ("signal-async" "[A-Z][A-Za-z0-9]*xA[A-Za-z0-9]*" "PaleVioletRed" "PaleVioletRed1") ("signal-3state" "[A-Z][A-Za-z0-9]*xZ[A-Za-z0-9]*" "Grey70" "Grey70"))))
+ '(vhdl-testbench-name (quote (".*" . "\\&Tb")))
+ '(vhdl-underscore-is-part-of-word t)
+ '(viper-auto-indent t)
+ '(xslt-process-java-program "java-1.4.1_02")
+ '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
   ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
   ;; Your init file should contain only one such instance.

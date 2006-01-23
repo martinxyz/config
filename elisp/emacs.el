@@ -29,7 +29,9 @@
 (global-set-key  [f6]  'next-multiframe-window)
 ;(global-set-key  [f7]  'switch-to-other-buffer)
 (global-set-key  [f8]  'compile)
-(global-set-key  [f9]  'recompile)
+(global-set-key  [f9]  (lambda () (interactive) 
+                         (if compilation-in-progress (kill-compilation)) 
+                         (run-at-time 0.1 nil 'recompile)))
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
 ;(global-set-key "\C-z" 'undo)
