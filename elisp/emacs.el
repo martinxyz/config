@@ -98,6 +98,16 @@
   (c-set-style "stroustrup")
   )
 
+(defun synfig-c-mode ()
+  "Synfig cpp coding style"
+  (interactive)
+  (c++-mode)
+  ; indent with tabs only.
+  (setq c-basic-offset 8
+        tab-width 8
+        indent-tabs-mode t)
+  )
+
 (defun gtk-gnutella-c-mode ()
   "Gtk-gnutella C coding style"
   (interactive)
@@ -139,6 +149,12 @@
       (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*synfig.*/.*\\.h$" . synfig-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*synfig.*/.*\\.cpp$" . synfig-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/gtk-gnutella.*/.*/.*\\.[ch]$" . gtk-gnutella-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
@@ -149,6 +165,9 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*\\.java$" . java-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*SConstruct$" . python-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -391,3 +410,7 @@
 
 ;; TODO: try to configure "semantic" / "cedet" to work fast enough here
 ;;   it reparses the buffer automatically on changes, cool! but too slow.
+
+; mode for ocaml files
+;(load "append-tuareg")
+(load "pyrex-mode")
