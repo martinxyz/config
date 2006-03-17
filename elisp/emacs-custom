@@ -7,8 +7,6 @@
  '(column-number-mode nil)
  '(compilation-ask-about-save nil)
  '(complex-buffers-menu-p t)
- '(current-language-environment "German")
- '(default-input-method "german-postfix")
  '(delete-key-deletes-forward t)
  '(desktop-enable t nil (desktop))
  '(desktop-missing-file-warning t)
