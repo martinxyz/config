@@ -16,6 +16,7 @@ AddToFunc InitFunction_autostart
 + I Exec Esetroot -scale ~/grafik/background/work
 + I Exec /home/martin/bin/startgaleon
 + I Exec emacs -geometry 114x49
++ I Exec workrave
 
 DestroyMenu MartinMenu recreate
 AddToMenu MartinMenu "Martin" Title

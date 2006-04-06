@@ -6,6 +6,7 @@ AddToFunc InitFunction_autostart
 + I Exec Esetroot -scale ~/grafik/background/default
 + I Exec /home/martin/bin/startgaleon
 + I Exec emacs -geometry 114x49
++ I Exec workrave
 
 # Background images
 AddToMenu MBGM "Background" Title
@@ -31,6 +32,7 @@ AddToMenu MartinMenu "Martin" Title
 + "G&imp" Exec exec /home/martin/bin/gimp
 + "&Xchat" Exec exec /home/martin/bin/xchat
 + "&Abiword" Exec exec abiword
++ "&Translate (Ding)" Exec exec ding
 #+ "&OpenOffice" Exec exec oowriter
 + "&OpenOffice" Exec exec openoffice
 
