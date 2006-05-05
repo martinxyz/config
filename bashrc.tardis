@@ -50,8 +50,8 @@ export OBJC_INCLUDE_PATH=$CPATH
 export CFLAGS="-I$HOME/installed/include/SDL"
 export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:$HOME/apps/lib/python2.3/site-packages/:$HOME/apps/lib/python2.3/site-packages/PIL"
 
-# allow core dumps up to 20 MB
-ulimit -c 20000
+# allow core dumps up to 10 MB
+ulimit -c 10000
 #ulimit -c unlimited
 
 # purify licence

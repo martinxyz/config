@@ -147,7 +147,7 @@ Module FvwmEvent
 Key i A 2 Module FvwmIdent
 Key Menu A N Popup MartinMenu
 Key Menu A 2 Popup /Debian
-Key e A 2 Exec exec urxvt --print-pipe echo -cr yellow -bg black -fg gray80 -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1
+Key e A 2 Exec exec bigterm
 Key b A 2 Exec exec xterm -j -s -sl 9999 -fn -*-fixed-*-*-*-*-20-*-*-*-*-*-*-*
 Key u A 2 Exec exec rxvt --print-pipe echo -cr yellow -bg black -fg gray80 -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1
 Key a A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 70 -fn 10x20

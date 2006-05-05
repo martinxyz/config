@@ -413,4 +413,5 @@
 
 ; mode for ocaml files
 ;(load "append-tuareg")
-(load "pyrex-mode")
+; fails on tardis:
+;(load "pyrex-mode")
