@@ -17,6 +17,6 @@ ln -s config/cvsrc .cvsrc
 ln -s config/Xdefaults .Xdefaults
 echo "Symlinks done."
 
-xrdb -merge ~/.Xdefaults
+xrdb -merge .Xdefaults
 
 
