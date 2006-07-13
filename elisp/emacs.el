@@ -170,6 +170,10 @@
       (cons '(".*SConstruct$" . python-mode)
           auto-mode-alist))
 
+(setq auto-mode-alist 
+      (cons '(".*\\.m$" . octave-mode)
+          auto-mode-alist))
+
 ;; Add my directories to load-path.
 (setq load-path (append
                  '("~/config/elisp")
@@ -195,10 +199,10 @@
   (interactive) ;make the function a command too
   (setq truncate-lines (if truncate-lines nil t)))
 
-;; default text mode is with auto-fill on
+;; default text mode is with auto-fill <s>on</s>off
 (setq default-major-mode 'text-mode)
 (setq text-mode-hook
-      '(lambda () (auto-fill-mode 1) ) )
+      '(lambda () (auto-fill-mode 0) ) )
 
 ;; disable menu bar
 (menu-bar-mode 0)
@@ -280,14 +284,21 @@
 (define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
 ;(define-key viper-vi-local-user-map "F" 'swbuff-switch-to-previous-buffer)
 ;(define-key viper-vi-local-user-map "s" 'swbuff-switch-to-previous-buffer)
+(define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
+(defun martin-kill-whole-line ()
+  (interactive)
+  (viper-beginning-of-line (cons ?d ?d))
+)
+
+;  (viper-beginning-of-line 1)
+;  (viper-kill-line 1)
+;  )
 ;; insert a new comment with space
 (defun martin-insert-comment ()
   (interactive)
   (comment-dwim nil)
   (viper-insert nil))
-  ;; (viper-change-state-to-insert)))
-;(define
 
 ; for outline-mode
 ;(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
