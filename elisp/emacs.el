@@ -140,6 +140,16 @@
   (setq c-tab-width 2)
   )
 
+(defun gimp-c-mode ()
+  (interactive)
+  (c-mode)
+  ;; from developer.gimp.org FAQ:
+  ;; use the GNU style for C files, spaces instead of tabs, highlight bad spaces
+  (c-set-style "gnu")
+  (setq indent-tabs-mode nil)
+  (setq show-trailing-whitespace t)
+  )
+
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
@@ -156,6 +166,9 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/gtk-gnutella.*/.*/.*\\.[ch]$" . gtk-gnutella-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/nil/.*(cpp|h)$" . nil-c-mode)
@@ -317,6 +330,7 @@
 (define-key viper-vi-local-user-map "K" 'kill-this-buffer)
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
+;(define-key viper-vi-local-user-map "v" 'ido-find-file)
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
@@ -409,6 +423,7 @@
 ; nur schon beim emacs-start auf...
 ; ... passiert auch ohne (require 'tramp), also nur rein damit.
 ;(require 'tramp)
+;(setq tramp-default-method "ssh")
 
 ;; ; not a mode, but I search for tramp-mode anyway when I want it
 ;; (defun tramp-mode ()
@@ -426,3 +441,53 @@
 ;(load "append-tuareg")
 ; fails on tardis:
 ;(load "pyrex-mode")
+
+
+;; Wishlist
+;
+; Faster incremental search. (without pressing return)
+; - bind viper / to isearch
+; - bind viper ä to reverse isearch
+; - remap keys within the search (disallow searching for:)
+;   - type space to confirm the search.
+;   - type / to find the next
+;   - type ESC to cancel the search (no viper commands needed in minibuffer)
+; - (use // to repeat it)
+; - start to use it.
+;
+; --- and I don't want to code this... damn it... there must be an easier way...
+
+; use 'dtemacs' & co (package gnuserv) to use emacs as $EDITOR for small stuff too
+; - maybe use (package wmctrl) to raise the window?
+
+; alternative(s) to swbuff:  -- will become emacs 22 default, see wiki
+; Iswitchb is [0] (info "(emacs)Iswitchb")
+;   <fsbot> [1] an improvement (on C-x b) in switching buffers,
+;   <fsbot> [2] type few letters of a buffer name and it will move to the front of the list,
+;   <fsbot> [3] use C-s and C-r to "scroll" forward and backwards through the buffer-list, ..[Type ,more]
+;(setq ibuffer-shrink-to-minimum-size t)
+;(setq ibuffer-always-show-last-buffer nil)
+;(setq ibuffer-sorting-mode 'recency)
+;(setq ibuffer-use-header-line t)
+
+; what is ido-mode? Same thing for opening files. (with minimal amount of keystrokes)
+(require 'ido)
+(ido-mode t)
+
+; From the GIMP developer webpage:
+
+;; Merge this into your custom-set-variables section if you already have one
+(custom-set-variables
+ ;; Syntax highlighting
+ ;'(global-font-lock-mode t nil (font-lock))
+ ;'(show-paren-mode t nil (paren))
+ ;; User name to be put in the ChangeLog file by M-x add-change-log-entry
+ '(user-full-name "Martin Renold")
+ '(user-mail-address "martinxyz@gmx.ch"))
+
+;; use UTF-8 by default
+;(prefer-coding-system 'mule-utf-8)
+
+(global-set-key "\M-l" 'dabbrev-expand) ; windows-tastaturen haben den / nicht in reichweite
+
+

@@ -140,6 +140,8 @@ clear mod2
 
 ! ö = slash
 keycode  47 = slash odiaeresis dead_acute dead_doubleacute
+! ä = return
+keycode  48 = Return adiaeresis braceleft dead_caron
 
 ! "no dead keys" fuer die Tasten ^ ` ~
 !keycode  21 = dead_circumflex dead_grave dead_tilde dead_ogonek

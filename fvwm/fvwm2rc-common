@@ -26,6 +26,10 @@ AddToFunc GaleonOtherDesk
 + I Style "galeon-bin" ShowMapping,StartsAnyWhere
 Key g A 2 GaleonOtherDesk
 
+# kein Desktopwechsel wenn der Mauszeiger am Bildrand ist
+EdgeScroll 0 0
+EdgeThickness 0
+
 #DestroyFunc RestartFunction
 #AddToFunc RestartFunction
 #+ "I" Wait FvwmPager
