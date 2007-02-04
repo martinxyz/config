@@ -7,9 +7,9 @@ DestroyFunc InitFunction
 AddToFunc InitFunction
 + I Style "*" SkipMapping
 + I Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
-+ I Style "Emacs*" SkipMapping,StartsOnPage 0 1
-+ I Style "X-Chat*" SkipMapping,StartsOnPage 2 1
-+ I Style "XChat*" SkipMapping,StartsOnPage 2 1
++ I Style "Emacs*" SkipMapping,StartsOnPage 1 1
++ I Style "X-Chat*" SkipMapping,StartsOnPage 3 1
++ I Style "XChat*" SkipMapping,StartsOnPage 3 1
 + I Style "xmms*" SkipMapping,StartsOnPage 2 0
 + I Style "XMMS*" SkipMapping,StartsOnPage 2 0
 # Note: galeon needs --noraise for this to work

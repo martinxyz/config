@@ -5,17 +5,21 @@ if [ ! -d $HOME/config ] ; then
   exit 1
 fi
 
-set -x
-cd $HOME
-ln -s config/elisp/emacs.el .emacs
-ln -s config/elisp/viper.el .viper
+function symlink {
+  [ ! -L $2 ] && ln -v -s $1 $2
+}
 
-#ln -s config/xmodmap .xmodmap
-#ln -s config/fvwm2rc .fvwm2rc
-ln -s config/vimrc .vimrc
-ln -s config/vim .vim
-ln -s config/cvsrc .cvsrc
-ln -s config/Xdefaults .Xdefaults
+#set -x
+cd $HOME
+symlink config/elisp/emacs.el .emacs
+symlink config/elisp/viper.el .viper
+
+for i in vimrc vim cvsrc Xdefaults inputrc; do
+  symlink config/$i .$i
+done
+
+# xmodmap fvwm2rc
+
 echo "Symlinks done."
 
 xrdb -merge .Xdefaults

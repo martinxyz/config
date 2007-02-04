@@ -221,7 +221,8 @@
 (menu-bar-mode 0)
 
 ;; groessere Schrift
-(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
+;(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
+(set-frame-font "-Misc-Fixed-Medium-R-Normal--15-140-75-75-C-90-ISO8859-1")
 
 ;; Neuerdings druecke ich Ctrl-x-c aus versehen...
 (defun ask-before-quit ()
@@ -490,4 +491,5 @@
 
 (global-set-key "\M-l" 'dabbrev-expand) ; windows-tastaturen haben den / nicht in reichweite
 
-
+;(load-library "ispell")
+;(setq ispell-program-name "aspell")
