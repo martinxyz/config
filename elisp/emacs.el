@@ -29,9 +29,10 @@
 (global-set-key  [f6]  'next-multiframe-window)
 ;(global-set-key  [f7]  'switch-to-other-buffer)
 (global-set-key  [f8]  'compile)
-(global-set-key  [f9]  (lambda () (interactive) 
-                         (if compilation-in-progress (kill-compilation)) 
-                         (run-at-time 0.1 nil 'recompile)))
+(global-set-key  [f9]  (lambda () (interactive)
+                         (if compilation-in-progress (kill-compilation))
+                         (run-at-time 2.0 nil 'recompile)))
+(global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
 ;(global-set-key "\C-z" 'undo)
@@ -117,6 +118,16 @@
   (setq c-tab-width 4)
   )
 
+(defun wesnoth-c-mode ()
+  "Wesnoth cpp coding style"
+  (interactive)
+  (c++-mode)
+  ; indent with tabs only.
+  (setq c-basic-offset 8
+        tab-width 8
+        indent-tabs-mode t)
+  )
+
 (defun nil-c-mode ()
   "nil C coding style"
   (interactive)
@@ -157,6 +168,12 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/wesnoth.*\\.cpp$" . wesnoth-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*synfig.*/.*\\.h$" . synfig-c-mode)
