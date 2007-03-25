@@ -16,6 +16,7 @@ AddToFunc InitFunction
 + I Style "Galeon"     SkipMapping,StartsOnPage 1 0
 + I Style "Galeon-bin" SkipMapping,StartsOnPage 1 0
 + I Style "galeon-bin" SkipMapping,StartsOnPage 1 0
+#+ I Style "Brood War" ManualPlacement
 + I InitFunction_autostart
 
 # Wenn ein zweiter galeon auf einem anderen desk offen ist
@@ -159,6 +160,8 @@ Key a A 2 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 70 -fn 1
 # bound to maximize: Key m W 2 Move
 Key q WTSF 2 Close
 Key k W 2 Destroy
+Key 0 A 2 Exec exec xrandr -s 0
+Key 9 A 2 Exec exec xrandr -s 6
 AddToFunc StickAndStay
 + I Current Stick
 + I Current (Sticky) Layer 6

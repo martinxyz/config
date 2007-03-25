@@ -31,7 +31,7 @@
 (global-set-key  [f8]  'compile)
 (global-set-key  [f9]  (lambda () (interactive)
                          (if compilation-in-progress (kill-compilation))
-                         (run-at-time 2.0 nil 'recompile)))
+                         (run-at-time 0.3 nil 'recompile)))
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 

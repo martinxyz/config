@@ -55,11 +55,12 @@ set hlsearch
 " Tab complete now ignores these
 set wildignore=*.o,*.obj,*~,*.pyc,*.pyo
 
-py import sys,os; sys.path.append('/home/martin/.vim')
-py import pyhelp
-au Syntax python map <F2> :py pyhelp.lookup()<CR>
-"au[tocmd] [group] {event} {pat} [nested] {cmd}
+" py import sys,os; sys.path.append('/home/martin/.vim')
+" py import pyhelp
+" au Syntax python map <F2> :py pyhelp.lookup()<CR>
+" "au[tocmd] [group] {event} {pat} [nested] {cmd}
 
 
-py import martin
-imap <c-l> <esc>:py martin.mycomplete()<cr>a
+" py import martin
+" imap <c-l> <esc>:py martin.mycomplete()<cr>a
+
