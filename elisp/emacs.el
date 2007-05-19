@@ -284,7 +284,9 @@
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
 
-(global-set-key "\M- " 'pop-global-mark)
+(global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
+(define-key viper-vi-local-user-map "?" 'pop-global-mark) ; ich benutze rueckwaertssuche eh nie
+(define-key viper-vi-local-user-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
 
 (column-number-mode t)
 
