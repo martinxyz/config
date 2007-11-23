@@ -1,6 +1,11 @@
 ! Martin's tardis linux xmodmap (klappt vermutlich nicht auf solaris)
 
+! second  with  Shift, the third when the Mode_Switch key is used
+! with this key and the fourth  when  both  the  Mode_Switch  and
+! Shift keys are used.
+
 keycode  66 = Escape
+clear lock
 
 ! hm...
 keycode 113 = Mode_switch Alt_R Meta_R
@@ -13,4 +18,8 @@ keycode 115 = Super_L
 keycode 116 = Super_R
 add Mod2 = Super_L
 add Mod2 = Super_R
+
+! enter
+!keycode  48 = apostrophe quotedbl
+keycode  48 = Return quotedbl apostrophe apostrophe
 

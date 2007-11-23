@@ -7,8 +7,11 @@ Read fvwm2rc-tardis-colors
 DeskTopSize 3x3
 Module FvwmPager
 
-Style Konqueror StartsOnPage 1 0
-Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
+#Style Konqueror StartsOnPage 1 0
+Style Firefox StartsOnPage 1 0
+#Exec exec konqueror http://people.ee.ethz.ch/~mrenold/
+Exec exec firefox http://people.ee.ethz.ch/~mrenold/
+
 # Doesn't work :-(
 Style emacs StartsOnPage 0 1
 Style Emacs StartsOnPage 0 1

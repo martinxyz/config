@@ -1,4 +1,6 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
+#env
+#pkg-config --libs opencv
 
 if (uname -a | grep -i linux > /dev/null) ; then
     export arch=i686-debian-linux3.0
@@ -37,26 +39,19 @@ export CVS_EDITOR=vim
 export CVS_RSH=ssh
 export RSYNC_RSH=ssh
 
-export PATH=$HOME/apps/games:$HOME/bin:$HOME/scripts:$HOME/installed/bin:$PATH
-# for etags
-export PATH=$PATH:/usr/pack/emacs-21.3-to/$arch/bin
-export LD_LIBRARY_PATH=$HOME/installed/lib
-export LIBRARY_PATH=$HOME/installed/lib
-export CPATH=$HOME/installed/include
-export C_INCLUDE_PATH=$CPATH
-export CPLUS_INCLUDE_PATH=$CPATH
-export OBJC_INCLUDE_PATH=$CPATH
+source ~/scripts/bashrc_add_prefix
 
-export CFLAGS="-I$HOME/installed/include/SDL"
-export PYTHONPATH="$PYTHONPATH:/usr/pack/numeric-21.3-to/$arch/lib/python2.3/Numeric:$HOME/apps/lib/python2.3/site-packages/:$HOME/apps/lib/python2.3/site-packages/PIL"
+export PATH=$HOME/bin:$HOME/scripts:$PATH
+add_prefix $HOME/installed
 
 # allow core dumps up to 10 MB
-ulimit -c 10000
+#ulimit -c 10000
 #ulimit -c unlimited
 
 # purify licence
-export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map
+#export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map
 
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/pack/gtk-2.4.13-mo/$arch/lib/pkgconfig
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/pack/gtk-2.4.13-mo/$arch/lib
+export LANG=de_DE.UTF-8
+
+cd ~/da
 

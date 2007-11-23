@@ -1,5 +1,6 @@
 if uname -a | grep -i linux ; then
     xmodmap /home/mrenold/config/xmodmaps/tardis-linux
+    #xmodmap /home/mrenold/config/xmodmaps/bazaar
 else
     xmodmap /home/mrenold/config/xmodmaps/ctrl-esc-nocaps
 fi

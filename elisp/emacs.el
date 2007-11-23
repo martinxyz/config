@@ -491,8 +491,8 @@
 ;(setq ibuffer-use-header-line t)
 
 ; what is ido-mode? Same thing for opening files. (with minimal amount of keystrokes)
-(require 'ido)
-(ido-mode t)
+;(require 'ido)
+;(ido-mode t)
 
 ; From the GIMP developer webpage:
 

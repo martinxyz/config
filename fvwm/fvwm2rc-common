@@ -256,6 +256,7 @@ AddToFunc FocusNext
 + I Next (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp # ?FlipFocus?
 + I Current Raise
 Key Tab A 2 FocusNext
+Key Tab A M FocusNext
 
 # remove unused keybindings
 Key F1 A M Nop
@@ -270,7 +271,7 @@ Key F9 A M Nop
 Key F10 A M Nop
 Key F11 A M Nop
 Key F12 A M Nop
-Key Tab A M -
+#Key Tab A M -
 
 AddToFunc Naked
 + I Style $[w.class] NoTitle
