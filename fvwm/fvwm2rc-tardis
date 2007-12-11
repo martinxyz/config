@@ -1,6 +1,7 @@
 #Read "/usr/pack/fvwm-2.4.7-hps/template/system.fvwm2rc"
 Read fvwm2rc-tardis-system
 Read fvwm2rc-common
+
 Read fvwm2rc-work-colors
 Read fvwm2rc-tardis-colors
 

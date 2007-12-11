@@ -1,11 +1,14 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(bar-cursor 2)
  '(c-strict-syntax-p nil)
  '(case-fold-search t)
  '(column-number-mode nil)
  '(compilation-ask-about-save nil)
+ '(compilation-context-lines 0)
  '(compilation-scroll-output t)
  '(complex-buffers-menu-p t)
  '(delete-key-deletes-forward t)
@@ -65,6 +68,8 @@
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  )
