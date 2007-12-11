@@ -1,0 +1,54 @@
+source ~/scripts/bashrc_add_prefix
+
+add_prefix ~/apps
+export PATH=$HOME/bin:$HOME/scripts:$PATH
+
+# If running interactively, then:
+if [ "$PS1" ]; then
+
+    # enable color support of ls and also add handy aliases
+
+    #eval `dircolors`
+    #unalias ls
+    alias ls='ls -r -t --color=auto '
+    alias pstree='pstree -G'
+    alias qmv="qmv -e e --format=do"
+    alias less="less --chop-long-lines"
+    alias łess="less --chop-long-lines"
+    #alias ll='ls -l'
+    #alias la='ls -A'
+    #alias l='ls -CF'
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+    alias ..="cd .."
+
+    #alias mplayer="unalias mplayer; PS1=$(echo -e -n '\e[34m')\"$PS1\" #"
+    alias crazy="aaa=0; PROMPT_COMMAND='((aaa=(aaa+1)%6))'; PS1='$PS1\$(((bbb=aaa+31)); echo -e -n \\e[\$bbb; echo -n m)'"
+
+    # set a fancy prompt
+    PS1='\u@\h:\w\$ '
+
+    # . /etc/bash_completion
+
+    # resize correctly, please
+    #export PROMPT_COMMAND='kill -WINCH $$'
+    shopt -s checkwinsize
+fi
+
+export HISTIGNORE='*#[Rr][Mm]:?:??:halt'
+export HISTCONTROL="ignoredups"
+export HISTFILESIZE=8000
+export HISTSIZE=8000
+
+export EDITOR=vim
+export VISUAL=vim
+export CVS_EDITOR=vim
+export CVS_RSH=ssh
+export RSYNC_RSH=ssh
+export SHELL=bash
+
+export SCONSFLAGS="-Q"
+
+#export BROWSER="galeon -n"
+export BROWSER="firefox -new-tab"
+

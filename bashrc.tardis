@@ -2,36 +2,18 @@
 #env
 #pkg-config --libs opencv
 
+source ~/config/bashrc.common
+
 if (uname -a | grep -i linux > /dev/null) ; then
     export arch=i686-debian-linux3.0
 else
     export arch=sun4u-sun-solaris2.8
 fi
 
-if [ "$PS1" ]; then
-    cd $HOME/sa 2>/dev/null
-    alias ls='ls --color=auto -r -t '
-    # simpler prompt
-    PS1='\u@\h:\w\$ '
-    shopt -s checkwinsize
-fi
-
 export MAILCHECK=60
-
-export SHELL=bash
-export EDITOR=vim
-export VISUAL=vim
-export CVS_EDITOR=vim
-export CVS_RSH=ssh
-export RSYNC_RSH=ssh
-
-source ~/scripts/bashrc_add_prefix
 
 #export PKG_CONFIG_PATH=/usr/pack/opencv-1.0.0-dr/i686-debian-linux3.1/lib/pkgconfig
 #/usr/pack/gtk-2.10.14-sd/i686-debian-linux3.1/lib/pkgconfig/
-
-export PATH=$HOME/bin:$HOME/scripts:$PATH
-add_prefix $HOME/installed
 
 # allow core dumps up to 10 MB
 #ulimit -c 10000
@@ -41,8 +23,10 @@ ulimit -c unlimited
 #export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map
 
 export LANG=de_DE.UTF-8
-export SCONSFLAGS="-Q"
 
-cd ~/da
+if [ "$PS1" ]; then
+   cd ~/da
+fi
+
 export PATH=$HOME/da/code/tools:$PATH
 

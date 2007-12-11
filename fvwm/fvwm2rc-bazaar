@@ -2,9 +2,10 @@ Read fvwm2rc-common
 
 DestroyFunc InitFunction_autostart
 AddToFunc InitFunction_autostart
-+ I Exec aterm +sb -e /home/martin/bin/startupreport --minimal
++ I Exec xterm +sb -e /home/martin/bin/startupreport --minimal
 + I Exec Esetroot -scale ~/grafik/background/default
-+ I Exec /home/martin/bin/startgaleon
+#+ I Exec /home/martin/bin/startgaleon
++ I Exec iceweasel
 + I Exec emacs -geometry 114x49
 + I Exec workrave
 

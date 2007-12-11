@@ -204,6 +204,10 @@
       (cons '(".*\\.m$" . octave-mode)
           auto-mode-alist))
 
+(setq auto-mode-alist 
+      (cons '(".*\\.d$" . c-mode)
+          auto-mode-alist))
+
 ;; Add my directories to load-path.
 (setq load-path (append
                  '("~/config/elisp")
@@ -512,3 +516,5 @@
 
 ;(load-library "ispell")
 ;(setq ispell-program-name "aspell")
+
+(load "remem.el")
