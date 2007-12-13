@@ -1,7 +1,7 @@
 source ~/scripts/bashrc_add_prefix
 
 add_prefix ~/apps
-export PATH=$HOME/bin:$HOME/scripts:$PATH
+export PATH=~/bin:~/scripts:$PATH
 
 # If running interactively, then:
 if [ "$PS1" ]; then
