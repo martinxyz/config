@@ -265,8 +265,9 @@
 (add-hook 'c-mode-common-hook
   (lambda () 
     ; keine automatischen newlines wenn man ; drueckt
-    (c-toggle-auto-newline-state -1)
-    (c-toggle-auto-state -1)
+    ;(c-toggle-auto-newline-state -1)
+    (c-toggle-auto-newline -1)
+    ; obsolete: (c-toggle-auto-state -1)
     ; hungry delete loescht alle leerzeichen auf einmal
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")
@@ -517,4 +518,5 @@
 ;(load-library "ispell")
 ;(setq ispell-program-name "aspell")
 
-(load "remem.el")
+;(load "remem.el")
+
