@@ -1,4 +1,5 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
+
 #env
 #pkg-config --libs opencv
 
@@ -12,12 +13,17 @@ fi
 
 export MAILCHECK=60
 
-#export PKG_CONFIG_PATH=/usr/pack/opencv-1.0.0-dr/i686-debian-linux3.1/lib/pkgconfig
+if uname -a|grep x86_64 >/dev/null ; then
+  add_prefix /usr/pack/opencv-1.0.0-dr/amd64-debian-linux3.1
+  add_prefix /home/mrenold/apps64
+else
+  add_prefix /usr/pack/opencv-1.0.0-dr/i686-debian-linux3.1
+fi
 #/usr/pack/gtk-2.10.14-sd/i686-debian-linux3.1/lib/pkgconfig/
 
 # allow core dumps up to 10 MB
-#ulimit -c 10000
-ulimit -c unlimited
+ulimit -c 10000
+#ulimit -c unlimited
 
 # purify licence
 #export RSU_LICENSE_MAP=/usr/pack/developmentstudio-2002.05.00-mo/config/License_Map
@@ -28,5 +34,7 @@ if [ "$PS1" ]; then
    cd ~/da
 fi
 
-export PATH=$HOME/da/code/tools:$PATH
+#export PATH=$HOME/da/code/tools:$PATH
 
+# someone resets this but not everything else...
+export LD_LIBRARY_PATH=$LIBRARY_PATH
