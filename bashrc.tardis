@@ -17,7 +17,15 @@ if uname -a|grep x86_64 >/dev/null ; then
   add_prefix /usr/pack/opencv-1.0.0-dr/amd64-debian-linux3.1
   add_prefix /home/mrenold/apps64
 else
+  add_prefix /usr/pack/boost-1.34.1-sd/i686-debian-linux3.1/
+  add_prefix /usr/pack/gtk-2.10.14-sd/i686-debian-linux3.1
   add_prefix /usr/pack/opencv-1.0.0-dr/i686-debian-linux3.1
+  add_prefix /usr/pack/python-debian31-2.5-ds
+  add_prefix /usr/pack/atlas-3.7.24-ds/i686-debian-linux3.1
+  add_prefix /usr/pack/tiff-3.7.2-mo/i686-debian-linux3.0
+  add_prefix /home/mrenold/apps_big
+  # hack for #$%^& python problem (PIL uses a .pth file but those are ignored in PYTHONPATH directories)
+  export PYTHONPATH=$PYTHONPATH:/home/mrenold/apps/lib/python2.5/site-packages/PIL
 fi
 #/usr/pack/gtk-2.10.14-sd/i686-debian-linux3.1/lib/pkgconfig/
 

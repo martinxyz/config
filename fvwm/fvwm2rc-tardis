@@ -16,5 +16,5 @@ Exec exec firefox http://people.ee.ethz.ch/~mrenold/
 # Doesn't work :-(
 Style emacs StartsOnPage 0 1
 Style Emacs StartsOnPage 0 1
-Exec exec emacs
+#Exec exec emacs
 
