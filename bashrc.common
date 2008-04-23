@@ -37,8 +37,8 @@ fi
 
 export HISTIGNORE='*#[Rr][Mm]:?:??:halt'
 export HISTCONTROL="ignoredups"
-export HISTFILESIZE=8000
-export HISTSIZE=8000
+export HISTFILESIZE=80000
+export HISTSIZE=80000
 
 export EDITOR=vim
 export VISUAL=vim
