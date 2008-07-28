@@ -59,6 +59,11 @@
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
+(set-cursor-color "yellow")
+
+;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
+;; vi/emacs input modes, causing confusion in non-viper buffers
+(global-unset-key "\C-z")
 ;; start viper on startup (vim keybindings), siehe auch viper.el
 (setq viper-mode t)
 (require 'viper)
@@ -265,8 +270,12 @@
 (add-hook 'c-mode-common-hook
   (lambda () 
     ; keine automatischen newlines wenn man ; drueckt
+; <old version>
+;   ;(c-toggle-auto-newline-state -1)
+    (c-toggle-auto-state -1)
+; </old version>
     ;(c-toggle-auto-newline-state -1)
-    (c-toggle-auto-newline -1)
+    ;(c-toggle-auto-newline -1)
     ; obsolete: (c-toggle-auto-state -1)
     ; hungry delete loescht alle leerzeichen auf einmal
     (c-toggle-hungry-state 1)
@@ -322,6 +331,12 @@
 (define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
 ;(define-key viper-vi-local-user-map "F" 'swbuff-switch-to-previous-buffer)
 ;(define-key viper-vi-local-user-map "s" 'swbuff-switch-to-previous-buffer)
+
+; TODO: replace swbuff?
+;Another vote for iswitchb-mode. It's so immensely useful, and does not seem to be very well known. I set it up like this:
+;(setq iswitchb-prompt-newbuffer nil)
+;(iswitchb-mode t)
+
 (define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
 (defun martin-kill-whole-line ()
@@ -508,7 +523,8 @@
  ;'(show-paren-mode t nil (paren))
  ;; User name to be put in the ChangeLog file by M-x add-change-log-entry
  '(user-full-name "Martin Renold")
- '(user-mail-address "martinxyz@gmx.ch"))
+ '(user-mail-address "martinxyz@gmx.ch")
+ )
 
 ;; use UTF-8 by default
 ;(prefer-coding-system 'mule-utf-8)

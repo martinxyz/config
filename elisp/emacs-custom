@@ -1,13 +1,11 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
   ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
  '(bar-cursor 2)
  '(c-strict-syntax-p nil)
  '(case-fold-search t)
  '(column-number-mode nil)
- '(compilation-ask-about-save nil)
+ '(compilation-ask-about-save nil t)
  '(compilation-context-lines 0)
  '(compilation-scroll-output t)
  '(complex-buffers-menu-p t)
@@ -32,7 +30,7 @@
  '(mouse-yank-at-point t)
  '(octave-auto-indent t)
  '(paren-mode (quote paren) nil (paren))
- '(ps-paper-type (quote a4))
+ '(ps-paper-type (quote a4) t)
  '(ps-print-color-p nil)
  '(py-continuation-offset 2)
  '(query-user-mail-address nil)
@@ -65,11 +63,10 @@
  '(vhdl-testbench-name (quote (".*" . "\\&Tb")))
  '(vhdl-underscore-is-part-of-word t)
  '(viper-auto-indent t)
+ '(viper-replace-overlay-cursor-color "yellow")
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
   ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
  )

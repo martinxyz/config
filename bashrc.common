@@ -1,3 +1,4 @@
+unset PREFIX_LIST # someone seems to reset $PATH while leaving PREFIX_LIST
 source ~/scripts/bashrc_add_prefix
 
 add_prefix ~/apps
@@ -23,7 +24,7 @@ if [ "$PS1" ]; then
     alias ...="cd ../.."
     alias ....="cd ../../.."
 
-    alias crazy="aaa=0; PROMPT_COMMAND='((aaa=(aaa+1)%6))'; PS1='$PS1\$(((bbb=aaa+31)); echo -e -n \\e[\$bbb; echo -n m)'"
+    alias em='emacs -nw'
 
     # set a fancy prompt
     PS1='\u@\h:\w\$ '
@@ -35,7 +36,7 @@ if [ "$PS1" ]; then
     shopt -s checkwinsize
 fi
 
-export HISTIGNORE='*#[Rr][Mm]:?:??:halt'
+export HISTIGNORE='*#[Rr][Mm]:?:halt'
 export HISTCONTROL="ignoredups"
 export HISTFILESIZE=80000
 export HISTSIZE=80000
@@ -47,7 +48,7 @@ export CVS_RSH=ssh
 export RSYNC_RSH=ssh
 export SHELL=bash
 
-export SCONSFLAGS="-Q"
+export SCONSFLAGS="-Q -u"
 
 #export BROWSER="galeon -n"
 export BROWSER="firefox -new-tab"
