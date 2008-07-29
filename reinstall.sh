@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ ! -d $HOME/config ] ; then
   echo "Put those things into ~/config !"

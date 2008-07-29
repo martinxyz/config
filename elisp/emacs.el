@@ -166,6 +166,21 @@
   (setq show-trailing-whitespace t)
   )
 
+(defun neuronics-c-mode ()
+  "save only tabs to disk, show 4 spaces (visual only)"
+  (interactive)
+  (c++-mode)
+  ; indent with tabs only.
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode t)
+  )
+;; Hack, TODO: host trap
+(setq auto-mode-alist (cons '(".*\\.h$" . neuronics-c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '(".*\\.c$" . neuronics-c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '(".*\\.cpp$" . neuronics-c-mode) auto-mode-alist))
+
+
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
@@ -280,13 +295,17 @@
     ; hungry delete loescht alle leerzeichen auf einmal
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")
-    ;(setq tab-width 2)
+    (setq tab-width 4)
     ))
 
 ; Der Octave-Mode braucht eine extraaufforderung den viper zu benutzen
 (add-hook 'octave-mode-hook
   (lambda () 
-    (viper-mode) ))
+    (viper-mode)
+    ; TODO: neuronics trap?
+    ;c-basic-offset 4 
+    (setq tab-width 4)
+    ))
 
 ; Tabs fuer eclipse java zeugs
 (add-hook 'java-mode-hook
@@ -294,6 +313,10 @@
     (setq indent-tabs-mode t)
     (setq tab-width 4)))
 
+; Neuronics python
+(add-hook 'python-mode-hook
+  (lambda () 
+    (setq tab-width 4)))
 
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
@@ -536,3 +559,5 @@
 
 ;(load "remem.el")
 
+;(setq-default tab-width 4)
+;(setq-default tab-stop-list (list 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108))
