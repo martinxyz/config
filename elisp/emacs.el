@@ -37,11 +37,12 @@
 
 
 (global-set-key  [f12]  'bigterm-in-current-directory)
+(define-key viper-vi-local-user-map "\C-e" 'bigterm-in-current-directory)
 
 (defun bigterm-in-current-directory ()
   "start a terminal in the current directory"
   (interactive)
-  (shell-command "bigterm"))
+  (start-process "terminal" nil "bigterm"))
 
 ;(global-set-key "\C-z" 'undo)
 
