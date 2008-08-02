@@ -97,32 +97,6 @@
        (c-set-offset 'substatement-open 0)
        (setq tab-width 8))
 
-(defun stratagus-c-mode ()
-  "Stratagus C coding style"
-  (interactive)
-  (c-mode)
-  (c-set-style "stroustrup")
-  )
-
-(defun synfig-c-mode ()
-  "Synfig cpp coding style"
-  (interactive)
-  (c++-mode)
-  ; indent with tabs only.
-  (setq c-basic-offset 8
-        tab-width 8
-        indent-tabs-mode t)
-  )
-
-(defun gtk-gnutella-c-mode ()
-  "Gtk-gnutella C coding style"
-  (interactive)
-  (c-mode)
-  (setq tab-width 4)
-  (set-variable 'tab-width 4)
-  (setq c-tab-width 4)
-  )
-
 (defun wesnoth-c-mode ()
   "Wesnoth cpp coding style"
   (interactive)
@@ -131,29 +105,6 @@
   (setq c-basic-offset 8
         tab-width 8
         indent-tabs-mode t)
-  )
-
-(defun nil-c-mode ()
-  "nil C coding style"
-  (interactive)
-  (asdlfkjvasdera)
-  (set-variable 'tab-width 2)
-  (c-mode)
-  ;; Help! Does all not work, only manually "M-x set-variable tab-with 2" does
-  (set-variable 'tab-width 2)
-  (setq-default tab-width 2)
-  ;(set-variable tab-width 2)
-
-  
-  (setq tab-stop 2 t)
-  (setq tab-stop-list (quote (2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32)))
-  (setq tab-width 2)
-
-  (setq c-basic-offset 2)
-  (setq c-indent-level 2)
-  (setq indent-tabs-mode t)
-  (setq tab-width 2)
-  (setq c-tab-width 2)
   )
 
 (defun gimp-c-mode ()
@@ -187,28 +138,13 @@
       (cons '(".*/linux.*/.*\\.[ch]$" . linux-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*/stratagus/.*/.*\\.[ch]$" . stratagus-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.cpp$" . wesnoth-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*synfig.*/.*\\.h$" . synfig-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*synfig.*/.*\\.cpp$" . synfig-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/gtk-gnutella.*/.*/.*\\.[ch]$" . gtk-gnutella-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/nil/.*(cpp|h)$" . nil-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*\\.mas$" . python-mode)
@@ -381,8 +317,17 @@
 ;(define-key viper-vi-local-user-map "-" 'hs-hide-all)
 ;(define-key viper-vi-local-user-map "+" 'hs-show-all)
 
+(global-set-key "\M-." (lambda () (interactive)
+                         (setq last-tags-jump-was-find-tag t)
+                         (call-interactively 'find-tag)))
+(define-key viper-vi-local-user-map "," (lambda () (interactive)
+                                          (setq last-tags-jump-was-find-tag nil)
+                                          (call-interactively 'tags-search)))
+(global-set-key "\M-," (lambda () (interactive)
+                         (if last-tags-jump-was-find-tag
+                             (find-tag nil t)
+                             (tags-loop-continue))))
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
-(define-key viper-vi-local-user-map "," 'tags-search)
 
 ;(define-key viper-vi-local-user-map "W" 'kill-region)
 (define-key viper-vi-local-user-map "W" 'copy-region-as-kill)
