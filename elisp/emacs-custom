@@ -38,6 +38,7 @@
  '(save-place t nil (saveplace))
  '(scroll-bar-mode nil)
  '(scroll-conservatively 8)
+ '(scroll-margin 4)
  '(scrollbars-visible-p nil)
  '(show-paren-mode t nil (paren))
  '(speedbar-tag-hierarchy-method nil)

@@ -9,6 +9,16 @@
 ; scheint auch ohne zu gehen, aber so ist es gleich von Anfang an geladen
 (require 'cc-mode)
 
+(set-cursor-color "yellow")
+
+;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
+;; vi/emacs input modes, causing confusion in non-viper buffers
+(global-unset-key "\C-z")
+;; start viper on startup (vim keybindings), siehe auch viper.el
+(setq viper-mode t)
+(require 'viper)
+
+;
 ;; ??
 ;(add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
 ;(setq  dired-omit-files-p  t)
@@ -68,16 +78,7 @@
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
-(set-cursor-color "yellow")
-
-;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
-;; vi/emacs input modes, causing confusion in non-viper buffers
-(global-unset-key "\C-z")
-;; start viper on startup (vim keybindings), siehe auch viper.el
-(setq viper-mode t)
-(require 'viper)
-
-;; ;; This adds additional extensions which indicate files normally
+; ;; This adds additional extensions which indicate files normally
 ;; ;; handled by cc-mode.
 ;; (setq auto-mode-alist
 ;;       (append '(("\\.C$"  . c++-mode)
