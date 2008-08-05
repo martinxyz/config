@@ -1,6 +1,8 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(bar-cursor 2)
  '(c-strict-syntax-p nil)
  '(case-fold-search t)
@@ -29,9 +31,9 @@
  '(mouse-avoidance-threshold 8)
  '(mouse-wheel-mode t nil (mwheel))
  '(mouse-yank-at-point t)
- '(octave-auto-indent t)
+ '(octave-auto-indent nil)
  '(paren-mode (quote paren) nil (paren))
- '(ps-paper-type (quote a4) t)
+ '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
  '(py-continuation-offset 2)
  '(query-user-mail-address nil)
@@ -70,6 +72,8 @@
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  )

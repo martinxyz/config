@@ -251,6 +251,7 @@
     ; TODO: neuronics trap?
     ;c-basic-offset 4 
     (setq tab-width 4)
+    (setq octave-block-offset 4)
     ))
 
 ; Tabs fuer eclipse java zeugs
