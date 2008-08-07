@@ -36,6 +36,7 @@
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
  '(py-continuation-offset 2)
+ '(python-guess-indent nil)
  '(query-user-mail-address nil)
  '(save-place t nil (saveplace))
  '(scroll-bar-mode nil)

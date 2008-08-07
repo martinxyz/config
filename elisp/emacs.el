@@ -52,7 +52,7 @@
 (defun bigterm-in-current-directory ()
   "start a terminal in the current directory"
   (interactive)
-  (start-process "terminal" nil "bigterm"))
+  (start-process "terminal" nil "~/scripts/bigterm"))
 
 ;(global-set-key "\C-z" 'undo)
 
@@ -117,6 +117,13 @@
         indent-tabs-mode t)
   )
 
+(defun pke-python-mode ()
+  (interactive)
+  (python-mode)
+  ; indent with tabs only.
+  (setq indent-tabs-mode t)
+  )
+
 (defun gimp-c-mode ()
   (interactive)
   (c-mode)
@@ -138,6 +145,7 @@
   )
 ;; Hack, TODO: host trap
 (setq auto-mode-alist (cons '(".*\\.h$" . neuronics-c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '(".*\\.hpp$" . neuronics-c-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '(".*\\.c$" . neuronics-c-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '(".*\\.cpp$" . neuronics-c-mode) auto-mode-alist))
 
@@ -172,6 +180,9 @@
 
 (setq auto-mode-alist 
       (cons '(".*\\.d$" . c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*eventhandler.*\\.py$" . pke-python-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -257,13 +268,7 @@
 ; Tabs fuer eclipse java zeugs
 (add-hook 'java-mode-hook
   (lambda () 
-    (setq indent-tabs-mode t)
-    (setq tab-width 4)))
-
-; Neuronics python
-(add-hook 'python-mode-hook
-  (lambda () 
-    (setq tab-width 4)))
+    (setq indent-tabs-mode t)))
 
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
