@@ -279,9 +279,6 @@
 
 (column-number-mode t)
 
-; macht nur dass cut&paste von einem xterm nicht mehr geht
-;(setq x-select-enable-clipboard t)
-
 ; Nützlich für "Search & Replace" in einer Region
 (put 'narrow-to-region 'disabled nil)
 
@@ -312,6 +309,19 @@
 ;(setq iswitchb-prompt-newbuffer nil)
 ;(iswitchb-mode t)
 
+; ido = iswitchb fork + same functionality for finding files
+(require 'ido)
+;(ido-mode t)
+
+(add-hook 'ido-define-mode-map-hook 'ido-my-keys)
+
+(defun ido-my-keys ()
+  "Add my keybindings for ido."
+  ;(define-key ido-mode-map " " 'ido-next-match)
+  (define-key ido-mode-map " " 'ido-next-match)
+  ;(define-key ido-mode-map "~" 'ido-next-match)
+  )
+
 (define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
 (defun martin-kill-whole-line ()
@@ -341,8 +351,10 @@
                                           (call-interactively 'tags-search)))
 (global-set-key "\M-," (lambda () (interactive)
                          (if last-tags-jump-was-find-tag
-                             (find-tag nil t)
-                             (tags-loop-continue))))
+                             (progn
+                               (find-tag nil t)
+                               (ring-remove find-tag-marker-ring 0))
+                           (tags-loop-continue))))
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
 ;(define-key viper-vi-local-user-map "W" 'kill-region)
@@ -354,7 +366,7 @@
 (define-key viper-vi-local-user-map "K" 'kill-this-buffer)
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
-;(define-key viper-vi-local-user-map "v" 'ido-find-file)
+(define-key viper-vi-local-user-map "v" 'ido-find-file)
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
@@ -365,9 +377,11 @@
   (pager-row-down)
   (pager-row-down)
   (pager-row-down)
+  (pager-row-down)
   )
 (defun pager-some-rows-up ()
   (interactive)
+  (pager-row-up)
   (pager-row-up)
   (pager-row-up)
   (pager-row-up)
@@ -493,10 +507,6 @@
 ;(setq ibuffer-always-show-last-buffer nil)
 ;(setq ibuffer-sorting-mode 'recency)
 ;(setq ibuffer-use-header-line t)
-
-; what is ido-mode? Same thing for opening files. (with minimal amount of keystrokes)
-;(require 'ido)
-;(ido-mode t)
 
 ; From the GIMP developer webpage:
 
