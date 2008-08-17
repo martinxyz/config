@@ -190,6 +190,11 @@
                  '("~/config/elisp")
                  load-path))
 
+;(eval-after-load "pymacs"
+;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
+;(pymacs-load "pymacstest" "pytest-")
+;;(message (pytest-foo))
+
 ; Color-themes package. 
 ; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?ColorTheme
 (require 'color-theme)
@@ -310,6 +315,7 @@
 ;(iswitchb-mode t)
 
 ; ido = iswitchb fork + same functionality for finding files
+(load "ido")
 (require 'ido)
 ;(ido-mode t)
 
@@ -532,3 +538,4 @@
 
 ;(setq-default tab-width 4)
 ;(setq-default tab-stop-list (list 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108))
+
