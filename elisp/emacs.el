@@ -189,6 +189,9 @@
 (setq load-path (append
                  '("~/config/elisp")
                  load-path))
+(setq load-path (append
+                 '("~/config/elisp/python-mode-1.0")
+                 load-path))
 
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
@@ -315,9 +318,8 @@
 ;(iswitchb-mode t)
 
 ; ido = iswitchb fork + same functionality for finding files
-(load "ido")
 (require 'ido)
-;(ido-mode t)
+(ido-mode t)
 
 (add-hook 'ido-define-mode-map-hook 'ido-my-keys)
 
@@ -325,8 +327,28 @@
   "Add my keybindings for ido."
   ;(define-key ido-mode-map " " 'ido-next-match)
   (define-key ido-mode-map " " 'ido-next-match)
+  ;(define-key ido-mode-map "<up>" 'ido-next-match) TODO: history
   ;(define-key ido-mode-map "~" 'ido-next-match)
   )
+
+
+; sort ido filelist by mtime instead of alphabetically
+; my own implementation, watch for feedback at http://www.emacswiki.org/cgi-bin/wiki/InteractivelyDoThings
+(add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
+(add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
+(defun ido-sort-mtime ()
+  (setq ido-temp-list
+        (sort ido-temp-list 
+              (lambda (a b)
+                (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
+                      (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
+                  (if (= (nth 0 ta) (nth 0 tb))
+                      (> (nth 1 ta) (nth 1 tb))
+                    (> (nth 0 ta) (nth 0 tb)))))))
+  (ido-to-end  ;; move . files to end (again)
+   (delq nil (mapcar
+              (lambda (x) (if (string-equal (substring x 0 1) ".") x))
+              ido-temp-list))))
 
 (define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
