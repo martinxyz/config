@@ -194,5 +194,7 @@
 ;;;; your own risk, etc.
 
 ;; Additions by Martin Renold moved to emacs config file.
+;; but according to docu this one has to be in .viper:
 
-
+; no viper in minibuf (because it conflicts eg. with ido backspace)
+(setq viper-vi-style-in-minibuffer nil)

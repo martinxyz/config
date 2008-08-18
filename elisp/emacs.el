@@ -18,10 +18,6 @@
 (setq viper-mode t)
 (require 'viper)
 
-;
-;; ??
-;(add-hook  'dired-load-hook  (function  (lambda  ()  (load  "dired-x"))))
-;(setq  dired-omit-files-p  t)
 
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
@@ -193,6 +189,9 @@
                  '("~/config/elisp/python-mode-1.0")
                  load-path))
 
+;(require 'vimpulse) ; only visual mode, not much more...
+(setq viper-ex-style-editing nil)  ; can backspace past start of insert / line
+
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
 ;(pymacs-load "pymacstest" "pytest-")
@@ -282,7 +281,6 @@
 (auto-compression-mode t)
 
 (global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
-(define-key viper-vi-local-user-map "?" 'pop-global-mark) ; ich benutze rueckwaertssuche eh nie
 (define-key viper-vi-local-user-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
 
 (column-number-mode t)
@@ -321,15 +319,15 @@
 (require 'ido)
 (ido-mode t)
 
-(add-hook 'ido-define-mode-map-hook 'ido-my-keys)
-
-(defun ido-my-keys ()
-  "Add my keybindings for ido."
-  ;(define-key ido-mode-map " " 'ido-next-match)
-  (define-key ido-mode-map " " 'ido-next-match)
-  ;(define-key ido-mode-map "<up>" 'ido-next-match) TODO: history
-  ;(define-key ido-mode-map "~" 'ido-next-match)
-  )
+; not really working anyway
+;; (add-hook 'ido-define-mode-map-hook 'ido-my-keys)
+;; (defun ido-my-keys ()
+;;   "Add my keybindings for ido."
+;;   ;(define-key ido-mode-map " " 'ido-next-match)
+;;   (define-key ido-mode-map " " 'ido-next-match)
+;;   (define-key ido-mode-map [up] 'ido-enter-find-file) ; just for the history, TODO: how can the same be done in ido?
+;;   ;(define-key ido-mode-map "~" 'ido-next-match)
+;;   )
 
 
 ; sort ido filelist by mtime instead of alphabetically
@@ -390,7 +388,7 @@
 (define-key viper-vi-local-user-map " " 'set-mark-command)
 ;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
 (define-key viper-vi-local-user-map "M" 'delete-other-windows)
-(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
+;(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
 (define-key viper-vi-local-user-map "K" 'kill-this-buffer)
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
