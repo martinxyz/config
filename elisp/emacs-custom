@@ -14,7 +14,7 @@
  '(complex-buffers-menu-p t)
  '(delete-key-deletes-forward t)
  '(desktop-enable t nil (desktop))
- '(desktop-globals-to-save (quote (desktop-missing-file-warning search-ring regexp-search-ring register-alist compile-command compile-history extended-command-history)))
+ '(desktop-globals-to-save (quote (desktop-missing-file-warning search-ring regexp-search-ring register-alist compile-command compile-history extended-command-history tags-file-name tags-table-list)))
  '(desktop-locals-to-save (quote (desktop-locals-to-save truncate-lines case-fold-search case-replace fill-column overwrite-mode change-log-default-name line-number-mode column-number-mode size-indication-mode buffer-file-coding-system indicate-buffer-boundaries indicate-empty-lines show-trailing-whitespace)))
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
