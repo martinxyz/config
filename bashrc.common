@@ -13,7 +13,7 @@ if [ "$PS1" ]; then
     #unalias ls
     alias ls='ls -r -t --color=auto '
     alias pstree='pstree -G'
-    alias qmv="qmv -e e --format=do"
+    alias qmv="qmv -e emacs --format=do"
     alias łess='less'
     #alias ll='ls -l'
     #alias la='ls -A'
