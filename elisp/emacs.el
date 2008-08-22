@@ -36,6 +36,7 @@
 ;(global-set-key  [f7]  'switch-to-other-buffer)
 (global-set-key  [f8]  'compile)
 (global-set-key  [f9]  (lambda () (interactive)
+						 (desktop-save-in-desktop-dir)
                          (if compilation-in-progress (kill-compilation))
                          (run-at-time 0.3 nil 'recompile)))
 (global-set-key  [f10]  'kill-compilation)
@@ -113,7 +114,7 @@
         indent-tabs-mode t)
   )
 
-(defun pke-python-mode ()
+(defun neuronics-python-mode ()
   (interactive)
   (python-mode)
   ; indent with tabs only.
@@ -177,8 +178,11 @@
 (setq auto-mode-alist 
       (cons '(".*\\.d$" . c-mode)
           auto-mode-alist))
+;(setq auto-mode-alist 
+;      (cons '(".*eventhandler.*\\.py$" . pke-python-mode)
+;          auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*eventhandler.*\\.py$" . pke-python-mode)
+      (cons '(".*py$" . neuronics-python-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -277,6 +281,13 @@
   (lambda () 
     (setq indent-tabs-mode t)))
 
+; Tabs fuer eclipse java zeugs
+(add-hook 'python-mode-hook
+  (lambda () 
+    (setq indent-tabs-mode t)
+    (setq tab-width 4)
+	))
+
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
 
@@ -289,7 +300,7 @@
 (put 'narrow-to-region 'disabled nil)
 
 ; indent with spaces, never tabs (for details google "emacs tabs")
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode t)
 
 ;; Enter soll im c-modus auto-indent machen
 (setq viper-auto-indent t)
@@ -556,6 +567,6 @@
 
 ;(load "remem.el")
 
-;(setq-default tab-width 4)
-;(setq-default tab-stop-list (list 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108))
+(setq-default tab-width 4)
+(setq-default tab-stop-list (list 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108))
 
