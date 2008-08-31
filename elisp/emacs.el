@@ -114,13 +114,6 @@
         indent-tabs-mode t)
   )
 
-(defun neuronics-python-mode ()
-  (interactive)
-  (python-mode)
-  ; indent with tabs only.
-  (setq indent-tabs-mode t)
-  )
-
 (defun gimp-c-mode ()
   (interactive)
   (c-mode)
@@ -130,22 +123,6 @@
   (setq indent-tabs-mode nil)
   (setq show-trailing-whitespace t)
   )
-
-(defun neuronics-c-mode ()
-  "save only tabs to disk, show 4 spaces (visual only)"
-  (interactive)
-  (c++-mode)
-  ; indent with tabs only.
-  (setq c-basic-offset 4
-        tab-width 4
-        indent-tabs-mode t)
-  )
-;; Hack, TODO: host trap
-(setq auto-mode-alist (cons '(".*\\.h$" . neuronics-c-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '(".*\\.hpp$" . neuronics-c-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '(".*\\.c$" . neuronics-c-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '(".*\\.cpp$" . neuronics-c-mode) auto-mode-alist))
-
 
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
@@ -177,12 +154,6 @@
 
 (setq auto-mode-alist 
       (cons '(".*\\.d$" . c-mode)
-          auto-mode-alist))
-;(setq auto-mode-alist 
-;      (cons '(".*eventhandler.*\\.py$" . pke-python-mode)
-;          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*py$" . neuronics-python-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -270,8 +241,6 @@
 (add-hook 'octave-mode-hook
   (lambda () 
     (viper-mode)
-    ; TODO: neuronics trap?
-    ;c-basic-offset 4 
     (setq tab-width 4)
     (setq octave-block-offset 4)
     ))
@@ -300,7 +269,7 @@
 (put 'narrow-to-region 'disabled nil)
 
 ; indent with spaces, never tabs (for details google "emacs tabs")
-(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
 
 ;; Enter soll im c-modus auto-indent machen
 (setq viper-auto-indent t)
@@ -567,6 +536,5 @@
 
 ;(load "remem.el")
 
-(setq-default tab-width 4)
-(setq-default tab-stop-list (list 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108))
-
+; host specific stuff
+(load "~/config/elisp/local-config")
