@@ -42,14 +42,16 @@
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
-
-(global-set-key  [f12]  'bigterm-in-current-directory)
 (define-key viper-vi-local-user-map "\C-e" 'bigterm-in-current-directory)
+;(global-set-key  "\C-e" 'bigterm-in-current-directory)
+(global-set-key  [F12] 'bigterm-in-current-directory)
 
 (defun bigterm-in-current-directory ()
   "start a terminal in the current directory"
   (interactive)
-  (start-process "terminal" nil "~/scripts/bigterm"))
+  ;(start-process "terminal" nil "~/scripts/bigterm"))
+  ; background it to avoid "active processes exist" question when exiting emacs
+  (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&"))
 
 ;(global-set-key "\C-z" 'undo)
 
@@ -249,13 +251,6 @@
 (add-hook 'java-mode-hook
   (lambda () 
     (setq indent-tabs-mode t)))
-
-; Tabs fuer eclipse java zeugs
-(add-hook 'python-mode-hook
-  (lambda () 
-    (setq indent-tabs-mode t)
-    (setq tab-width 4)
-	))
 
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
@@ -536,5 +531,11 @@
 
 ;(load "remem.el")
 
+;; Org-mode settings
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;(global-set-key "\C-cl" 'org-store-link)
+;(global-set-key "\C-ca" 'org-agenda)
+
 ; host specific stuff
 (load "~/config/elisp/local-config")
+

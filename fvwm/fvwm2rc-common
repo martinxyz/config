@@ -5,28 +5,10 @@ DesktopSize 4 3
 
 DestroyFunc InitFunction
 AddToFunc InitFunction
-+ I Style "*" SkipMapping
+#+ I Style "*" SkipMapping
 + I Style * CaptureHonorsStartsOnPage, KeepWindowGroupsOnDesk
-+ I Style "Emacs*" SkipMapping,StartsOnPage 1 1
-+ I Style "X-Chat*" SkipMapping,StartsOnPage 3 1
-+ I Style "XChat*" SkipMapping,StartsOnPage 3 1
-+ I Style "xmms*" SkipMapping,StartsOnPage 2 0
-+ I Style "XMMS*" SkipMapping,StartsOnPage 2 0
-# Note: galeon needs --noraise for this to work
-+ I Style "Galeon"     SkipMapping,StartsOnPage 2 0
-+ I Style "Galeon-bin" SkipMapping,StartsOnPage 2 0
-+ I Style "galeon-bin" SkipMapping,StartsOnPage 2 0
-+ I Style "Iceweasel"     SkipMapping,StartsOnPage 1 0
 #+ I Style "Brood War" ManualPlacement
 + I InitFunction_autostart
-
-# Wenn ein zweiter galeon auf einem anderen desk offen ist
-# kommt das Suchfenster (Ctrl-F) auf dem startdesk, sehr mühsem.
-AddToFunc GaleonOtherDesk
-+ I Style "Galeon"     ShowMapping,StartsAnyWhere
-+ I Style "Galeon-bin" ShowMapping,StartsAnyWhere
-+ I Style "galeon-bin" ShowMapping,StartsAnyWhere
-Key g A 2 GaleonOtherDesk
 
 # kein Desktopwechsel wenn der Mauszeiger am Bildrand ist
 EdgeScroll 0 0
@@ -43,11 +25,11 @@ EdgeResistance 250 100
 Style "*" Font -*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*
 Style "*" HilightFore white
 Style "*" HilightBack steelblue
-Style "*" BorderWidth 6
-Style "*" HandleWidth 6
-Style "*" MWMFunctions
-Style "*" MWMBorder
-Style "*" MWMDecor
+Style "*" BorderWidth 4
+Style "*" HandleWidth 4
+#Style "*" MWMFunctions
+#Style "*" MWMBorder
+#Style "*" MWMDecor
 Style "*" DecorateTransient
 Style "*" ActivePlacement
 Style "*" NoPPosition
@@ -85,25 +67,19 @@ Style "FvwmIdent" Title
 Style "FvwmIdent" WindowListHit
 Style "FvwmIdent" CirculateHit
 
+#Style "*" NoTitle
 
 Style "*" MinOverlapPercentPlacement
 #Style * TileCascadePlacement
-#Style "*" MouseFocus
 Style "*" SloppyFocus
+#Style "*" ClickToFocus
 Style "*" GrabFocus
 Style "*" GrabFocusTransient
 Style "*" SkipMapping
 
-Style "Eterm" BorderWidth 1, HandleWidth 1, NoTitle
-Style "aterm" BorderWidth 1, HandleWidth 1, NoTitle
-Style "xterm" BorderWidth 1, HandleWidth 1, NoTitle
-Style "uxterm" BorderWidth 1, HandleWidth 1, NoTitle
-Style "urxvt" BorderWidth 1, HandleWidth 1, NoTitle
-Style "rxvt" BorderWidth 1, HandleWidth 1, NoTitle
-Style "Emacs" BorderWidth 0, HandleWidth 0, NoTitle
-# When a Etern has the focus, do not grab it for a newly created window.
-#Style "Eterm" OverrideGrabFocus
-Style MPlayer NoTitle
+GlobalOpts MouseFocusClickRaises
+
+#Style MPlayer NoTitle
 #Style Workrave !Iconifable #SkipMapping # NeverFocus # useful?
 #Style "Workrave" NeverFocus
 Style "Workrave" NoIcon 
@@ -176,16 +152,12 @@ Mouse 1 W 2 Move-or-Raise
 Mouse 2 W 2 Lower
 Mouse 3 W 2 Resize
 Key p A 2 Module FvwmPager *
-Key space A 2 KillModule FvwmPager
+Key o A 2 KillModule FvwmPager
 Key x A 2 CursorStyle DEFAULT None
 Key c A 2 CursorStyle DEFAULT
 # TODO: remove title bar and maximize, minimize and add title bar
 Key m A 2 Maximize toggle 100 100
 # jumping around
-#AddToFunc FocusIfNone
-#+ I Current (!CurrentPage) Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-#+ I Next (AcceptsFocus !Shaded CurrentPage) Focus NoWarp
-#Key t A 2 FocusIfNone
 AddToFunc JumpH
 + I GotoPage -1p +0p
 AddToFunc JumpL
@@ -325,15 +297,6 @@ Key t A 2 Lower
 Mouse 0 2       A   Close
 
 
-# focus on click in window
-#DestroyFunc FocusAndClick
-#AddToFunc FocusAndClick
-#+ I Focus
-#+ I FakeClick press
-## Mouse [(window)] Button Context Modifiers Function
-#Mouse 1 W       N   FocusAndClick
-
-
 ### gtk-menu-beep: notes about the problem ####
 
 # beep-demo
@@ -341,8 +304,8 @@ Mouse 0 2       A   Close
 #AddToFunc MarkWindowAsActiveFunc
 #+ I echo XXXX
 #*FvwmEvent: focus_change Current (!Iconified) State 2 True #MarkWindowAsActiveFunc
-*FvwmEvent: focus_change Echo XXXX
-Module FvwmEvent
+#*FvwmEvent: focus_change Echo XXXX
+#Module FvwmEvent
 
 
 # Feststellungen:

@@ -15,6 +15,12 @@
         indent-tabs-mode t)
   )
 
+(add-hook 'python-mode-hook
+  (lambda () 
+    (setq indent-tabs-mode t)
+    (setq tab-width 4)
+	))
+
 (setq auto-mode-alist (cons '(".*\\.h$" . neuronics-c-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '(".*\\.hpp$" . neuronics-c-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '(".*\\.c$" . neuronics-c-mode) auto-mode-alist))
