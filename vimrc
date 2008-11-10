@@ -150,3 +150,5 @@ nnoremap <F9> :w<CR>:make<CR>:cope 5<CR>:cc<CR>
 nnoremap <F4> :cn<CR>
 nnoremap <S-F4> :cp<CR>
 
+set background=dark
+

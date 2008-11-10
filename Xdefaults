@@ -1,24 +1,54 @@
-XTerm*Background:  black
-XTerm*foreground:  gray
-XTerm*cursorColor: yellow
+!adapted from http://dotfiles.org/~Nobbs/.Xdefaults
 
-URxvt.termName: rxvt
+urxvt*borderLess:               false
+urxvt*externalBorder:           0
+urxvt*internalBorder:           2
+urxvt*scrollBar:                false
+urxvt*depth:                    32
+urxvt*background:               rgb:00/00/00
+urxvt*foreground:               #c8c8c8
+urxvt*cursorColor:              #dedede
+!urxvt*cursorColor:              yellow
+urxvt*cursorColor2:             #050505
+urxvt*cursorBlink:              true
+urxvt*inheritPixmap:            false
+urxvt*termName:                 rxvt
+urxvt*saveLines:                9999
+urxvt*scrollTtyOutput:          false
+urxvt*scrollTtyKeypress:        true
+urxvt*mouseWheelScrollPage:     false
+urxvt*perl-lib:                 /usr/lib/urxvt/perl/
+urxvt*perl-ext-common:          default,matcher
+urxvt*matcher.button:           1
+urxvt*matcher.pattern.1:        \\bwww\\.[\\w-]+\\.[\\w./?&@#-]*[\\w/-]
+urxvt*urlLauncher:              firefox
+urxvt*underlineColor:           #3465a4
+urxvt*loginShell:               true
+
+! bold (used in manpages)
 urxvt*colorBD: white
 
-xterm*color0:      #000000
-xterm*color1:      #c80000
-xterm*color2:      #00cc00
-xterm*color3:      #c8cc00
-xterm*color4:      #0000c8
-xterm*color5:      #c800c8
-xterm*color6:      #00ccc8
-xterm*color7:      #e0e0e0
-xterm*color8:      #484c48
-xterm*color9:      #f80000
-xterm*color10:     #00fc00
-xterm*color11:     #f8fc00
-xterm*color12:     #0000f8
-xterm*color13:     #f800f8
-xterm*color14:     #00fcf0
-xterm*color15:     #f8fcf8
-
+!black
+*color0:         rgb:00/00/00
+*color8:         rgb:75/77/73
+!red
+*color1:         rgb:cc/00/00
+*color9:         rgb:ef/29/29
+!green
+*color2:         rgb:4e/9a/06
+*color10:        rgb:8a/e2/34
+!brown/yellow
+*color3:         rgb:c4/a0/00
+*color11:        rgb:fc/e9/4f
+!blue
+*color4:         rgb:34/65/a4
+*color12:        rgb:72/9f/cf
+!magenta
+*color5:         rgb:75/50/7b
+*color13:        rgb:ad/7f/a8
+!cyan
+*color6:         rgb:06/98/9a
+*color14:        rgb:34/e2/e2
+!white
+*color7:         rgb:d3/d7/cf
+*color15:        rgb:ee/ee/ec
