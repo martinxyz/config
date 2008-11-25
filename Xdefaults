@@ -10,7 +10,7 @@ urxvt*foreground:               #c8c8c8
 urxvt*cursorColor:              #dedede
 !urxvt*cursorColor:              yellow
 urxvt*cursorColor2:             #050505
-urxvt*cursorBlink:              true
+urxvt*cursorBlink:              false
 urxvt*inheritPixmap:            false
 urxvt*termName:                 rxvt
 urxvt*saveLines:                9999
