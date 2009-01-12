@@ -8,7 +8,7 @@ syntax enable
 set tabstop=4
 set shiftwidth=4
 " Nie tabs speichern:
-" set expandtab
+set expandtab
 
 set ignorecase
 set autoindent

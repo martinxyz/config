@@ -177,3 +177,8 @@ add Mod2 = Super_R
 ! scroll-lock
 keycode 78 = Multi_key
 
+! somehow it is possible to screw those up
+add     shift   = Shift_L Shift_R
+add     control = Control_L Control_R
+add     mod1    = Alt_L Alt_R
+

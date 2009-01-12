@@ -538,4 +538,3 @@
 
 ; host specific stuff
 (load "~/config/elisp/local-config")
-
