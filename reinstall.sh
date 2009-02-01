@@ -18,6 +18,11 @@ for i in vimrc gvimrc vim cvsrc Xdefaults inputrc fluxbox; do
   symlink config/$i .$i
 done
 
+if [ -d scripts/.svn ] ; then
+    echo 'Move ~/scripts out of the way!'
+fi
+symlink config/scripts scripts
+
 # xmodmap fvwm2rc
 
 echo "Symlinks done."
