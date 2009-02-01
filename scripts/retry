@@ -1,0 +1,77 @@
+#!/bin/bash
+# Zweck: Einen bestimmten Befehl wieder und wieder probieren, bis
+# er Erfolg hat. Danach aus der Warteschlange loeschen.
+#
+# Ich benutze das vor allem als Downloader. Beispiel:
+# retry wget -c --limit-rate=20k http://ftp.sunet.se/pub/tv+movies/warriors/warriors-700-de-VBR.mpg
+#
+# 'retry' ohne argumente nimmt alle unterbrochenen jobs wieder auf.
+#
+# Cronjob Vorschlag (job output wird an Ende gemailt): 
+# 0 * * * * cronjob=true /usr/local/bin/retry
+#
+# Jobs löschen: einfach das entsprechende .sh script aus ~/.retryq löschen.
+
+set -e
+
+if [ "x$cronjob" = "x" ] ; then
+  cronjob=false
+fi
+
+# Verzeichnis mit der Warteschlange
+qdir=$HOME/.retryq
+
+[ -d $qdir ] || mkdir $qdir
+
+if [ $# -eq 0 ] ; then
+  $cronjob || echo "Warteschlange ($qdir):"
+  list=$(ls $qdir/*.sh 2>/dev/null)
+  $cronjob || echo "$list"
+  if [ -r $qdir/lock ] ; then
+    pid=$(cat $qdir/lock)
+    if ps -p $pid | grep retry >/dev/null 2>&1 ; then
+      $cronjob || echo "Ein anderer Prozess (PID $pid) laeuft bereits!"
+      $cronjob && exit 0
+      exit 1
+    else
+      $cronjob || echo "Entferne veraltetes $qdir/lock"
+      rm $qdir/lock
+    fi
+  fi
+  $cronjob || echo "--- queue-run (alles auf einmal) ---"
+  trap 'rm -f $qdir/lock; exit 2' TERM INT
+  echo -n $$ > $qdir/lock
+  for i in $list ; do
+    logfile="$qdir/$(basename $i .sh).log"
+    echo >> $logfile
+    echo >> $logfile
+    echo -n "Retry queue run - " >> $logfile
+    date >> $logfile
+    if $cronjob ; then
+      (bash $i >> $logfile 2>&1  && rm $i && echo "$i erfolgreich - job gelöscht." && cat $logfile && rm $logfile) &
+    else
+      (bash $i 2>&1 | tee -a $logfile && rm $i && cat $logfile && echo "$i erfolgreich - job gelöscht." && rm $logfile) &
+    fi
+  done
+  # warten, bis alle fertig sind
+  wait
+  rm -f $qdir/lock
+  exit 0
+else
+  if [ "x$@" = "x--help" ] || [ "x$@" = "x-h" ] ; then
+    echo "$(basename $0) [Befehl]"
+    echo "Wenn kein Befehl angegeben wurde, wird die Warteschlange abgearbeitet."
+    echo "Wenn der Befehl »-« ist, wird von Standardeingabe gelesen."
+    exit 0
+  fi
+  (( i = 1 ))
+  while [ -r $qdir/$i.sh ] ; do
+    (( i = i + 1 ))
+  done
+  echo "Die Befehle werdem von $(which bash) abgearbeitet werden."
+  echo "cd $(pwd) || exit 1" > $qdir/$i.sh
+  echo "$@" >> $qdir/$i.sh
+  echo "Job $qdir/$i.sh:"
+  cat $qdir/$i.sh
+fi
+

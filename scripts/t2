@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+"""translate english <> german"""
+import os, sys, re, time
+from pysqlite2 import dbapi2 as sqlite
+
+# aptitude install trans-de-en
+dictfile = '/usr/share/trans/de-en' 
+maxoutput = 14
+
+dbfile = os.path.join(os.getenv('HOME'), 'tmp', 'translation_cache.db')
+
+def recreate():
+    con = sqlite.connect(dbfile)
+    con.execute("""
+    CREATE TABLE pairs (
+      id INTEGER PRIMARY KEY,
+      english VARCHAR,
+      german VARCHAR
+    )""")
+
+    con.execute("""
+    CREATE TABLE subs (
+      sub  INTEGER PRIMARY KEY,
+      main INTEGER
+    )""")
+
+    con.execute("""
+    CREATE TABLE words (
+      word VARCHAR,
+      pair INTEGER
+    )""")
+
+    # populate with data
+    
+    for lineno, line in enumerate(open(dictfile)):
+        if lineno % 100 == 0:
+            print lineno
+        if line.startswith('#'): continue
+        #entry = entry.decode('utf8')
+        line = re.sub(r'{[^}]*}', '', line)
+        if line.count('::') != 1:
+            print 'buggy line', lineno, ':', line
+            continue
+        de, en = line.split('::')
+        de = de.split('|')
+        en = en.split('|')
+        main = None
+        for en, de in zip(en, de):
+            en = en.strip()
+            de = de.strip()
+            cursor = con.execute("INSERT INTO pairs VALUES (null, ?, ?)", (en, de))
+            i = cursor.lastrowid
+            if main is None:
+                main = i
+            else:
+                con.execute("INSERT INTO subs VALUES (?, ?)", (i, main))
+
+            s = de + ' ' + en
+            s = s.replace(';', ' ')
+            s = s.replace(',', ' ')
+            words = s.lower().split()
+
+            for word in words:
+                if len(word) < 2: continue
+                con.execute("INSERT INTO words VALUES (?, ?)", (word.lower(), i))
+
+        assert main
+
+    con.execute("CREATE INDEX idx1 ON words (word)")
+
+    con.commit()
+
+if not os.path.exists(dbfile):
+    recreate()
+con = sqlite.connect(dbfile)
+
+requests = sys.argv[1:]
+assert len(requests) == 1
+
+word = requests[0]
+cursor = con.execute("select p.id, german, english from words as w, pairs as p where w.word = ? and w.pair = p.id", (word,))
+
+results = []
+for id, de, en in cursor:
+    results.append((de, en))
+
+total = len(results)
+results = results[0:maxoutput]
+if not results:
+    print 'nothing found'
+    sys.exit(0)
+
+length = max([len(de) for de, en in results])
+if length > 40: length = 40
+for r in results:
+    s = '%-' + str(length) + 's   %s'
+    print s % r
+
+if total > len(results):
+    print '%d more' % (total - len(results))

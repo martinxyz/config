@@ -1,0 +1,30 @@
+# use this in your .bashrc (or type it on bash prompt):
+#
+# source ~/scripts/bashrc_add_prefix
+# add_prefix ~/apps
+#
+
+function prepend_to_pathlist {
+    if [ ${!1} ] ; then
+        export $1="$2:${!1}"
+    else
+        export $1="$2"
+    fi
+}
+function add_prefix {
+    # check if already done
+    for word in $PREFIX_LIST; do
+      if [ x$1 = x$word ] ; then
+        return
+      fi
+    done
+    export PREFIX_LIST="$1 $PREFIX_LIST"
+    prepend_to_pathlist PATH                $1/bin
+    prepend_to_pathlist CPATH               $1/include
+    prepend_to_pathlist LIBRARY_PATH        $1/lib
+    prepend_to_pathlist LD_LIBRARY_PATH     $1/lib
+    prepend_to_pathlist PKG_CONFIG_PATH     $1/lib/pkgconfig
+    #prepend_to_pathlist PYTHONPATH          $1/lib/python2.3/site-packages
+    prepend_to_pathlist PYTHONPATH          $1/lib/python2.4/site-packages
+    prepend_to_pathlist PYTHONPATH          $1/lib/python2.5/site-packages
+}

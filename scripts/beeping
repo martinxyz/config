@@ -1,0 +1,5 @@
+#!/bin/sh
+while true; do
+  ping -c 1 $@ && (beep || echo -en "\x07")
+  sleep 5s
+done

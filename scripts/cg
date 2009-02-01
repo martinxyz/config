@@ -1,0 +1,3 @@
+#!/bin/bash
+find -name '*.cpp' -or -name '*.hpp' -or -name '*.py' -or -name '*.c' -or -name '*.h' |grep -v svn| xargs grep -i --color -C 6 "$@"
+

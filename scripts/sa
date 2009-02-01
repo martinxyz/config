@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+"standard action script"
+import sys, os
+
+things = sys.argv[1:]
+if not things:
+    print "Parameter expected."
+    sys.exit(1)
+
+for thing in things:
+    isurl = thing.startswith('http://') or thing.startswith('ftp://')
+    if isurl:
+        if thing.startswith('http://prdownloads.sourceforge.net'):
+            if thing.endswith('?download'):
+	        part = thing[34:-9]
+            else:
+	        part = thing[34:]
+            #thing = 'http://switch.dl.sourceforge.net/sourceforge' + part
+            thing = 'http://puzzle.dl.sourceforge.net/sourceforge' + part
+            print 'Sourceforge Mirrorlink! ==>', thing
+        command = 'wget -O- ' + thing
+    else:
+        command = 'cat ' + thing
+
+    if thing.endswith('.tar.gz') or thing.endswith('.tgz'):
+        command += ' | tar -xvz'
+    elif thing.endswith('.tar.bz2'):
+        command += ' | tar -xvj'
+    elif thing.endswith('.tar'):
+        command += ' | tar -xv'
+    elif thing.endswith('.avi'):
+        if isurl:
+            command = 'cd /video/ && wget ' + thing
+        else:
+            command = 'mplayer ' + thing
+    elif thing.endswith('.mp3'):
+        command = 'mplayer ' + thing
+    elif thing.endswith('.txt'):
+        command += ' | less'
+    elif '.' in thing and thing.split('.')[-1] in ['png', 'jpg', 'gif', 'jpeg']:
+        command = 'feh ' + thing
+    elif 'youtube.com' in thing:
+        assert isurl
+        name = thing.split('=')[-1] + '.flv'
+        if os.path.exists(name):
+            command = 'mplayer ' + name
+        else:
+            command = 'youtube-dl ' + thing + ' && mplayer ' + name
+    else:
+        print 'No idea what to do.'
+        command = 'file ' + thing
+    os.system(command)

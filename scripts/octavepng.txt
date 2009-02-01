@@ -1,0 +1,7 @@
+print("-dpng", "large",  "ddd.png");
+
+print("-dps", "large",  "-color", "ddd.ps");
+
+name = strrep(program_name, ".m", "");
+print("-dpng", "large", [name "_PID_Innen_nyquist.png"]);
+

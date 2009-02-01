@@ -1,0 +1,4 @@
+#!/bin/sh
+
+find -name '*.cpp' -or -name '*.hpp' -or -name '*.c' -or -name '*.h' -or -name '*.py' -or -name '*.d' -or -name '*.cc' -or -name '*.hh' -or -name '*.cxx' -or -name '*.hxx' | grep -v '#' | grep -v .svn | xargs grep "$1" -ir |  grep -v '/doc/' | grep "$1" -ir --color=auto
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+#(play /musik/wav/wah.wav &) > /dev/null 2>&1
+(mplayer /musik/sammlung/age_up.mp3 &) > /dev/null 2>&1
+echo -en "\x07"

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+input=$1
+if [ ! -r $input ] ; then
+  echo $0 inputfile.ps
+  exit 1
+fi
+
+psbook $input ${input}_booklet.ps
+psnup -2 ${input}_booklet.ps ${input}_printme.ps
+echo Fertig.
+

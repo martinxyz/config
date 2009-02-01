@@ -1,0 +1,29 @@
+#!/bin/bash
+# frontend zu http://www.netswarm.net/leo.pl
+
+LINES=$(tput lines)
+((C=LINES-6))
+
+trap 'clear; exit' 2
+
+[ ! -d ~/.autoleo ] && mkdir ~/.autoleo && chmod go-rx ~/.autoleo
+
+LOGFILE=~/.autoleo/autoleo.log
+echo "#$(date '+%Y%m%d').log" >> $LOGFILE
+
+while true; do
+    echo # weil die erste Zeile meist unangenehm zu lesen ist
+    echo -n "englisches Wort: "
+    read wort || exit 1
+    clear
+    # Wort aussprechen, wenn möglich
+    (say $wort &) > /dev/null 2>&1
+    # Wort loggen, um spaeter statistik zu machen
+    # und häuftig nachgeschlagene wörter zu üben
+    echo $wort >> $LOGFILE
+    echo
+    echo
+    t $wort -c $C
+    tput cup 0 0
+done
+
