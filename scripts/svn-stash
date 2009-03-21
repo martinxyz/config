@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+stashdir=svn-stash
+
+if ! [ -d .svn ] ; then
+    echo "Not inside a SVN repository!"
+    exit 1
+fi
+
+if ! svn info|grep ^URL:|grep /trunk$ >/dev/null ; then
+    echo "The svn URL does not end with /trunk!"
+    exit 1
+fi
+
+if echo $0 | grep unstash$ > /dev/null; then
+    # unstashing...
+    if ! [ -d $stashdir ] ; then
+        echo "Nothing is stashed."
+        exit 1
+    fi
+    if [ $(svn st -q | wc -l) != 0 ] ; then
+        echo "You have local modifications. Not unstashing."
+        exit 1
+    fi
+    echo "Unstashing:"
+    cp -a -f $stashdir/. . && rm -rf $stashdir
+    svn st -q
+else
+    if [ -d $stashdir ] ; then
+        echo "Currently stashed:"
+        svn st $stashdir
+        echo "There is already something stashed. Get it back with 'unstash'."
+        exit 1
+    fi
+    cp -a . $stashdir 2>/dev/null && true
+    ( cd $stashdir && svn-clean -q )
+    svn revert -R .
+    echo "Modifications stashed away."
+fi
+
