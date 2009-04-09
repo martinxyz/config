@@ -14,7 +14,7 @@ cd $HOME
 symlink config/elisp/emacs.el .emacs
 symlink config/elisp/viper.el .viper
 
-for i in vimrc gvimrc vim cvsrc Xdefaults inputrc fluxbox; do
+for i in vimrc gvimrc vim cvsrc Xdefaults inputrc fluxbox gitconfig; do
   symlink config/$i .$i
 done
 

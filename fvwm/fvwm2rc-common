@@ -84,6 +84,8 @@ GlobalOpts MouseFocusClickRaises
 #Style "Workrave" NeverFocus
 Style "Workrave" NoIcon 
 
+Style "Do" NoTitle, !Borders
+
 DestroyMenu Window-Ops
 AddToMenu Window-Ops "Alt-F1: Window Ops" Title
 + "Window List"                 WindowList

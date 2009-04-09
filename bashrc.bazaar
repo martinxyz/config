@@ -1,0 +1,52 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files for examples
+
+source ~/config/bashrc.common
+
+ulimit -S -c unlimited
+
+export MAILCHECK=
+export PS1='\u@\h:\w`[ -r /home/martin/.newmail ] && echo -n "\$"`\$ '
+#function l() {
+#  cd $@
+#  ls
+#}
+
+umask 022
+
+export EMAIL="Martin Renold <martinxyz@gmx.ch>"
+
+#mesg y
+
+if [ `tty` = '/dev/vc/2' ] 2>/dev/null || [ `tty` = '/dev/tty2' ] 2>/dev/null ; then
+  if [ ! -r /tmp/.X0-lock ] ; then # nur einmal bitte, xinit ruft diesen code auf
+    mesg n
+    echo "Starte xorg. Logfile: .startx.log"
+    #/usr/X11R6/bin/xinit -- -nolisten tcp > .xinit.log 2>&1
+    #export XSESSION_STARTED
+    #xinit -- -nolisten tcp > .xinit.log 2>&1
+    startx > .startx.log 2>&1
+  fi
+fi
+
+# UTF-8
+#unset LC_MESSAGES LC_CTYPE LC_NUMERIC
+#export LANG="de_CH.UTF-8"
+#export LANGUAGE="de_CH.UTF-8"
+#export LC_ALL="de_CH.UTF-8"
+#export CHARSET=ISO-8859-1
+#export LC_ALL=de_CH.UTF-8
+
+#source /home/martin/.ktoon.env
+
+# note to self:
+# bind -p | grep edit-and-execute-command --- fc command does it too
+
+# ccache
+export PATH="/usr/lib/ccache:${PATH}"
+
+# (FIXME: why the heck does this work without export?)
+#   It is not exported! 'env' will not show it, but
+#   'echo $FOOBAR' will. This file seems to get "sourced".
+FOOBAR="blah"
+
