@@ -55,4 +55,6 @@ export SCONSFLAGS="-Q -u"
 #export BROWSER="galeon -n"
 export BROWSER="firefox -new-tab"
 
-export LESS='-R --chop-long-lines'
+#export LESS='-R --chop-long-lines'
+export LESS='-R'
+

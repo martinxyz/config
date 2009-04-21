@@ -4,6 +4,9 @@
 
   [color]
     ui = auto
+	diff = auto
+	status = auto
+	branch = auto
   [color "branch"]
     current = yellow reverse
     local = yellow
@@ -25,3 +28,13 @@
     co = checkout
     df = diff
     lg = log -p
+    ann = annotate
+[core]
+	excludesfile = /home/martin/.gitignore
+[giggle]
+	compact-mode = false
+	main-window-maximized = false
+	main-window-geometry = 1272x993+0+0
+	main-window-view = HistoryView
+	file-view-vpane-position = 391
+	history-view-vpane-position = 338
