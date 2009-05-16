@@ -379,6 +379,7 @@
   (pager-row-down)
   (pager-row-down)
   (pager-row-down)
+  (back-to-indentation)
   )
 (defun pager-some-rows-up ()
   (interactive)
@@ -386,6 +387,7 @@
   (pager-row-up)
   (pager-row-up)
   (pager-row-up)
+  (back-to-indentation)
   )
 
 (define-key viper-vi-basic-map "\C-u" 'pager-page-up)

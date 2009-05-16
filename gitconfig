@@ -38,3 +38,6 @@
 	main-window-view = HistoryView
 	file-view-vpane-position = 391
 	history-view-vpane-position = 338
+[cola]
+	fontdiff = Bitstream Vera Sans Mono,13,-1,5,50,0,0,0,0,0
+	fontui = Nimbus Sans L,13,-1,5,50,0,0,0,0,0
