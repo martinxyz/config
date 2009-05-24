@@ -29,6 +29,8 @@
     df = diff
     lg = log -p
     ann = annotate
+	unstage = reset HEAD
+	unstash = stash apply
 [core]
 	excludesfile = /home/martin/.gitignore
 [giggle]

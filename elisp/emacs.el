@@ -540,3 +540,10 @@
 
 ; host specific stuff
 (load "~/config/elisp/local-config")
+
+; tips from http://infolab.stanford.edu/~manku/dotemacs.html
+(fset 'yes-or-no-p 'y-or-n-p)
+(setq enable-recursive-minibuffers t) ;; allow recursive editing in minibuffer
+;(resize-minibuffer-mode 1)            ;; minibuffer gets resized if it becomes too big
+(setq scroll-step 1) ; maybe this did interfer with "pager"?
+(setq scroll-conservatively 1) ; maybe this did interfer with "pager"?
