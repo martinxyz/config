@@ -38,8 +38,8 @@ fi
 
 export HISTIGNORE='*#[Rr][Mm]:?:halt'
 export HISTCONTROL="ignoredups"
-export HISTFILESIZE=80000
-export HISTSIZE=80000
+export HISTFILESIZE=160000
+export HISTSIZE=160000
 shopt -s histreedit
 shopt -s histappend
 
