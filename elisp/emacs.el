@@ -547,3 +547,7 @@
 ;(resize-minibuffer-mode 1)            ;; minibuffer gets resized if it becomes too big
 (setq scroll-step 1) ; maybe this did interfer with "pager"?
 (setq scroll-conservatively 1) ; maybe this did interfer with "pager"?
+
+;; overwrite viper function to remove silly question:
+(defun viper-set-register-macro (reg)
+  (set-register reg last-kbd-macro))
