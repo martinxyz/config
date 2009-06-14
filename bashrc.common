@@ -58,3 +58,10 @@ export BROWSER="firefox -new-tab"
 #export LESS='-R --chop-long-lines'
 export LESS='-R'
 
+# Use bash-completion, if available
+# Too slow!
+#if [ -f /etc/bash_completion ]; then
+#  . /etc/bash_completion
+#fi
+. /etc/bash_completion.d/git
+

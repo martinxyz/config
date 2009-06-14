@@ -30,7 +30,7 @@
     lg = log -p
     ann = annotate
 	unstage = reset HEAD
-	unstash = stash apply
+	unstash = stash pop
 [core]
 	excludesfile = /home/martin/.gitignore
 [giggle]

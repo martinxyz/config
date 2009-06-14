@@ -237,6 +237,7 @@
     (c-toggle-hungry-state 1)
     (c-set-style "gnu")
     (setq tab-width 4)
+    ;(setq show-trailing-whitespace t)
     ))
 
 ; Der Octave-Mode braucht eine extraaufforderung den viper zu benutzen
