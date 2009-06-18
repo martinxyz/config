@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-## Easy GIT (eg), a usable version of git
-## Version .95
-## Copyright 2008 by Elijah Newren, and others
+## Easy GIT (eg), a frontend for git designed for former cvs and svn users
+## Version .99
+## Copyright 2008, 2009 by Elijah Newren, and others
 ## Licensed under GNU GPL, version 2.
 
 ## To use eg, simply stick this file in your path.  Then fire off an
@@ -17,14 +17,17 @@ use warnings;
 use Getopt::Long;
 use Cwd qw(getcwd abs_path);
 use List::Util qw(max);
+use File::Temp qw/ tempfile /;
 
 # configurables
 my $debug=0;
 
 # globals :-(
 my $outfh;
-my $version = ".95";
+my $version = ".99";
 my $eg_exec = abs_path($0);
+my $git_cmd = "git";  # Includes any global args, thus "git --exec-path=..."
+my $use_pager = -1;
 my %command;    # command=>{section, short_description} mapping
 my $section = {
   'creation' =>
@@ -114,7 +117,7 @@ INIT {
 package subcommand;
 sub new {
   my $class = shift;
-  my $self = {git_repo_needed => 1, @_};  # Hashref initialized as we're told
+  my $self = {git_repo_needed => 0, @_};  # Hashref initialized as we're told
   bless($self, $class);
 
   # Our "see also" section in help usually references the same subsection
@@ -146,13 +149,21 @@ sub new {
 sub help {
   my $self = shift;
   my $package_name = ref($self);
+  $package_name =~ s/_/-/;  # Packages use underscores, commands use dashes
+
   my $git_equiv = $self->{git_equivalent};
+  $git_equiv =~ s/_/-/;  # Packages use underscores, commands use dashes
 
   if ($package_name eq "subcommand") {
-    exit ExecUtil::execute("git $self->{command} --help")
+    exit ExecUtil::execute("$git_cmd $self->{command} --help")
   }
 
-  open(OUTPUT, "| less -FRSX");
+  $ENV{"LESS"} = "FRSX" unless defined $ENV{"LESS"};
+  my $less = ($use_pager == 1) ? "less" :
+             ($use_pager == 0) ? "cat" :
+             `$git_cmd config core.pager` || "less";
+  chomp($less);
+  open(OUTPUT, "| $less");
   print OUTPUT "$package_name: $command{$package_name}{about}\n";
   print OUTPUT $self->{'help'};
   print OUTPUT "\nDifferences from git $package_name:";
@@ -174,33 +185,8 @@ EOF
 sub preprocess {
   my $self = shift;
 
+  return if (scalar(@ARGV) > 0 && $ARGV[0] eq "--");
   my $result=main::GetOptions("--help" => sub { $self->help() });
-}
-
-sub quote_args {
-  my $self = shift;
-  my @args = @_;
-
-  # Quote arguments with special characters so that when we
-  # do something like
-  #   system("$command hardcoded_arg1 @args")
-  # that the @args will get passed correctly to the shell command $command
-  my @newargs;
-  foreach my $arg (@args) {
-    my $quotes_needed = 0;
-    if ($arg =~ /[;'"<>()|`* \\]/) {
-      $quotes_needed = 1;
-    }
-
-    $arg =~ s#\\#\\\\#g;    # Backslash escape backslashes
-    $arg =~ s#"#\\"#g;      # Backslash escape quotes
-    $arg =~ s#`#\\`#g;      # Backslash escape backticks
-
-    $arg = '"'.$arg.'"' if $quotes_needed;
-
-    push(@newargs, $arg);
-  }
-  return @newargs;
 }
 
 sub run {
@@ -210,8 +196,8 @@ sub run {
   my $subcommand = 
     $package_name eq "subcommand" ? $self->{'command'} : $package_name;
 
-  @ARGV = $self->quote_args(@ARGV);
-  return ExecUtil::execute("git $subcommand @ARGV", ignore_ret => 1);
+  @ARGV = Util::quote_args(@ARGV);
+  return ExecUtil::execute("$git_cmd $subcommand @ARGV", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -229,7 +215,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Description:
@@ -252,7 +238,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 0, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -316,11 +302,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(
-    initial_commit_error_msg => "No branches can be created, deleted, or " .
-                                "listed until a commit has been made.",
-    @_
-    );
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -373,6 +355,10 @@ Options:
   -s
     After creating the new branch, switch to it
 ";
+  $self->{'differences'} = '
+  eg branch is identical to git branch other than adding a new -s option for
+  switching to a branch immediately after creating it.
+';
   return $self;
 }
 
@@ -386,10 +372,11 @@ sub run {
     shift @ARGV;
   }
 
-  @ARGV = $self->quote_args(@ARGV);
-  ExecUtil::execute("git branch @ARGV", ignore_ret => 1);
-  ExecUtil::execute("git checkout $ARGV[0]", ignore_ret => 1)
-    if ($switch);
+  @ARGV = Util::quote_args(@ARGV);
+  my $ret = ExecUtil::execute("$git_cmd branch @ARGV", ignore_ret => 1);
+  $ret = ExecUtil::execute("$git_cmd checkout $ARGV[0]", ignore_ret => 1)
+    if ($switch && $ret == 0);
+  return $ret;
 }
 
 ###########################################################################
@@ -408,6 +395,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     initial_commit_error_msg => "No bundles can be created until a commit " .
                                 "has been made.",
     @_
@@ -492,6 +480,11 @@ Options:
       ^baz foo bar       Include commits on the foo or bar branch, except for
                            those that are in the baz branch
 ";
+  $self->{'differences'} = '
+  eg bundle differs from git bundle in two ways:
+    (1) eg bundle defaults to "--all HEAD" if no revisions are passed to create
+    (2) eg bundle provides a create-update subcommand
+';
   return $self;
 }
 
@@ -528,7 +521,7 @@ sub preprocess {
     die "$oldname does not exist.\n" if ! -f $oldname;
 
     my ($retval, $output) =
-      ExecUtil::execute_captured("git bundle list-heads $oldname");
+      ExecUtil::execute_captured("$git_cmd bundle list-heads $oldname");
     my @lines = split '\n', $output;
 
     my @refs = map { m#^([0-9a-f]+)# && "^$1" } @lines;
@@ -557,6 +550,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     git_equivalent => 'show',
     initial_commit_error_msg => "Error: Cannot show committed versions of " .
                                 "files when no commits have occurred.",
@@ -589,8 +583,10 @@ Examples
       \$ eg cat HEAD~1:hello.c timbuktu:world.h
 ";
   $self->{'differences'} = '
-  The output of "git show FILE" is probably confusing to users at first.
-  Thus, "eg cat FILE" calls "git show HEAD:PATH/TO/FILE".
+  The output of "git show FILE" is probably confusing to users at first,
+  as is the need to specify files relative to the top of the git project
+  rather than relative to the current directory.  Thus, "eg cat FILE"
+  calls "git show HEAD:PATH/TO/FILE".
 ';
   return $self;
 }
@@ -610,7 +606,7 @@ sub preprocess {
       my ($path) = Util::reroot_paths__from_to_files($cur_dir, $top_dir, $arg);
       push(@args, "HEAD:$path");
     } else {
-      my ($REVISION, $FILE) = split(/:/, $arg, 1);
+      my ($REVISION, $FILE) = split(/:/, $arg, 2);
       my ($path) = Util::reroot_paths__from_to_files($cur_dir, $top_dir, $FILE);
       push(@args, "$REVISION:$path");
     }
@@ -623,8 +619,8 @@ sub run {
   my $self = shift;
   my $package_name = ref($self);
 
-  @ARGV = $self->quote_args(@ARGV);
-  return ExecUtil::execute("git show @ARGV", ignore_ret => 1);
+  @ARGV = Util::quote_args(@ARGV);
+  return ExecUtil::execute("$git_cmd show @ARGV", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -642,7 +638,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(git_equivalent => '', @_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, git_equivalent => '', @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -682,7 +678,12 @@ sub run {
   # Print valid subcommands sorted by section
   my $indent = "  ";
   my $header_indent = "";
-  open(OUTPUT, "|less -FRSX");
+  $ENV{"LESS"} = "FRSX" unless defined $ENV{"LESS"};
+  my $less = ($use_pager == 1) ? "less" :
+             ($use_pager == 0) ? "cat" :
+             `$git_cmd config core.pager` || "less";
+  chomp($less);
+  open(OUTPUT, "| $less");
 
   if ($self->{details}) {
     print OUTPUT "Summary of changes:\n";
@@ -712,6 +713,7 @@ sub run {
     foreach my $c (sort keys %command) {
       next if $command{$c}{unmodified_help} || $command{$c}{unmodified_behavior};
 
+      $c =~ s/-/_/;  # Packages use underscores, commands use dashes
       next if !$c->can("new");
       my $obj = $c->new(initial_commit_error_msg => '');
 
@@ -745,33 +747,45 @@ sub new {
   bless($self, $class);
   $self->{'help'} = "
 Usage:
-  eg checkout [--depth DEPTH] REPOSITORY [DIRECTORY]
   eg checkout [-b] BRANCH
   eg checkout [REVISION] PATH...
 
 Description:
-  eg checkout simulates the checkout command from both git and svn - if you
-  are not used to checkout from those systems, you should use eg clone, eg
-  switch, or eg revert and ignore eg checkout.
+  eg checkout mostly exists as a compatibility wrapper for those used to
+  other systems (cvs/svn and git).  If you:
+    (1) want a new copy of the source code from a remote repository
+    OR
+    (2) want to switch your working copy to a different branch
+    OR
+    (3) want to revert the contents of a file to its content from a
+        different revision
+  Then use:
+    (1) eg clone
+    (2) eg switch
+    (3) eg revert
 
-  The first usage form of eg checkout is used to get a new project based on
-  a (usually remote) repository.  Users are encouraged to use eg clone
-  instead, though eg checkout accepts all parameters that eg clone does.
+  eg checkout will accept the same arguments as eg clone (for getting a new
+  copy of the source code from a remote repository), but will provide an
+  error message and tell the user to use eg clone in such cases.
 
-  The second usage form of eg checkout is used to switch to a different
+  The first usage form of eg checkout is used to switch to a different
   branch (optionally also creating it first).  This is something that can
   be done with no network connectivity in git and thus eg.  Users can find
   identical functionality in eg switch.
 
-  The third usage form of eg checkout is used to replace files in the
+  The second usage form of eg checkout is used to replace files in the
   working copy with versions from an older commit, i.e. to revert files to
-  an older version.  Users can find the same functionality (as well as many
-  other capabilities) in eg revert.
+  an older version.  Note that this only works when the specified files
+  also existed in the older version (eg checkout will not delete or unstage
+  files for you), does not work for the initial commit (since there's no
+  older revision to revert back to -- unless you are an advanced user
+  interested in just undoing the changes since the most recent staging),
+  and cannot be used to undo an incomplete merge (since it only operates on
+  a subset of files and not everything since a given commit).  Users can
+  find the same functionality (without all the caveats) as well as other
+  capabilities in eg revert.
 
 Examples:
-  Get a local copy of cairo
-      \$ eg checkout git://git.cairographics.org/git/cairo
-
   Switch to the stable branch
       \$ eg checkout stable
 
@@ -786,8 +800,10 @@ Examples:
   such cases).
 
   The only difference between eg and git regarding checkout is that eg
-  checkout will also accept all arguments to git clone, and then call git
-  clone.
+  checkout will also accept all arguments to git clone, and then tell users
+  that they must have meant to run eg clone (a much nicer error message for
+  users trying to get a copy of source code from a remote repository than
+  "fatal: Not a git repository").
 ';
   return $self;
 }
@@ -819,7 +835,10 @@ sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
 
-  my $result = main::GetOptions("--help" => sub { $self->help() });
+  if (scalar(@ARGV) > 0 && $ARGV[0] ne "--") {
+    main::GetOptions("--help" => sub { $self->help() });
+  }
+
   $self->{command} = 'checkout';
   die "eg checkout requires at least one argument.\n" if !@ARGV;
 
@@ -832,26 +851,12 @@ sub preprocess {
      ) {
     $self->{command} = 'clone';
   }
-
-  # Avoid checking out a remote tracking branch
-  my $valid_ref = RepoUtil::valid_ref($ARGV[-1]);
-  if ($self->{command} eq 'checkout' &&    # Checkout, not clone
-      (@ARGV == 1 || $ARGV[1] =~ /^-/) &&  # First form of checkout
-      ($ARGV[-1] =~ m#/# && $valid_ref)) { # They want a remote-tracking branch
-    print STDERR<<EOF;
-Aborting: Should not switch to a remote tracking branch.  Please instead
-create a branch based on the remote tracking branch (use the command
-'eg branch NEWBRANCH $ARGV[-1]') and then switch to the new branch.
-EOF
-    exit 1;
-  }
-
 }
 
 sub run {
   my $self = shift;
 
-  @ARGV = $self->quote_args(@ARGV);
+  @ARGV = Util::quote_args(@ARGV);
   if ($self->{command} ne 'clone') {
     # If this operation isn't a clone, then we should have checked for
     # whether we are in a git directory.  But we didn't do that, just in
@@ -859,9 +864,129 @@ sub run {
     $self->{git_dir} = RepoUtil::git_dir();
     die "Must be run inside a git repository!\n" if !defined $self->{git_dir};
 
-    return ExecUtil::execute("git checkout @ARGV", ignore_ret => 1);
+    return ExecUtil::execute("$git_cmd checkout @ARGV", ignore_ret => 1);
   } else {
-    return ExecUtil::execute("$eg_exec  clone    @ARGV", ignore_ret => 1);
+    die "Did you mean to run\n  eg clone @ARGV\n?\n";
+  }
+}
+
+###########################################################################
+# cherry_pick                                                             #
+###########################################################################
+package cherry_pick;
+@cherry_pick::ISA = qw(subcommand);
+INIT {
+  $command{"cherry-pick"} = {
+    extra => 1,
+    section => 'modification',
+    about => 'Apply (or reverse) a commit, usually from another branch'
+  };
+}
+
+sub new {
+  my $class = shift;
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
+  bless($self, $class);
+  $self->{'help'} = "
+Usage:
+  eg cherry-pick [--reverse] [--edit] [-n] [-m parent-number] [-s] [-x] REVISION
+
+Description:
+  Given an existing revision, apply the change between its parent and it
+  (or reverse apply if the --reverse option is present), and record a new
+  revision with this change.  Your working tree must be clean (no local
+  unsaved modifications) in order to run eg cherry-pick.
+
+Examples:
+  Apply the fix 3 commits behind the tip of the experimental branch
+  (i.e. the fix made in experimental~3) to the current branch
+      \$ eg cherry-pick experimental~3
+
+  Make a new commit that reverses the changes made in the most recent
+  commit of the current branch
+      \$ eg cherry-pick -R HEAD
+
+Options:
+  --reverse, --revert, -R
+    Reverse apply the changes from the specified commit (i.e. revert the
+    specified revision with a new commit).
+
+  --edit, -e
+    With this option, eg cherry-pick will let you edit the commit message
+    prior to committing.
+
+  -x
+    When recording the commit, append to the original commit message a note
+    that indicates which commit this change was cherry-picked from.  Append
+    the note only for cherry picks without conflicts. Do not use this
+    option if you are cherry-picking from your private branch because the
+    information is useless to the recipient. If on the other hand you are
+    cherry-picking between two publicly visible branches (e.g. backporting
+    a fix to a maintenance branch for an older release from a development
+    branch), adding this information can be useful.
+
+    This option is turned on automatically when -R is specified.
+
+  --mainline parent-number, -m parent-number
+    cherry-pick always applies the changes between a revision and its
+    parent; thus if a revision represents a merge commit, it is not clear
+    which parent cherry-pick should get the changes relative to.  This
+    option specifies the parent number (starting from 1) of the mainline
+    and allows cherry-pick to replay the change relative to the specified
+    parent.
+
+  --no-commit, -n
+    Usually cherry-pick automatically creates a commit. This flag applies
+    the change necessary to cherry-pick the named revision to your working
+    tree and staging area, but does not make the commit. In addition, when
+    this option is used, the staging area can contain unsaved changes and
+    the cherry-pick will be done against the beginning state of your
+    staging area.
+
+    This is useful when cherry-picking more than one commit into a single
+    combined change.
+
+  --signoff, -s
+    Add Signed-off-by line at the end of the commit message.
+
+  REVISION
+    A reference to a recorded version of the repository.  See 'eg help
+    topic revisions' for more details.
+";
+  $self->{'differences'} = '
+  eg cherry-pick contains both the functionality of git cherry-pick and git
+  revert.  If the -R option is specified, eg cherry-pick calls git revert
+  (after removing the -R option); otherwise it calls git cherry-pick.
+';
+  return $self;
+}
+
+sub preprocess {
+  my $self = shift;
+  my $package_name = ref($self);
+
+  my ($reverse, $dash_x, $mainline) = (0, 0, -1);
+  Getopt::Long::Configure("permute");  # Allow unrecognized options through
+  my $result = main::GetOptions(
+    "--help"       => sub { $self->help() },
+    "mainline|m=i" => \$mainline,
+    "reverse|R"    => \$reverse,
+    "revert"       => \$reverse,
+    "x"            => \$dash_x,
+    );
+  $self->{reverse} = $reverse;
+  unshift(@ARGV, "-x") if (!$reverse && $dash_x);
+  unshift(@ARGV, ("-m", $mainline)) if $mainline != -1;
+}
+
+sub run {
+  my $self = shift;
+
+  @ARGV = Util::quote_args(@ARGV);
+  if ($self->{reverse}) {
+    return ExecUtil::execute("$git_cmd revert @ARGV", ignore_ret => 1);
+  } else {
+    return ExecUtil::execute("$git_cmd cherry-pick @ARGV", ignore_ret => 1);
   }
 }
 
@@ -915,7 +1040,7 @@ Options:
   $self->{'differences'} = "
   eg clone and git clone are very similar, but eg clone by default sets up
   a branch for each remote branch automatically (instead of only creating
-  master).
+  one branch, typically master).
 ";
   return $self;
 }
@@ -924,33 +1049,29 @@ sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
 
-  $self->{args} = [];
   $self->{bare} = 0;
-  my $record_arg   = sub { push(@{$self->{args}}, "--$_[0]"); };
-  my $record_args  = sub { $_[0] = "--$_[0]"; push(@{$self->{args}}, @_);  };
+  my @old_argv = @ARGV;
+  Getopt::Long::Configure("permute");
   my $result = main::GetOptions(
     "help"             => sub { $self->help() },
-    "template=s"       => sub { &$record_args(@_) },
-    "local|l"          => sub { &$record_arg(@_) },
-    "shared|s"         => sub { &$record_arg(@_) },
-    "no-hard-links"    => sub { &$record_arg(@_) },
-    "quiet|q"          => sub { &$record_arg(@_) },
-    "no-checkout|n"    => sub { &$record_arg(@_) },
-    "bare"             => sub { $self->{bare} = 1; &$record_arg(@_) },
-    "origin|o=s"       => sub { &$record_args(@_) },
-    "upload-pack|u=s"  => sub { &$record_args(@_) },
-    "reference=s"      => sub { &$record_args(@_) },
-    "depth=i"          => sub { &$record_args(@_) },
+    "bare"             => sub { $self->{bare} = 1 },
+    "depth=i",
+    "origin|o=s",
+    "reference=s",
+    "upload-pack|u=s",
     );
+  shift @ARGV while ($ARGV[0] =~ /^-/);  # Skip past any other options
   $self->{repository} = shift @ARGV;
   die "No repository specified!\n" if !$self->{repository};
   my $basename = $self->{repository};
-  $basename =~ s#/*$##;     # Remove trailing slashes
-  $basename =~ s#.*[/:]##;  # Remove everything but final dirname
-  $basename =~ s#\.git$##;  # Remote .git suffix, if present
-  $self->{directory} = shift @ARGV || $basename;
+  $basename =~ s#/*$##;        # Remove trailing slashes
+  $basename =~ s#.*[/:]##;     # Remove everything but final dirname
+  $basename =~ s#\.git$##;     # Remote .git suffix, if present
+  $basename =~ s#\.bundle$##;  # Remote .bundle suffix, if present
+  $self->{directory} = shift @ARGV || $basename . ($self->{bare} ? ".git" : "");
+  die "Too many parameters to clone!\n" if (scalar(@ARGV) > 0);
 
-  push(@{$self->{args}}, ($self->{repository}, $self->{directory}));
+  @ARGV = @old_argv;  # Workaround: GetOptions may have stripped a leading '--'
 }
 
 sub run {
@@ -959,16 +1080,16 @@ sub run {
   #
   # Perform the clone
   #
-  @args = $self->quote_args(@{$self->{args}});
-  my $ret = ExecUtil::execute("git clone @args", ignore_ret => 1);
-  return if $self->{bare};
+  @ARGV = Util::quote_args(@ARGV);
+  my $ret = ExecUtil::execute("$git_cmd clone @ARGV", ignore_ret => 1);
+  return $ret if $self->{bare};
   if ($debug == 2) {
     return if $self->{bare};
     print "    >>Running: 'cd $self->{directory}'<<\n";
-    print "    >>Running: 'git branch -r'<<\n";
+    print "    >>Running: '$git_cmd branch -r'<<\n";
     print "    --- Setting up extra branches by default ---\n";
     print "    >>Running, for each remote branch besides master (referred to as BRANCH):\n";
-    print "        git branch --no-track BRANCH origin/BRANCH\n";
+    print "        $git_cmd branch BRANCH origin/BRANCH\n";
   } elsif ($ret == 0) {
     # Switch to the appropriate directory, remembering the repository we
     # checked out
@@ -978,17 +1099,33 @@ sub run {
       if -d $self->{repository};
     chdir($self->{directory});
 
+    # Determine local and remote branches
+    my @remote_branches =
+      split('\n', `$git_cmd for-each-ref --format '%(refname)' refs/remotes`);
+    @remote_branches = map { m#^refs/remotes/(.*)$# && $1 } @remote_branches;
+    my @local_branches =
+      split('\n', `$git_cmd for-each-ref --format '%(refname)' refs/heads`);
+    @local_branches = map { m#^refs/heads/(.*)$# && $1 } @local_branches;
+
+    # Set branch.@local_branches.rebase to true if branch.autosetuprebse is true
+    my $autosetuprebase = `$git_cmd config --global branch.autosetuprebase`;
+    chomp($autosetuprebase);
+    if ($autosetuprebase eq 'always' || $autosetuprebase eq 'remote') {
+      foreach my $branch (@local_branches) {
+        ExecUtil::execute("$git_cmd config branch.$branch.rebase true");
+      }
+    }
+
     # Set up a branch for each remote branch, not just master
-    my @local_branches = split('\n', `git branch | sed -e "s/^..//"`);
-    my @branches = `git branch -r`;
-    foreach my $branch (@branches) {
-      chomp($branch);
-      $branch =~ s#  origin/##;
+    foreach my $b (@remote_branches) {
+      ($remote, $branch) = ($b =~ m#^(.*)/(.*?)$#);
       next if $branch eq "HEAD";
       next if grep {$branch eq $_} @local_branches;
-      ExecUtil::execute("git branch --no-track $branch origin/$branch");
+      ExecUtil::execute("$git_cmd branch $branch $remote/$branch > /dev/null");
     }
   }
+
+  return $ret;
 }
 
 ###########################################################################
@@ -1007,7 +1144,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -1098,8 +1235,7 @@ Options:
 
   The "--bypass-unknown-check" is unique to eg commit; git commit
   behavior differs by always turning on this functionality -- there is
-  no way to have git commit do an unknown files sanity check or a no
-  active branch check for you.
+  no way to have git commit do an unknown files sanity check for you.
 
   "-a" is not nearly as useful for eg commit as it is for git commit.  "-a"
   has the same behavior in both, but the "smart" behavior of eg commit
@@ -1110,18 +1246,24 @@ Options:
   for eg commit.
 
   To be precise about the behavior of a plain "eg commit":
-     If the working copy is clean             -> warn user: nothing to commit
-     else if there are unmerged files         -> warn user: unmerged files
-     else if there are new untracked files    -> warn user: new unknown files
-     else if both staged and unstaged changes -> warn user: mix
-     else if there is no active branch        -> warn user: no active branch
-     else                                     -> run "git commit -a"
+     If the working copy is clean                -> warn user: nothing to commit
+     else if there are unmerged files            -> warn user: unmerged files
+     else if there are new untracked files       -> warn user: new unknown files
+     else if both "staged" & unstaged changes[1] -> warn user: mix
+     else                                        -> run "git commit -a"
   Actually, I do not pass -a if there are only staged changes present, but
   the result is the same.  Note that this essentially boils down to making
   the user do less work (no need to remember -a in the common case) and
   extending the sanity checks git commit does (which currently only covers
   the clean working copy case) to also prevent a number of other very
   common user pitfalls.
+
+  [1] The reason for putting "staged" in quotes comes from the case of
+  running "eg commit --amend" when you have local unstaged changes.  Does
+  the user want to merely amend the prior commit message or add their
+  changes to the previous commit?  (Even if the index matches HEAD at this
+  time, we are committing relative to HEAD^1.)  It is not clear what the
+  user wants, so we warn and ask them to use -a or --staged.
 ';
   return $self;
 }
@@ -1134,30 +1276,32 @@ sub preprocess {
   # Parse options
   #
   $self->{args} = [];
-  my $record_arg   = sub { push(@{$self->{args}}, "--$_[0]"); };
-  my $record_args  = sub { $_[0] = "--$_[0]"; push(@{$self->{args}}, @_);  };
-  my ($all_known, $bypass_unknown, $bypass_no_branch, $staged) = (0, 0, 0, 0);
+  my $record_arg   = sub { push(@{$self->{args}}, "$_[0]$_[1]"); };
+  my $record_args  = sub { push(@{$self->{args}}, "$_[0]$_[1]");
+                           push(@{$self->{args}}, splice(@_, 2)); };
+  my ($all_known, $bypass_unknown, $staged, $amend) = (0, 0, 0, 0);
+  Getopt::Long::Configure("permute");
   my $result = main::GetOptions(
     "--help"                      => sub { $self->help() },
     "all-known|a"                 => \$all_known,
     "bypass-unknown-check|b"      => \$bypass_unknown,
-    "bypass-no-branch-check"      => \$bypass_no_branch,
     "staged|dirty|d"              => \$staged,
-    "s"                           => sub { &$record_arg(@_) },
-    "v"                           => sub { &$record_arg(@_) },
-    "u"                           => sub { &$record_arg(@_) },
-    "c=s"                         => sub { &$record_args(@_) },
-    "C=s"                         => sub { &$record_args(@_) },
-    "F=s"                         => sub { &$record_args(@_) },
-    "m=s"                         => sub { &$record_args(@_) },
-    "amend"                       => sub { &$record_arg(@_) },
-    "allow-empty"                 => sub { &$record_arg(@_) },
-    "no-verify"                   => sub { &$record_arg(@_) },
-    "e"                           => sub { &$record_arg(@_) },
-    "author=s"                    => sub { &$record_args(@_) },
-    "cleanup=s"                   => sub { &$record_args(@_) },
+    "s"                           => sub { &$record_arg("-", @_) },
+    "v"                           => sub { &$record_arg("-", @_) },
+    "u"                           => sub { &$record_arg("-", @_) },
+    "c=s"                         => sub { &$record_args("-", @_) },
+    "C=s"                         => sub { &$record_args("-", @_) },
+    "F=s"                         => sub { &$record_args("-", @_) },
+    "file=s"                      => sub { &$record_args("--", @_) },
+    "m=s"                         => sub { &$record_args("-", @_) },
+    "amend"                       => sub { $amend = 1; &$record_arg("--", @_) },
+    "allow-empty"                 => sub { &$record_arg("--", @_) },
+    "no-verify"                   => sub { &$record_arg("--", @_) },
+    "e"                           => sub { &$record_arg("-", @_) },
+    "author=s"                    => sub { &$record_args("--", @_) },
+    "cleanup=s"                   => sub { &$record_args("--", @_) },
     );
-  my ($opts, $revs, $files) = Util::git_rev_parse(@ARGV);
+  my ($opts, $revs, $files) = RepoUtil::parse_args(@ARGV);
 
   #
   # Set up flags based on options, do sanity checking of options
@@ -1169,7 +1313,6 @@ sub preprocess {
   die "Cannot specify --staged when specifying files!\n" if @$files && $staged;
   $check_unknown   = !$bypass_unknown && !$staged && !@$files;
   $check_mixed     = !$all_known      && !$staged && !@$files;
-  $check_no_branch = !$bypass_no_branch;
   push(@{$self->{'commit_flags'}}, "-a") if $all_known;
 
   #
@@ -1179,11 +1322,22 @@ sub preprocess {
     RepoUtil::commit_push_checks($package_name,
                                  {no_changes       => 1,
                                   unknown          => $check_unknown,
-                                  no_branch        => $check_no_branch,
                                   partially_staged => $check_mixed});
 
+  if ($amend && !$all_known && !$staged && !@$files &&
+      $status->{has_unstaged_changes} && !$status->{has_staged_changes}) {
+    print STDERR <<EOF;
+Aborting: It is not clear whether you want to simply amend the commit
+message or whether you want to include your local changes in the amended
+commit.  Please pass --staged to just amend the previous commit message, or
+pass -a to include your current local changes with the previous amended
+commit.
+EOF
+    exit 1;
+  }
+
   die "No staged changes, but --staged given.\n"
-      if (!$status->{has_staged_changes} && $staged);
+      if (!$status->{has_staged_changes} && $staged && !$amend);
 
   if (!$all_known && !$staged &&
       $status->{has_unstaged_changes} && !$status->{has_staged_changes} &&
@@ -1219,7 +1373,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 0, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -1265,7 +1419,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -1321,6 +1475,12 @@ Options:
     directory.  Cannot be used when a revision is specified.
 ";
   $self->{'differences'} = '
+  Changes to eg diff relative to git diff are:
+    (1) Different defaults for what to diff relative to
+    (2) Providing a more consistent double-dot operator
+
+  Section 1: Different defaults for what to diff relative to
+
   The following illustrate the two changed defaults of eg diff:
     eg diff            <=> git diff HEAD
     eg diff --unstaged <=> git diff
@@ -1333,15 +1493,52 @@ Options:
   revisions are given, eg diff will pass along the revision "HEAD" to git
   diff.
 
-  The "--staged" option is an alias for "--cached" unique to eg diff (the
+  The "--staged" option is an alias for "--cached" unique to eg diff; the
   purpose of the alias is to reduce the number of different names in git
-  used to refer to the same concept.)
+  used to refer to the same concept.  (Update: the --staged flag is now
+  part of git with the same meaning as in eg.)
 
   Merges: The above is slightly modified if the user has an incomplete
   merge; if the user has conflicts during a merge (or uses --no-commit when
   calling merge) and then tries "eg diff", it will abort with a message
   telling the user that there is no "last" commit and will provide
   alternative suggestions.
+
+  Section 2: Providing a more consistent double-dot operator
+
+    The .. operator of git diff (e.g. git diff master..devel) means what
+    the ... operator of git log means, and vice-versa.  This causes lots of
+    confusion.  We fix this by aliasing making the .. operator of eg diff
+    do exactly what the ... operator of git diff does.  To see why:
+    
+    Meanings of git commands, as a reminder (A and B are revisions):
+      git diff A..B  <=> git diff A B                      # Endpoint difference
+      git diff A...B <=> git diff $(git merge-base A B) B
+    
+    Why this is confusing (compare to above):
+      git log A..B  <=> git log $(git merge-base A B) B
+      git log A...B <=> git log ^$(git merge-base A B) A B # Endpoint difference
+    
+    So, my translation:
+      eg diff A B   <=>  git diff A B    <=> git diff A..B
+      eg diff A..B  <=>  git diff A...B
+      eg diff A...B <=>  git diff A...B
+
+    Reasons for this change:
+      * New users automatically get sane behavior, and use either eg diff A B
+        or eg diff A..B, each doing what one would expect.  They do not ever
+        realize that A...B is a bit weird because they have no need to try to
+        use it; eg diff A B covers their needs.
+      * Users worried about switching between eg and git without having to
+        modify their command lines can always use either diff A B or
+        diff A...B, but never any other form; using this subset ensures that
+        both eg and git behave identically.
+      * Users only access git diff A..B behavior through eg diff A B, which
+        is less typing and makes more sense.
+      * Since git diff A..B and git diff A B are the same, the latter is far
+        more common, and the former is confusing, odds are that if any git
+        user suggests someone use git diff A..B they probably really meant
+        git diff A...B
 ';
   return $self;
 }
@@ -1350,34 +1547,46 @@ sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
 
-  my ($opts, $revs, $files) = Util::git_rev_parse(@ARGV);
+  # Avoid Util::git_rev_parse because it fails on t2010-checkout-ambiguous by
+  # treating "--quiet" as a revision rather than an option; use our own
+  # parse_args implementation instead.
+  my ($opts, $revs, $files) = RepoUtil::parse_args(@ARGV);
+
+  # Replace '..' with '...' in revision specifiers.  Use backslash escaping to
+  # get actual dots and not just any character.  Use negative lookbehind and
+  # lookahead assertions to avoid replacing '...' with '....'.
+  my @new_revs = map(m#(.+)(?<!\.)\.\.(?!\.)(.+)# ? "$1...$2" : $_, @$revs);
+  $revs = \@new_revs;
 
   #
   # Parse options
   #
   $self->{'opts'} = "";
   @ARGV = @$opts;
-  my ($staged, $unstaged) = (0, 0);
+  my ($staged, $unstaged, $no_index) = (0, 0, 0);
+  Getopt::Long::Configure("permute");
   my $result = main::GetOptions(
     "--help"         => sub { $self->help() },
     "staged|cached"  => \$staged,
     "unstaged"       => \$unstaged,
+    "no-index"       => \$no_index,
     );
   die "Cannot specify both --staged and --unstaged!\n" if $staged && $unstaged;
-  $self->{'opts'} .= " --cached" if $staged;
-  $self->{opts} .= " @ARGV";
+  my @args;
+  push(@args, "--cached") if $staged;
+  push(@args, "--no-index") if $no_index;
+  push(@args, @ARGV);
 
   #
   # Parse revs
   #
-  die "eg diff: Too many revisions specified.\n" if (scalar @$revs > 2);
   die "eg diff: Cannot specify '--staged' with more than 1 revision.\n"
     if ($staged && scalar @$revs > 1);
   die "eg diff: Cannot specify '--unstaged' with any revisions.\n"
     if ($unstaged && scalar @$revs > 0);
   # 'eg diff' (without arguments) should act like 'git diff HEAD', unless
   # we are in an aborted merge state 
-  if (!@$revs && !$unstaged && !$staged) {
+  if (!@$revs && !$unstaged && !$staged && !$no_index) {
     if (-f "$self->{git_dir}/MERGE_HEAD") {
       my @merge_branches = RepoUtil::merge_branches();
       my $list = join(", ", @merge_branches);
@@ -1397,7 +1606,10 @@ EOF
     push(@$revs, "HEAD")
   }
 
-  @ARGV = split ' ', "$self->{opts} @$revs @$files"
+  push(@args, @$revs);
+  push(@args, "--");
+  push(@args, @$files);
+  @ARGV = @args;
 }
 
 ###########################################################################
@@ -1416,7 +1628,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -1457,6 +1669,7 @@ sub new {
   bless($self, $class);
   $self->{'help'} = "
 Usage:
+  eg help --all
   eg help [COMMAND]
   eg help topic [TOPIC]
 
@@ -1467,6 +1680,9 @@ Description:
 Examples:
   Show help for eg
       \$ eg help
+
+  Show help for extended list of commands available in eg
+      \$ eg help --all
 
   Show help for the switch command of eg
       \$ eg help switch
@@ -1519,6 +1735,7 @@ sub run {
   # Check if we were asked to get help on a subtopic rather than toplevel help
   if (@ARGV > 0) {
     my $subcommand = shift @ARGV;
+    $subcommand =~ s/-/_/;  # Packages use underscores, commands use dashes
     if (@ARGV != 0 && ($subcommand ne 'topic' || @ARGV != 1)) {
       die "Too many arguments to help.\n";
     }
@@ -1530,7 +1747,7 @@ sub run {
             " to git $subcommand).\nWill try running 'git help $subcommand'" .
             " in 2 seconds...\n";
       sleep 2;
-      exit ExecUtil::execute("git help $subcommand");
+      exit ExecUtil::execute("$git_cmd help $subcommand");
     }
 
     my $subcommand_obj = $subcommand->new(initial_commit_error_msg => '',
@@ -1538,8 +1755,20 @@ sub run {
     $subcommand_obj->help();
   }
 
+  # Set up a pager, if wanted
+  $ENV{"LESS"} = "FRSX" unless defined $ENV{"LESS"};
+  my $less = ($use_pager == 1) ? "less" :
+             ($use_pager == 0) ? "cat" :
+             `$git_cmd config core.pager` || "less";
+  chomp($less);
+  open(OUTPUT, "| $less");
+
+  # Help users know about the --all switch
+  if (!$self->{all}) {
+    print OUTPUT "(Run 'eg help --all' for a more detailed list.)\n\n";
+  }
+
   # Print valid subcommands sorted by section
-  open(OUTPUT, "| less -FRSX");
   foreach my $name (sort
                     {$section->{$a}{'order'} <=> $section->{$b}{'order'}}
                     keys %$section) {
@@ -1549,7 +1778,7 @@ sub run {
       next if !defined $command{$c}{section};
       next if $command{$c}{section} ne $name;
       next if $command{$c}{extra} && !$self->{all};
-      printf OUTPUT "  eg %-10s %s\n", $c, $command{$c}{about};
+      printf OUTPUT "  eg %-11s %s\n", $c, $command{$c}{about};
     }
     print OUTPUT "\n";
   }
@@ -1596,6 +1825,268 @@ sub new {
   my $self = {};
   bless($self, $class);
   return $self;
+}
+
+sub middle_of_am {
+  my $continue_text = "
+1. Standard case
+
+When all conflicts have been resolved, run
+  eg am --resolved
+Do NOT run \"eg commit\" to continue an interrupted rebase (unless you want
+to manually insert a new commit; if you already accidentally ran eg commit,
+then run 'eg reset HEAD~1' to undo it).  If you try to continue without
+resolving all conflicts, the command will error out and tell you that some
+conflicts remain to be resolved.
+
+2. Special case -- skipping a commit
+
+If you do not want this particular commit to be included in the final
+result, run
+  eg am --skip";
+  my $abort_text = "
+To abort your rebase operation, simply run
+  eg am --abort";
+
+  return _conflict_resolution_message(op => "am",
+                                      show_empty_case => 1,
+                                      continue_text => $continue_text,
+                                      abort_text => $abort_text
+                                      );
+}
+
+sub middle_of_merge {
+  my $completion_text = "
+When all conflicts have been resolved, run
+  eg commit
+
+The log message will be pre-populated with a sample commit message for you,
+noting the merge and any file conflicts.  If you try to run this command
+without resolving all conflicts, the command will error out and tell you
+that some conflicts remain to be resolved.";
+  my $abort_text = "
+If you had no uncommitted changes before the merge (or do not care about
+keeping those changes), you can run
+  eg reset --working-copy ORIG_HEAD
+
+If you had uncommitted changes before starting the merge, and have
+git-1.6.2 or later, you can try
+  eg ls-files --unmerged | awk {'print \$4'} | uniq | xargs eg stage
+  eg reset --merge ORIG_HEAD
+The first command will mark all unmerged files as ready for commit (who
+doesn't like having conflict markers in their files?), and the second
+command undoes all changes to staged files since ORIG_HEAD -- both the
+files that were successfully merged by git, and the files that you manually
+staged in the first command.";
+  return _conflict_resolution_message(op => "merge",
+                                      show_empty_case => 0,
+                                      continue_text => $completion_text,
+                                      abort_text => $abort_text);
+}
+
+sub middle_of_rebase {
+  my $extra_stop_info = "
+
+If you are in the middle of an interactive rebase (i.e. you specified the
+--interactive flag), then rebase can also stop if you selected to edit a
+commit, even when there are no conflicts.  In such a case where there are
+no conflicts, there is something else you may want to do:
+  5) Editing during an interactive rebase
+Before telling git to continue the operation.";
+  my $continue_text = "
+1. Standard case
+
+When all conflicts have been resolved, run
+  eg rebase --continue
+Do NOT run \"eg commit\" to continue an interrupted rebase (unless you want
+to manually insert a new commit; if you already accidentally ran eg commit,
+then run 'eg reset HEAD~1' to undo it).  If you try to continue without
+resolving all conflicts, the command will error out and tell you that some
+conflicts remain to be resolved.
+
+2. Special case -- skipping a commit
+
+If you do not want this particular commit to be included in the final
+result, run
+  eg rebase --skip";
+  my $abort_text = "
+To abort your rebase operation, simply run
+  eg rebase --abort";
+  my $interactive_edit_text = "
+******************* Editing during an interactive rebase *******************
+
+When an interactive rebase stops to allow you to edit a commit, make any
+necessary changes to files, then run
+  eg commit --amend
+If you do not use the --amend flag, you will be inserting a new commit
+after the one you chose to edit.
+
+After you are done amending the previous commit (and/or commit message),
+run 'eg rebase --continue' to allow the rebase operation to continue.
+";
+  return _conflict_resolution_message(op => "rebase",
+                                      show_empty_case => 1,
+                                      extra_stop_info => $extra_stop_info,
+                                      continue_text => $continue_text,
+                                      abort_text => $abort_text,
+                                      final_text => $interactive_edit_text,
+                                      );
+}
+
+sub _conflict_resolution_message {
+  my $opts = {op              => "!!!FIXME!!!",
+              show_empty_case => 0,
+              extra_stop_info => '',
+              continue_text   => '!!!FIXME!!!',
+              abort_text      => '!!!FIXME!!!',
+              final_text      => '',
+              @_};  # Hashref initialized as we're told
+  my $result = "
+When conflicting changes are detected, a $opts->{op} operation will stop to
+allow a user to resolve the conflicts.  At this stage there is one of four
+things a user may want to do:
+  1) Find out more about what conflicts occurred
+  2) Resolve the conflicts
+  3) Tell git to complete the operation
+  4) Abort the operation
+Each will be discussed below.$opts->{extra_stop_info}
+
+*************** Find out more about what conflicts occurred ***************
+
+1. Standard case
+
+In order to find out which files have conflicts, run
+  eg status
+and then look for lines that begin with \"unmerged:\".  You can then open
+the relevant file in an editor and look for lines with conflict markers,
+i.e. lines that start with one of
+  <<<<<<<
+  =======
+  >>>>>>>
+Between the <'s and the ='s will be one version of the changed file, while
+betwen the ='s and the >'s will be another version.
+
+2. Simple tip
+
+Since git will stage any changes it is able to successfully merge, you can
+find the unresolved conflict sections of a file by running
+  eg diff --unstaged FILE
+";
+  if ($opts->{show_empty_case}) {
+  $result .= "
+3. Special empty commit case
+
+Sometimes, during a $opts->{op}, the changes in a commit will no longer be
+necessary since they have already been included in the code which your
+commit is being applied on top of.  In such a case, eg status will simply
+show that there are no changes at all, and you can continue by telling git
+to skip the current unneeded commit (see below).
+
+4. Difficult cases
+"
+  } else {
+  $result .= "
+3. Difficult cases
+";
+  }
+  $result .= "
+You can run
+  eg ls-files --unmerged
+to get a list of all files in the unmerged state.  This will list up to
+three lines for each file, and look like the following:
+  100644 45b983be36b73c0788dc9cbcb76cbb80fc7bb057 1	foo.C
+  100644 ce013625030ba8dba906f756967f9e9ca394464a 2	foo.C
+  100644 dd7e1c6f0fefe118f0b63d9f10908c460aa317a6 3	foo.C
+The first line corresponds to a version of the file at some common point in
+history, the second and third lines correspond to different versions of the
+file being merged (relative to the common version).  Each line is of the
+form
+  mode   internal-object-name                     stage filename
+The mode represents the permission bits and or type (executable file,
+symlink etc.), the internal-object-name is git's internal name for the
+contents of the file, the stage is a simple integer, and you should
+recognize the filename.
+
+You can make use of this information to detect the following situations:
+  A) There's a conflict in mode change (e.g. removed the executable bit on
+     one side of history, turned the file into a symlink in another)
+  B) The file is deleted in one version and modified in another (when this
+     happens either the 2nd or 3rd stage line will be missing)
+Further, you can view the different versions of the file easily, by using
+either of:
+  eg show :STAGE:FILENAME
+  eg show INTERNAL-OBJECT-NAME
+Some examples using the output above:
+  eg show :2:foo.C
+  eg show dd7e1c6f0fefe118f0b63d9f10908c460aa317a6
+
+************************** Resolve the conflicts **************************
+
+1. Standard case.
+
+For each file with conflicts, edit the file to remove the conflict markers
+and provide just the correct version of the merged file.  Then run
+  eg stage FILE
+to tell git that you have resolved the conflicts in FILE.
+
+2. Special cases
+
+Nearly all special cases (and even the standard case) boil down to making
+sure the file has the correct contents, the correct permission bits and
+type, and then running
+  eg stage FILE
+
+If the file is a binary, then there will not be any conflict markers.  In
+such a case, simply ensure that the contents of the file are what you want
+and then run eg stage, as noted above.
+
+If the file is deleted on one side of history and changed in another,
+decide what contents the file should have.  If the correct resolution is to
+delete the file, run
+  eg rm FILE
+Otherwise, put the appropriate contents in the file and run eg stage as
+noted above.
+
+If the file has a mode conflict, then fix up the mode of the file (run
+'man chmod' and 'man ln' for help on how to do so).  Note that the modes
+used by git are as follows:
+  100644  --  Normal, non-executable file
+  100755  --  File with the executable bit set
+  120000  --  symlink
+  160000  --  A git submodule (run 'man git-submodule' for more info)
+
+******************** Tell git to continue the operation ********************
+$opts->{continue_text}
+
+*************************** Abort the operation ***************************
+$opts->{abort_text}
+";
+  $result .= $opts->{final_text};
+  return $result;
+}
+
+sub middle_of_bisect {
+  return "
+When git is bisecting, it will pick commits that need to be tested, check
+them out, and then let you test them.  (Unless, of course, you give git a
+script that it can run to automatically test commits.)  At this point you
+can test and then:
+
+1) Continue
+
+  eg bisect good    # Mark the current commit as good, give me a new commit
+OR
+  eg bisect bad     # Mark the current commit as bad, give me a new commit
+
+2) Skip this particular commit
+
+  eg bisect skip    # Can't test the current version; give me a new commit
+
+3) Abort
+
+  eg bisect reset
+
+See 'man git-bisect' for more details."
 }
 
 sub refspecs {
@@ -2181,6 +2672,11 @@ sub help {
   # glossary      <Not yet written; this is just a stub>
 
   my $topics = "
+middle-of-am      How to resolve or abort an incomplete am (apply mail)
+middle-of-bisect  How to continue or abort a bisection
+middle-of-merge   How to resolve or abort an incomplete merge
+middle-of-rebase  How to resolve or abort an incomplete rebase
+
 refspecs      Advanced pushing and pulling: detailed control of storage
 remote-urls   Format for referring to remote (and not-so-remote) repositories
 revisions     Various methods for referring to revisions
@@ -2200,7 +2696,12 @@ storage       High level overview of how commits, tags, and branches are stored
     $help_msg = $topics;
   }
 
-  open(OUTPUT, "| less -FRSX");
+  $ENV{"LESS"} = "FRSX" unless defined $ENV{"LESS"};
+  my $less = ($use_pager == 1) ? "less" :
+             ($use_pager == 0) ? "cat" :
+             `$git_cmd config core.pager` || "less";
+  chomp($less);
+  open(OUTPUT, "| $less");
   print OUTPUT "$topic\n";
   print OUTPUT $help_msg;
   close(OUTPUT);
@@ -2310,7 +2811,7 @@ sub preprocess {
   if ($path) {
     die "$path does not look like a directory.\n" if ! -d $path;
     my ($ret, $useless_output) =
-      ExecUtil::execute_captured("git ls-remote $path", ignore_ret => 1);
+      ExecUtil::execute_captured("$git_cmd ls-remote $path", ignore_ret => 1);
     if ($ret != 0) {
       die "$path does not appear to be a git archive " .
           "(maybe it has no commits yet?).\n";
@@ -2348,7 +2849,7 @@ EOF
   #
 
   # total commits
-  my $total_commits = ExecUtil::output("git rev-list --all | wc -l");;
+  my $total_commits = ExecUtil::output("$git_cmd rev-list --all | wc -l");
   print "Total commits: $total_commits\n" if $debug < 2;
 
   # local repo
@@ -2357,7 +2858,7 @@ EOF
   # named remote repos
   my %remotes;
   my $longest = 0;
-  my @abbrev_remotes = split('\n', ExecUtil::output("git remote"));
+  my @abbrev_remotes = split('\n', ExecUtil::output("$git_cmd remote"));
   foreach $remote (@abbrev_remotes) {
     chomp($remote);
     my $url = RepoUtil::get_config("remote.$remote.url");
@@ -2384,16 +2885,15 @@ EOF
   print "Current branch: $branch\n" if $debug < 2;
 
   # Sha1sum
-  my $current_commit = ExecUtil::output("git show-ref -s -h | head -n 1");
+  my $current_commit = ExecUtil::output("$git_cmd show-ref -s -h | head -n 1");
   print "  Cryptographic checksum (sha1sum): $current_commit\n" if $debug < 2;
 
   # Default pull/push options
-  RepoUtil::migrate_old_easy_git_pull_push_options();
   my $default = "-None-";
   my $print_config_options = 0;
   my ($ret, $options) =
-    ExecUtil::execute_captured("git config --get-regexp ^branch\.$branch\.*",
-                               ignore_ret => 1);
+    ExecUtil::execute_captured("$git_cmd config --get-regexp " .
+                               "^branch\.$branch\.*", ignore_ret => 1);
   chomp($options);
   my @lines;
   if ($ret == 0) {
@@ -2405,7 +2905,7 @@ EOF
       $default = $1;
       $print_config_options = ($line_count > 1);
     } else {
-      my @output = `git config --get-regexp remote.origin.*`;
+      my @output = `$git_cmd config --get-regexp remote.origin.*`;
       $default = "origin" if @output;
     }
   }
@@ -2419,16 +2919,16 @@ EOF
   }
 
   # No. contributors
-  my $contributors  = ExecUtil::output("git shortlog -s -n HEAD | wc -l");
+  my $contributors  = ExecUtil::output("$git_cmd shortlog -s -n HEAD | wc -l");
   print "  Number of contributors: $contributors\n" if $debug < 2;
 
   # No. files
-  my $num_files = ExecUtil::output("git ls-tree -r HEAD | wc -l");
+  my $num_files = ExecUtil::output("$git_cmd ls-tree -r HEAD | wc -l");
   print "  Number of files: $num_files\n" if $debug < 2;
 
   # No. dirs
   my $num_dirs = ExecUtil::output(
-                    "git ls-tree -r -t HEAD " .
+                    "$git_cmd ls-tree -r -t HEAD " .
                     " | grep -E '[0-9]+ tree'" .
                     " | wc -l");
   print "  Number of directories: $num_dirs\n" if $debug < 2;
@@ -2437,7 +2937,7 @@ EOF
   # method I could find that would work given the corner case filenames
   # (spaces and unicode chars) in the git.git repo (Try eg info on repo
   # from 'git clone git://git.kernel.org/pub/scm/git/git.git').
-  my @files = `git ls-tree -r -l --full-name HEAD`;
+  my @files = `$git_cmd ls-tree -r -l --full-name HEAD`;
   my %biggest = (name => '', size => 0);
   foreach my $line (@files) {
     if ($line =~ m#^[0-9]+ [a-z]+ [0-9a-f]+[ ]*(\d+)[ \t]*(.*)$#) {
@@ -2453,7 +2953,7 @@ EOF
   print "  Biggest file size, in bytes: $biggest_file\n" if $debug < 2;
 
   # No. commits
-  my $branch_depth  = ExecUtil::output("git rev-list HEAD | wc -l");;
+  my $branch_depth  = ExecUtil::output("$git_cmd rev-list HEAD | wc -l");
   print "  Commits: $branch_depth\n" if $debug < 2;
 
   # Other possibilities:
@@ -2462,6 +2962,9 @@ EOF
   #   Number of unpacked objects?
 
   chdir($orig_dir);
+
+  # Well, if we got this far, it must have worked, so...
+  return 0;
 }
 
 ###########################################################################
@@ -2550,7 +3053,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
-    initial_commit_error_msg => "Error: No recorded commits to show yet.",
+    git_repo_needed => 1,
     @_);
   bless($self, $class);
   $self->{'help'} = "
@@ -2582,6 +3085,12 @@ sub _get_values {
     ($name, $distance) = @{$names->{$sha1sum}};
   }
   return ($name, $distance);
+}
+
+sub _path_count {
+  my ($name) = @_;
+  my @matches = ($name =~ m/[~^]/g);
+  return scalar @matches;
 }
 
 sub _get_revision_name {
@@ -2616,7 +3125,8 @@ sub _get_revision_name {
       $parent_name = "$cur_name~1";
     }
     $parent_distance = $distance + 1;
-    if (!$orig_parent_name || $orig_parent_distance > $parent_distance) {
+    if (!$orig_parent_name ||
+        _path_count($orig_parent_name) > _path_count($parent_name)) {
       $names->{$parent} = [$parent_name, $parent_distance];
     }
 
@@ -2626,7 +3136,8 @@ sub _get_revision_name {
     foreach my $merge_parent (@merge_parents) {
       ($orig_parent_name, $orig_parent_distance) =
         _get_values($names, $merge_parent);
-      if (!$orig_parent_name || $orig_parent_distance > $parent_distance) {
+      if (!$orig_parent_name ||
+          _path_count($orig_parent_name) > _path_count("$cur_name^$count")) {
         $names->{$merge_parent} = ["$cur_name^$count", $parent_distance];
       }
       $count++;
@@ -2648,51 +3159,86 @@ sub _get_revision_name {
 
 sub run {
   my $self = shift;
-  @ARGV = $self->quote_args(@ARGV);
+  @ARGV = Util::quote_args(@ARGV);
 
   my $branch = RepoUtil::current_branch();
-  my ($ret, $revision) =
-    ExecUtil::execute_captured("git rev-parse refs/heads/$branch");
-  chomp($revision);
+
+  # Check whether to warn if there are no commits.  We don't want to parse
+  # all the arguments to determine if there is a valid revision listed on the
+  # command line (or, failing that, whether HEAD reference a valid revision);
+  # instead, we just check for the simple case of no branches existing yet.
+  if (!`$git_cmd branch -a`) {
+    die "Error: No recorded commits to show yet.\n";
+  }
 
   # We can just run plain git log if there's not current branch
-  if (!$branch) {
-    ExecUtil::execute("git log @ARGV");
-    return;
+  if (!$branch || !RepoUtil::valid_ref($branch)) {
+    return ExecUtil::execute("$git_cmd log @ARGV", ignore_ret => 1);
   }
+
+  my ($ret, $revision) =
+    ExecUtil::execute_captured("$git_cmd rev-parse refs/heads/$branch");
+  exit $ret if $ret;
+  chomp($revision);
 
   # Show the user the essential equivalent to what we manually do
   if ($debug) {
-    print "    >>Running: git log @ARGV | \\\n" .
-       "               git name-rev --stdin --refs=refs/heads/$branch | \\\n" .
+    print "    >>Running: $git_cmd log @ARGV | \\\n" .
+       "               $git_cmd name-rev --stdin " .
+           "--refs=refs/heads/$branch | \\\n" .
        "               less\n";
     return if $debug == 2;
   }
 
   # Setup name determination via output from git rev-list
   my %names;
-  open(REV_LIST_INPUT, "git rev-list --parents $branch | ");
+  open(REV_LIST_INPUT, "$git_cmd rev-list --parents $branch | ");
   $names{$revision} = [$branch, 0];
 
   # Loop over the output of git log, printing/modifying as we go
-  open(INPUT, "git log @ARGV | ");
-  open(OUTPUT, "| less -FRSX");
+  my $use_colors = -t STDOUT ? "GIT_PAGER_IN_USE=1" : "";
+  open(INPUT, "$use_colors $git_cmd log @ARGV | ");
+  $ENV{"LESS"} = "FRSX" unless defined $ENV{"LESS"};
+  my $less = ($use_pager == 1) ? "less" :
+             ($use_pager == 0) ? "cat" :
+             `$git_cmd config core.pager` || "less";
+  chomp($less);
+  my $pid = open(OUTPUT, "| $less");
+
+  # Make sure that we don't leave the terminal in a weird state if the user
+  # hits Ctrl-C during eg log
+  local $SIG{INT} = 
+    sub { kill SIGKILL, $pid; close(INPUT); close(OUTPUT); close(REV_LIST_INPUT);
+          exit(0); };
+ 
   #open(OUTPUT, ">&STDOUT");
   while (<INPUT>) {
     # If it's a commit line, determine the name of the commit and print it too
-    if (/^(commit ([0-9a-f]{40}))$/) {
+    # ANSI color escape sequences make this regex kind of ugly...
+    if (/^((?:\e\[.*?m)?commit ([0-9a-f]{40}))((?:\e\[m)?)$/) {
       my $name = _get_revision_name($2, REV_LIST_INPUT, \%names);
-      print OUTPUT "$1 ($name)\n" if $name;
-      print OUTPUT "$1\n"         if !$name;
+      print OUTPUT "$1 ($name)$3\n" if $name;
+      print OUTPUT "$1$3\n"         if !$name;
     } else {
       print OUTPUT;
     }
   }
-  close(INPUT);
-  close(OUTPUT);
+  my ($ret1, $ret2, $ret3);
+  close(INPUT);  $ret1 = $?;
+  close(OUTPUT); $ret2 = $?;
 
-  # Make sure we close the pipe from rev-list too
-  close(REV_LIST_INPUT);
+  # Make sure we close the pipe from rev-list too; We use "$? && $!"
+  # instead of "$?" because we don't care about the return value of the
+  # rev-list program -- which we prematurely close -- just whether the close
+  # succeeded.  We can't just use "$!" because if --pretty="format:%s" is
+  # passed to eg log, then $! will be "Bad file descriptor" which translates
+  # to a nonzero exit status.
+  # (This is my best guess at what to do given the random failures from
+  # t1411-reflog-show.sh, and reading 'man perlfunc' under 'close'; it seems
+  # to work.)
+  close(REV_LIST_INPUT);  $ret3 = $? && $!;
+
+  return $ret1 || $ret2 || $ret3;
 }
 
 ###########################################################################
@@ -2710,11 +3256,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(
-    initial_commit_error_msg => "No branches can be merged until there is " .
-                                "at least one commit.",
-    @_
-    );
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -2780,6 +3322,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     git_equivalent => '',
     initial_commit_error_msg => "Error: No recorded commits to publish.",
     @_);
@@ -2905,30 +3448,31 @@ EOF
   #
   ExecUtil::execute("touch git-daemon-export-ok");
   print "Optimizing local repository and compressing it...\n" if $debug < 2;
-  ExecUtil::execute("git gc");
-  ExecUtil::execute("git --bare update-server-info");
+  ExecUtil::execute("$git_cmd gc");
+  ExecUtil::execute("$git_cmd --bare update-server-info");
   if (-f "hooks/post-update.sample") {
     ExecUtil::execute("mv hooks/post-update.sample hooks/post-update");
   }
   ExecUtil::execute("chmod u+x hooks/post-update");
-  my $is_bare = ExecUtil::output("git config --get core.bare");
-  ExecUtil::execute("git config core.bare true");
+  my $is_bare = ExecUtil::output("$git_cmd config --get core.bare");
+  ExecUtil::execute("$git_cmd config core.bare true");
 
   #
   # rsync .git to the publish location
   #
   print "Copy local repository to remote location...\n" if $debug < 2;
-  ExecUtil::execute(
+  my $ret = ExecUtil::execute(
     "rsync -e ssh -az --delete --exclude=refs/remotes " .
     "--exclude=COMMIT_EDITMSG --exclude=index --exclude=logs " .
     "--exclude=info/ignored-unknown " .
     "--exclude=ORIG_HEAD --exclude=FETCH_HEAD --exclude=MERGE_HEAD " .
     "./ \"$self->{remote_dir}\"");
+  exit $ret if $ret;
 
   #
   # Undo any temporary changes we did for publishing
   #
-  ExecUtil::execute("git config core.bare $is_bare");
+  ExecUtil::execute("$git_cmd config core.bare $is_bare");
   # FIXME: I should clean up git-daemon-export-ok, hooks/post-update, and
   # the files that 'man git-update-server-info' says it creates.
 
@@ -2937,7 +3481,7 @@ EOF
   # is not already setup.  Otherwise, tell the user how to simplify
   # future pushes/pulls.
   #
-  my @output = `git config --get-regexp remote.origin.*`;
+  my @output = `$git_cmd config --get-regexp remote.origin.*`;
   if (@output) { 
     print <<EOF;
 NOTE: Not setting up $self->{remote_dir} as your default push/pull location,
@@ -2949,14 +3493,14 @@ and then do future pushes and pulls with
   eg pull NICKNAME
 EOF
   } else {
-    ExecUtil::execute("git remote add origin $self->{remote_dir}");
+    ExecUtil::execute("$git_cmd remote add origin $self->{remote_dir}");
 
     #
     # Set up the configuration variables branch.BRANCH.(remote|merge)
     # for each BRANCH (used later as default push/pull locations)
     #
-    my @branches = `git branch`;
-    print "    >>Running: 'git branch'<<\n" if $debug;
+    my @branches = `$git_cmd branch`;
+    print "    >>Running: '$git_cmd branch'<<\n" if $debug;
     foreach my $branch (@branches) {
       chomp($branch);
       $branch =~ s#..##;
@@ -2967,6 +3511,7 @@ EOF
   }
 
   chdir($orig_dir);
+  return 0;
 }
 
 ###########################################################################
@@ -2983,7 +3528,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -3088,59 +3633,26 @@ Options
 ";
   $self->{'differences'} = "
   eg pull and git pull are nearly identical.  eg provides a slightly more
-  meaningful name for --tags (\"--all-tags\"), and introduces a new option
-  named --branch.  The new option (1) avoids the need to explain refspecs
-  too early to users, (2) makes command line examples more
-  self-documenting.  eg still accepts refspecs at the end of the
-  commandline the same as git pull, however their explanation is deferred
-  to 'eg help topic refspecs'.
+  meaningful name for --tags (\"--all-tags\"), introduces a new option
+  named --branch, and tries to assist the user when no branch to
+  merge/rebase is specified on the command line or in the config.
+
+  The new --branch option (1) avoids the need to explain refspecs too early
+  to users, (2) makes command line examples more self-documenting.  eg
+  still accepts refspecs at the end of the commandline the same as git
+  pull, however their explanation is deferred to 'eg help topic refspecs'.
+
+  When no branch to merge/rebase is specified, eg pull will provide a list
+  of known branches at the remote end.  In the special case that the remote
+  has exactly one branch, eg will use that branch for merging/rebasing
+  rather than erroring out.
 ";
   return $self;
-}
-
-#
-# FIXME: This function really isn't needed anymore...
-#
-sub _get_only_branch {
-  my $repository = shift;
-
-  if ($debug == 2) {
-    print "    >>Running: 'git ls-remote -h $repository'<<\n";
-    return;
-  }
-
-  # Check if the remote repository has exactly 1 branch...if so, return it,
-  # otherwise throw an error
-  my ($ret, $output) = 
-    ExecUtil::execute_captured("git ls-remote -h $repository",
-                               capture_stdout_only => 1);
-  die "Could not determine remote branches from repository '$repository'\n"
-    if $ret != 0;
-  my @remote_refs = split('\n', $output);
-
-  die "'$repository' has no branches to pull!\n" if @remote_refs == 0;
-  my @remote_branches = map { m#[0-9a-f]+.*/(.*)$# && $1 } @remote_refs;
-
-  if (@remote_branches > 1) {
-    print STDERR <<EOF;
-Aborting: It is not clear which remote branch to pull changes from.  Please
-retry, specifying which branch(es) you want to be merged into your current
-branch.  Existing remote branches of
-  $repository
-are
-  @remote_branches
-EOF
-    exit 1;
-  }
-
-  return $remote_branches[0];
 }
 
 sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
-
-  RepoUtil::migrate_old_easy_git_pull_push_options();
 
   #
   # Parse options
@@ -3163,16 +3675,15 @@ sub preprocess {
     "--no-tags"        => \$no_tags,
     "commit!"          => sub { &$record_arg(@_) },
     "summary!"         => sub { &$record_arg(@_) },
-    "-n"               => sub { &$record_arg(@_) },
+    "no-stat|n"        => sub { &$record_arg(@_) },
     "squash!"          => sub { &$record_arg(@_) },
     "ff!"              => sub { &$record_arg(@_) },
-    "strategy=s"       => sub { &$record_args(@_) },
-    "s=s"              => sub { &$record_args(@_) },
+    "strategy|s=s"     => sub { &$record_args(@_) },
     "rebase!"          => sub { &$record_arg(@_) },
     "quiet|q"          => sub { &$record_arg(@_) },
     "verbose|v"        => sub { &$record_arg(@_) },
     "append|a"         => sub { &$record_arg(@_) },
-    "--upload-pack=s"  => sub { &$record_args(@_) },
+    "upload-pack=s"    => sub { &$record_args(@_) },
     "force|f"          => sub { &$record_arg(@_) },
     "tags"             => \$all_tags,
     "keep|k"           => sub { &$record_arg(@_) },
@@ -3196,7 +3707,7 @@ sub preprocess {
   if ($repository) {
     push(@{$self->{args}}, $repository);
   } elsif (!$repository && @branches) {
-    my $repository = RepoUtil::get_default_push_pull_repository();
+    $repository = RepoUtil::get_default_push_pull_repository();
     push(@{$self->{args}}, $repository);
   } else {
     # Just drop through to the git pull defaults.
@@ -3211,10 +3722,13 @@ sub preprocess {
     my $branch = RepoUtil::current_branch();
     if ($branch) {
       my ($merge_branch, $url);
-      $merge_branch = RepoUtil::get_config("branch.$branch.merge");
-      $url = RepoUtil::get_config("branch.$branch.remote") if !$repository;
+      $url = RepoUtil::get_config("branch.$branch.remote");
+      if ($url && (!$repository || $url eq $repository)) {
+        $merge_branch = RepoUtil::get_config("branch.$branch.merge");
+      }
       if (!$merge_branch && ($repository || $url)) {
-        my $only_branch = _get_only_branch($repository || $url);
+        my $only_branch = RepoUtil::get_only_branch($repository || $url);
+        push(@{$self->{args}}, $url) if !$repository;
         push(@branches, $only_branch);
       }
     }
@@ -3231,8 +3745,8 @@ sub preprocess {
 sub run {
   my $self = shift;
 
-  @args = $self->quote_args(@{$self->{args}});
-  return ExecUtil::execute("git pull @args", ignore_ret => 1);
+  @args = Util::quote_args(@{$self->{args}});
+  return ExecUtil::execute("$git_cmd pull @args", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -3250,6 +3764,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     initial_commit_error_msg => "Error: No recorded commits to push.",
     @_);
   bless($self, $class);
@@ -3340,18 +3855,33 @@ Options
     the remote repository.
 ";
   $self->{'differences'} = "
-  eg push tries to simplify git, but is essentially the same other than
+  eg push tries to simplify git, but is essentially the same other than (1)
   defaulting to pushing only the current branch instead of matching
-  branches.  eg does provide extra --tag and --branch flags to make command
-  lines more self-documenting, and to avoid introducing refspecs (a very
-  confusing topic for new users) too early.  However, refspecs still work
-  with eg push, and users can learn about them by running 'eg help topic
-  refspecs'.
+  branches, and (2) trying to avoid pushing into a bare repository.  There
+  are two other minor changes, namely providing extra --tag and --branch
+  flags to make command lines more self-documenting and to avoid
+  introducing refspecs (a very confusing topic for new users) too early.
+  However, refspecs still work with eg push, and users can learn about them
+  by running 'eg help topic refspecs'.
 
-  eg push also avoids pushing into a non-bare repository, by disabling
-  such pushes in cases it can detect unless the user specifies both source
-  and destination references explicitly (which can be done by running, for
-  example, 'eg push origin master:master').
+  Pushing just the current branch to its tracking branch is a change mostly
+  made with the idea that new git users coming from the cvs/svn world will
+  probably be using central repositories that many developers push to.
+  However, given the recent push.default config option introduced in
+  git-1.6.3 (which can be set to 'tracking' to get the eg behavior or
+  'matching' to get the old git default behavior), this change in eg may be
+  obsolete and reverted in the future.
+
+  The method eg push uses to avoid pushing into a non-bare repository is a
+  push-side check rather than a receive-side check.  In cases it can detect
+  that the remote repository is bare (pushing to a directory on a locally
+  mounted filesystem or pushing over ssh), it will disable such pushes
+  unless the user specifies both source and destination references
+  explicitly (which can be done by running, for example, 'eg push origin
+  master:master').  However, given the new receive-side check introduced in
+  git-1.6.x to avoid pushing into bare repositories unless they have
+  configured to allow it, this change in eg may be obsolete and reverted in
+  the future.
 ";
   return $self;
 }
@@ -3388,7 +3918,7 @@ sub _check_if_bare {
     chdir($repository);
 
     my ($ret, $output) = 
-      ExecUtil::execute_captured("git rev-parse --is-bare-repository",
+      ExecUtil::execute_captured("$git_cmd rev-parse --is-bare-repository",
                                  ignore_ret => 1);
 
     chdir($orig_dir);
@@ -3415,7 +3945,7 @@ sub _check_if_bare {
 
   my ($ret, $output) = 
     ExecUtil::execute_captured(
-      "ssh $user$machine 'cd $path && git rev-parse --is-bare-repository'",
+      "ssh $user$machine 'cd $path && $git_cmd rev-parse --is-bare-repository'",
       ignore_ret => 1);
   return undef if $ret != 0;
   chomp($output);
@@ -3425,8 +3955,6 @@ sub _check_if_bare {
 sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
-
-  RepoUtil::migrate_old_easy_git_pull_push_options();
 
   #
   # Parse options
@@ -3443,7 +3971,7 @@ sub preprocess {
     "--help"              => sub { $self->help() },
     "--branch=s"          => sub { push(@branches, $_[1]) },
     "--tag=s"             => sub { push(@tags, $_[1]) },
-    "--all-branches"      => \$all_branches,
+    "--all-branches|all"  => \$all_branches,
     "--matching-branches" => \$matching_branches,
     "--all-tags"          => \$all_tags,
     "--mirror"            => \$mirror,
@@ -3476,13 +4004,22 @@ sub preprocess {
   push(@{$self->{args}}, "--tags")   if $all_tags;
   push(@{$self->{args}}, "--mirror") if $mirror;
 
+  my $default_specified = 0;
+  $default_specified = 1  if $all_branches;
+  $default_specified = 1  if $matching_branches;
+  $default_specified = 1  if $all_tags;
+  $default_specified = 1  if $mirror;
+
   #
-  # Get the repository to pull from
+  # Get the repository to push to
   #
+  if (defined $repository && $repository =~ m#^-#) {
+    die "Invalid repository to push to: $repository\n";
+  }
   my $remote;
   if ($repository) {
     push(@{$self->{args}}, $repository);
-  } elsif (!$repository && (@branches || @tags)) {
+  } elsif (!$repository && (@branches || @tags || !$default_specified)) {
     $repository = RepoUtil::get_default_push_pull_repository();
     push(@{$self->{args}}, $repository);
     $remote = $repository;
@@ -3538,6 +4075,36 @@ EOF
   }
 
   #
+  # Get the default branch to push to, if needed
+  #
+  if (!@branches && !@tags && !@git_refspecs && !$default_specified) {
+    # User hasn't specified what to push; default choices:
+    # 1 - remote.$remote.(push|mirror) options
+    my $default_known = 0;
+    if (defined($remote)) {
+      if (defined(RepoUtil::get_config("remote.$remote.push")) ||
+          defined(RepoUtil::get_config("remote.$remote.mirror"))) {
+        $default_known = 1;
+      }
+    }
+    # 2 - branch.$branch.merge option
+    if (!$default_known) {
+      my $branch = RepoUtil::current_branch();
+      $push_branch = RepoUtil::get_config("branch.$branch.merge");
+      if (defined $push_branch) {
+        $push_branch =~ s#refs/heads/##;
+        push(@{$self->{args}}, "$branch:$push_branch");
+        $default_known = 1;
+      }
+    }
+    # 3 - the only branch that exists at the remote end
+    if (!$default_known && defined $repository) {
+      my $only_branch = RepoUtil::get_only_branch($repository, "push");
+      push(@{$self->{args}}, $only_branch);
+    }
+  }
+
+  #
   # Get the branch(es) to push
   #
   push(@branches, @git_refspecs);
@@ -3550,8 +4117,8 @@ EOF
 sub run {
   my $self = shift;
 
-  @args = $self->quote_args(@{$self->{args}});
-  return ExecUtil::execute("git push @args", ignore_ret => 1);
+  @args = Util::quote_args(@{$self->{args}});
+  return ExecUtil::execute("$git_cmd push @args", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -3571,6 +4138,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     initial_commit_error_msg => "Error: No recorded commits to rewrite.",
     @_);
   bless($self, $class);
@@ -3764,8 +4332,9 @@ Options:
   is somewhat confusing in that it isn't rebasing master but the current
   branch.  To make this clearer, eg allows (and encourages) the form
     eg rebase --against master
-  where --against has the same meaning as --since, but is clearer in cases
-  where the --onto flag is not also used.
+  The reason that both --against and --since flags were added (with
+  identical behavior), is that the former makes for clearer command lines
+  when the --onto flag is not also used.
 ";
   return $self;
 }
@@ -3787,7 +4356,7 @@ sub preprocess {
     "verbose|v"           => sub { &$record_arg(@_) },
     "merge|m"             => sub { &$record_arg(@_) },
     "C=i"                 => sub { &$record_args(@_) },
-    "whitespace=s"        => sub { &$record_args(@_) },
+    "whitespace=s"        => sub { push(@{$self->{args}},"--whitespace=$_[1]") },
     "preserve-merges|p"   => sub { &$record_arg(@_) },
     "onto=s"              => sub { &$record_args(@_) },
     "against=s"           => sub { $since=$_[1] },
@@ -3805,8 +4374,8 @@ sub preprocess {
 sub run {
   my $self = shift;
 
-  @args = $self->quote_args(@{$self->{args}});
-  return ExecUtil::execute("git rebase @args", ignore_ret => 1);
+  @args = Util::quote_args(@{$self->{args}});
+  return ExecUtil::execute("$git_cmd rebase @args", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -3825,8 +4394,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(
-    @_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -3931,7 +4499,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -4038,6 +4606,8 @@ sub preprocess {
   # Parse options
   #
   my ($hard, $soft) = (0, 0);
+  return if (scalar(@ARGV) > 0 && $ARGV[0] eq "--");
+
   my $result = main::GetOptions(
     "--help"         => sub { $self->help() },
     "--working-copy" => \$hard,
@@ -4065,7 +4635,9 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(git_equivalent => 'add', @_);
+  my $self = $class->SUPER::new(git_repo_needed => 1,
+                                git_equivalent => 'add',
+                                @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -4091,8 +4663,8 @@ sub run {
   my $self = shift;
   my $package_name = ref($self);
 
-  @ARGV = $self->quote_args(@ARGV);
-  return ExecUtil::execute("git add @ARGV", ignore_ret => 1);
+  @ARGV = Util::quote_args(@ARGV);
+  return ExecUtil::execute("$git_cmd add @ARGV", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -4110,103 +4682,92 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, git_equivalent => '', @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
-  eg revert [--commit | --no-commit] [-m PARENT_NUMBER] [--staged | --unstaged]
-            [--in | --since] [REVISION] [--] [PATH...]
+  eg revert [[-m PARENT_NUMBER] --in REVISION | --since REVISION]
+            [--staged | --unstaged] [--] [PATH...]
 
 Description:
-  (Note: If you want to check out an earlier revision, use the switch
-  command; revert does not change the parent of the working directory.  If
-  you want to undo commits, use the reset command to set the branch tip to
-  a previous revision; revert does not modify the branch tip -- other than
-  by potentially adding a new commit.)
+  eg revert undoes edits to your files, without changing the commit history
+  or changing which commit is active.  (If you are looking for a different
+  kind of 'undo'; they are discussed and contrasted below.)  There are many
+  options for what to revert; you may want to jump ahead to the examples
+  section below and then come back and read the full description.
 
-  eg revert undoes previous changes, potentially including: restoring
-  deleted files to a previously recorded version, removing recorded
-  conflict states, undoing prior adds or stages, and discarding local
-  modifications, or reversing the changes made in a prior commit.  eg
-  revert can optionally also immediately make a commit after the reversion
-  is performed.  This command has many options for exactly what to revert,
-  and it may be useful to skip to the examples section below and then come
-  back and read the description.
+  The work eg revert does includes discarding local modifications, removing
+  recorded conflict states, undoing add or stage operations (i.e. unstaging
+  files), and restoring deleted files to the previously recorded version.
+  If you revert changes since some revision prior to the most recent,
+  revert will also remove any files which were added in a later revision.
 
-  Revert can operate on a subset of paths if specified.  When a directory
-  path is specified, all changes under the given directory will be
-  reverted.
+  By default, eg revert will revert edits since the last commit(*).  One
+  can specify a different revision to revert file contents back to, or
+  revert edits made in a single previous commit(**).  (Advanced usage note:
+  eg revert will undo both staged and unstaged changes by default; you can
+  request only one of these; see 'eg help topic staging' for more details
+  on what staged and unstaged changes are.)
 
-  This command has the ability to either revert changes *since* a given
-  commit, or to revert the changes *in* a given commit.  When a revision is
-  specified, either the --since or --in flags must also be specified to
-  make it clear which behavior is desired.  If no commit is specified and
-  neither --since nor --in is provided, the default is to assume you want
-  to undo changes since the last commit.  Note that these two flags tend to
-  be used under very different circumstances:
+  (*) For an initial or root commit, eg revert will simply undo adds.  When
+  in an uncompleted merge state, it is an error to not specify which commit
+  to revert relative to (with the --since flag).
 
-     revert-since                        revert-in
-     * is usually used in a dirty tree   * is typically used in a clean tree
-     * specific paths are usually        * specific paths are not often
-       specified                           specified
-     * it is rare to want to commit      * making a commit after reverting
-       immediately after reverting         is what you usually want
-     * it is uncommon to need to
-       specify a revision           
-
-  Because of the above differences, making a commit immediately after the
-  revert is done by default when you specify --in with no specific paths;
-  otherwise, no commit is performed by default.  Use the --commit or
-  --no-commit flags to override this behavior.
+. (**) When reverting the changes made *in* a merge commit, the revert
+  command needs to know which parent of the merge the revert should be
+  relative to.  This can be specified using the -m option.
 
   To avoid accidental loss of local changes, nothing will be done when no
-  arguments are specified.  (However, you will be given a helpful message
-  suggesting commands that you might want to run; this message detects a
-  variety of situations and prompts you accordingly.)
+  arguments are provided to eg revert.  However, eg revert will check for
+  various special cases (from the different types of 'undo' below), and try
+  to provide an error message tailored to any special circumstances
+  relevant to you.
 
-  (Advanced usage notes)
-    By default, changes are reverted in both the working copy and in the
-    staging area (i.e. the area tracking content explicitly marked by you
-    as ready to be committed; see 'eg help topic staging' for more
-    details).  One can limit the reversion of changes to just the working
-    copy (using the --unstaged flag), or to just the staging area (using
-    the --staged flag).  Note that, in addition to reverting changes to the
-    working copy since a given revision (with the --since REVISION flag),
-    you can also revert changes to the working copy relative to the staging
-    area (by specifying --unstaged without passing the --since flag).
-
-    When reverting the changes made *in* a merge commit, the revert command
-    needs to know which parent of the merge the revert should be relative to.
-    This can be specified using the -m option.
+  === Comparison of different types of 'undo' available ===
+  * Back up or switch to an earlier commit (eg switch)
+  * Make a new commit to reverse the changes of a previous commit (eg
+    cherry-pick -R)
+  * Remove commits from history (eg reset OR eg rebase --interactive)
+  * Reverting edits, without switching commits or changing commit history
+    (eg revert)
+  * Abort an incomplete operation
+    * Incomplete merge:      eg revert --since HEAD
+    * Unfinished rebase:     eg rebase --abort
+    * Unfinished apply mail: eg am --abort
+    * Unfinished bisect:     eg bisect reset
 
 Examples:
-  Undo changes since the last commit on the current branch to bar.h and foo.c.
-  This can be done with either of the following methods:
+  Undo changes since the last commit on the current branch to bar.h and
+  foo.c.  This can be done with either of the following methods:
       \$ eg revert bar.h foo.c                      # Method #1
       \$ eg revert --since HEAD bar.h foo.c         # Method #2, more explicit
 
   While on the bling branch, revert the changes in the last 3 commits (as
-  well as any local changes).  This can be done by:
-      \$ eg revert --since bling~3
+  well as any local changes) to any file under the directory docs.  This
+  can be done by:
+      \$ eg revert --since bling~3 docs
 
   While on the stable branch, you determine that the seventh commit prior
-  to the most recent was faulty and you simply want to undo it and make a
-  new commit once it is undone.  This can be accomplished by:
-      \$ eg revert --in stable~7
+  to the most recent had a faulty change to foosubdir and baz.txt and you
+  simply want to undo it.  This can be accomplished by:
+      \$ eg revert --in stable~7 -- foosubdir baz.txt
 
   You decide that all changes to foobar.cpp in your working copy and in the
   last 2 commits are bad and want to revert them.  This is done by:
   of:
       \$ eg revert --since HEAD~2 -- foobar.c
 
-  You decide that some of the changes in the merge commit HEAD~4 are
-  bad.  You would like to revert the changes in HEAD~4 to bar.h
-  relative to its second parent.  This can be accomplished as follows:
-      \$ eg revert -m 2 --in HEAD~4 -- bar.h
+  You decide that some of the changes in the merge commit HEAD~4 are bad.
+  You would like to revert the changes to baz.py in HEAD~4 relative to its
+  second parent.  This can be accomplished as follows:
+      \$ eg revert -m 2 --in HEAD~4 baz.py
   
   (Advanced) Undo a previous stage, marking changes in foo.c as not
-  being ready for commit:
+  being ready for commit (this is equivalent to eg unstage foo.c):
       \$ eg revert --staged foo.c
+
+  (Advanced) Undo changes since the most recent stage to soopergloo.f77
+      \$ eg revert --unstaged soopergloo.f77
 
   (Advanced) You decide that the changes to abracadabra.xml made in commit
   HEAD~8 are bad.  You want to revert those changes in the version of
@@ -4214,15 +4775,6 @@ Examples:
       \$ eg revert --unstaged --in HEAD~8 -- abracadabra.xml
 
 Options:
-  --commit
-    Commit your files immediately after reverting.  There must be no local
-    changes prior to running revert if this option is used.  --commit is not
-    the default.
-
-  --no-commit
-    The opposite of --commit, this flag is the default and exists just for
-    completeness.
-
   --since
     Revert the changes made since the specified commit, including any local
     changes.  This takes the difference between the specified commit and
@@ -4264,24 +4816,51 @@ Options:
     to the listed files or files below the listed directories.
 ";
   $self->{'differences'} = '
-  git revert is a strict subset of the capabilities of eg revert; eg revert
-  also contains part of the abilities of the git checkout and git reset
-  commands (namely, the second form of each), as well as a couple new
-  things to round it all out.
+  eg revert is similar to the revert command of svn, hg, bzr, or darcs.  It
+  is not provided by any one git command; it overlaps with about five
+  different git commands in specific cases.  git users wanting the
+  functionality in eg revert will typically be guided by expert git users
+  towards whichever git command seems like the most natural fit for the
+  particular case the user asks about.  Quite often, such users will
+  continue using the command they are given for subsequent situations...and
+  will often stumble across multiple cases where the git command no longer
+  matches the wanted revert behavior.
+
+  git does provide a command called revert, which is a subset of the
+  behavior of eg cherry-pick:
+    git revert COMMIT
+  is the same as
+    eg cherry-pick -R COMMIT
+  which is, modulo the automatic commit message provided by git revert, the
+  same as
+    eg revert --in COMMIT && eg commit
+  Note that while eg revert --in may look similar to git revert, the former
+  is about undoing changes in just the working copy, is typically
+  restricted to a specific subset of files, and is usually just one change
+  of many towards testing or creating something new to be committed.  The
+  latter is always concerned with reverse applying an entire commit, and is
+  almost always used to immediately record that change.
+
+  Note that git revert commands are invalid syntax in eg (since eg revert
+  always requires the --since or --in flags to be specified whenever a
+  commit is).  This means that eg can catch such cases and notify git
+  users to adopt the eg cherry-pick -R command.
 
   Due to these changes, eg revert should be much more welcoming to users of
-  svn, hg, bzr, or darcs (all of which assume the --since behavior for
-  revert), while also still having the capabilities of git revert (which
-  assumes the --in behavior of revert).  This also makes the reset and
-  checkout/switch subcommands of eg easier to understand by limiting their
-  scope instead of each having two very different capabilities.
-  (Technically, eg reset and eg checkout still have those capabilities for
-  backwards compatibility, I just omit them in the documentation.)
+  svn, hg, bzr, or darcs.  It also provides a simple discovery mechanism
+  for existing git users to allow them to easily work with eg.
+  Additionally, these changes also make the reset and checkout/switch
+  subcommands of eg easier to understand by limiting their scope instead of
+  each having two very different capabilities.  (Technically, eg reset and
+  eg checkout still have those capabilities for backwards compatibility, I
+  just omit them in the documentation.)
 
-  The biggest surprise for users of git revert are:
-    1) They have to specify the --in flag
-  Without specifying this flag, eg revert simply aborts and reports that it
-  needs either the --since or --in flags when a revision is specified.
+  It seems that perhaps eg revert could be extended further, to accept
+  things like
+      \$ eg revert --in HEAD~8..HEAD~5 foo.c
+  to allow reverting changes made in a range of commits.  The --in could
+  even be optional in such a case, since the range makes it clear what is
+  wanted.
 ';
   return $self;
 }
@@ -4294,17 +4873,11 @@ sub preprocess {
   my $initial_commit = RepoUtil::initial_commit();
 
   # Parsing opts
-  $self->{original_args} = [];
-  push(@{$self->{original_args}}, @ARGV);
-  my ($commit, $edit, $staged, $unstaged, $in) = (-1, -1, 0, 0, -1);
+  my ($staged, $unstaged, $in) = (0, 0, -1);
   my $m;
   my $rev;
   my $result = main::GetOptions(
     "--help"         => sub { $self->help() },
-    "--commit"       => \$commit,
-    "--no-commit"    => sub { $commit = 0 },
-    "--edit"         => \$edit,
-    "--no-edit"      => sub { $edit = 0 },
     "-m=i"           => \$m,
     "--staged"       => \$staged,
     "--unstaged"     => \$unstaged,
@@ -4316,41 +4889,15 @@ sub preprocess {
   my ($opts, $revs, $files) = RepoUtil::parse_args(@ARGV);
   unshift(@$revs, $rev) if defined($rev);
 
-  # Determining whether there are modified or unmerged files
-  my $files_modified = RepoUtil::files_modified();
-  my @quoted_files;
-  if (@$files) {
-    @quoted_files = $self->quote_args(@$files);
-  } else {
-    push(@quoted_files, $top_dir);
-  }
-  my @unmerged_files = `git ls-files --full-name -u -- @quoted_files`;
-  @unmerged_files = map { m/.*[ ]+(.*)/ && $1 } @unmerged_files;
-  @unmerged_files = Util::uniquify_list(@unmerged_files);
-
-  # Figure out whether to just call git revert, and otherwise whether to
-  # commit after reverting
-  if ($in && !@$files && ($unstaged == $staged)) {
-    my @list_minus_in_flag = grep {!/^--in$/} @{$self->{original_args}};
-    $self->{original_args} = \@list_minus_in_flag;
-  } else {
-    # Git revert can't handle this case; throw away original arguments
-    # and handle it ourselves
-    $self->{original_args} = [];
-  }
-  if ($commit == -1) {
-    $commit = 0;
-  }
-
   #
   # Big ol' safety checks and warnings
   #
   if (!@$revs && !@$files) {
+    my $files_modified = RepoUtil::files_modified();
     if (-f "$self->{git_dir}/MERGE_HEAD") {
       print STDERR<<EOF;
 Aborting: no revisions or files specified to revert.  If you want to abort
-your incomplete merge, try 'eg revert --since HEAD' (or, alternatively,
-'eg reset --working-copy HEAD').
+your incomplete merge, try 'eg reset --working-copy HEAD'.
 EOF
       exit 1;
     }
@@ -4401,7 +4948,27 @@ EOF
     }
   }
 
-  if (!@$revs && -f "$self->{git_dir}/MERGE_HEAD") {
+  # Sanity checks
+  die "Cannot specify -m without specifying --in.\n" if !$in && defined($m);
+  die "Can only specify one revision\n" if @$revs > 1;
+  die "No revision specified after --in\n"    if ($in == 1 && !@$revs);
+  die "No revision specified after --since\n" if ($in == 0 && !@$revs);
+  if ($in == -1 && @$revs) {
+    die "You must specify either --in or --since when specifying a revision.\n".
+        "(git users:) If you are used to git revert; try running\n".
+        "  eg cherry-pick -R @ARGV\n";
+  }
+  die "Unrecognized options: @$opts\n" if @$opts;
+  $in = 0 if $in == -1;
+  if (!$staged && !$unstaged) {
+    $staged = 1;
+    $unstaged = 1;
+  }
+
+  # Special checks in the case of an incomplete merge to make sure we know
+  # what to revert back to; if no --since or --in specified then we can only
+  # proceed if the user is only reverting unstaged changes
+  if (!@$revs && $staged && -f "$self->{git_dir}/MERGE_HEAD") {
     my @merge_branches = RepoUtil::merge_branches();
     my $list = join(", ", @merge_branches);
     print STDERR <<EOF;
@@ -4416,34 +4983,21 @@ EOF
     exit 1;
   }
 
-  # Sanity checks
-  die "Cannot specify -m without specifying --in.\n" if !$in && defined($m);
-  die "Unrecognized options: @$opts\n" if @$opts;
-  die "Can only specify one revision\n" if @$revs > 1;
-  die "No revision specified after --in\n"    if ($in == 1 && !@$revs);
-  die "No revision specified after --since\n" if ($in == 0 && !@$revs);
-  die "You must specify either --in or --since when specifying a revision\n"
-    if ($in == -1 && @$revs);
-  $in = 0 if $in == -1;
-  if (!$staged && !$unstaged) {
-    $staged = 1;
-    $unstaged = 1;
-  }
-
   if ($initial_commit) {
     die "Cannot revert a previous commit since there are no previous " .
       "commits.\n" if $in;
     die "Cannot revert to a previous commit since there are no previous " .
-        "commits.\n" if !$in && (@$revs || !$staged);
+        "commits.\n" if !$in && @$revs;
   }
 
+  my @quoted_files = Util::quote_args(@$files);
+  my @unmerged_files = `$git_cmd ls-files --full-name -u -- @quoted_files`;
   if (@unmerged_files && $in) {
     die "Aborting: please clear conflicts from @unmerged_files before " .
         "proceeding.\n";
   }
 
   # Record needed information
-  $self->{commit} = $commit;
   $self->{staged} = $staged;
   $self->{unstaged} = $unstaged;
   $self->{just_recent_unstaged} = !$in && !$staged && !@$revs;
@@ -4455,7 +5009,7 @@ EOF
     # Get the revision whose changes we want to revert, and its parents
     Util::push_debug(new_value => 0);
     my $links = ExecUtil::output(
-                  "git rev-list --parents --max-count=1 $self->{revs}");
+                  "$git_cmd rev-list --parents --max-count=1 $self->{revs}");
     Util::pop_debug();
     my @list = split(' ', $links);  # commit id + parent ids
 
@@ -4480,180 +5034,228 @@ EOF
     $self->{revs} = "$first_rev $self->{revs}";
   }
 
-  # reroot files relative to top of repo
-  my @rerooted_files = 
-    Util::reroot_paths__from_to_files($cur_dir, $top_dir, @$files);
-  $self->{files} = \@rerooted_files;
-
   # Determine some other stuff needed 
+  $self->{files} = \@quoted_files;
   my ($new_files, $newish_files, $revert_files);
-  my ($staged_info, $old_staged_info);
   if (!$in && !$initial_commit) {
     my $revision = (@$revs) ? $revs->[0] : "HEAD";
-    ($new_files, $newish_files, $revert_files, $staged_info, $old_staged_info) =
+    ($newly_added_files, $new_since_rev_files, $other_files) =
        RepoUtil::get_revert_info($revision, @quoted_files);
   } elsif ($initial_commit) {
-    $new_files = \@rerooted_files;
-    $newish_files = [];
-    $revert_files = [];
+    $newly_added_files = $files;
+    $new_since_rev_files = [];
+    $other_files = [];
   }
-  $self->{new_files} = $new_files;
-  $self->{newish_files} = $newish_files;
-  $self->{revert_files} = $revert_files;
-  $self->{staged_info} = $staged_info;
-  $self->{old_staged_info} = $old_staged_info;
+  $self->{newly_added_files} = $newly_added_files;
+  $self->{new_since_rev_files} = $new_since_rev_files;
+  $self->{other_files} = $other_files;
 }
 
 sub run {
   my $self = shift;
 
-  # Just call git revert when it can handle the job (i.e. in those cases we
-  # didn't erase the arguments)
-  if (@{$self->{original_args}}) {
-    @args = $self->quote_args(@{$self->{original_args}});
-    return ExecUtil::execute("git revert @args", ignore_ret => 1);
-  }
+  my $git_dir = RepoUtil::git_dir();
+  my $paths_specified = scalar(@{$self->{files}}) > 0;
+  my $ret = 0;
 
-  # Determine some useful directories; run from top of repo
-  my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
-  chdir($top_dir) if $top_dir ne $cur_dir;
-  if ($debug && $top_dir ne $cur_dir) {
-    print "    >>Running: cd $top_dir\n";
-  }
+  if (!$self->{in}) {
+    my $revision = $self->{revs};
+    my @newly_added_files = @{$self->{newly_added_files}};
+    my @new_since_rev_files = @{$self->{new_since_rev_files}};
+    my @other_files = @{$self->{other_files}};
+    my @all_files = @{$self->{files}};
 
-  # Get the list of files we are working with (well, most of them...)
-  my @files = $self->quote_args( @{$self->{files}} );
-  my $file_list = "";
-  $file_list = "-- @files" if @files;
-
-  if (!$self->{in} && $self->{just_recent_unstaged}) {
-    # If we're reverting unstaged changes only, and the user didn't specify a
-    # revision to revert relative to, then we want to revert relative to the
-    # index, not relative to HEAD or some prior commit.
-    ExecUtil::execute("git checkout $file_list", ignore_ret => 1);
-  }
-  elsif (!$self->{in}) {
-
-    # Any newly added files should be unstaged, not deleted
-    if ($self->{staged} && @{$self->{new_files}}) {
-      my @new_files = $self->quote_args( @{$self->{new_files}} );
-      ExecUtil::execute("git rm --cached -q -- @new_files", ignore_ret => 1);
+    #
+    # Case: Initial commit
+    #
+    if ($self->{initial_commit}) {
+      $ret = ExecUtil::execute("$git_cmd rm --cached --quiet -- " .
+                               "@newly_added_files", ignore_ret => 1);
+      exit $ret if $ret;
     }
 
-    # Since "git checkout REVISION -- FILES..." doesn't remove files, we
-    # need to do that manually
-    if (@{$self->{newish_files}}) {
-      my $flags = "";
-      $flags = "--cached" if ($self->{staged} && !$self->{unstaged});
-      my @delete_files = $self->quote_args( @{$self->{newish_files}} );
-      ExecUtil::execute("git rm $flags -q -- @delete_files", ignore_ret => 1);
+    #
+    # Set: Reverting both staged and unstaged changes
+    #
+    elsif ($self->{staged} && $self->{unstaged}) {
+      #
+      # Case: ALL staged and unstaged changes since some revision
+      #
+      if (!$paths_specified) {
+        if (@newly_added_files) {
+          # git reset is not quiet even when requested and has idiotic return
+          # state; if three files have conflicts and I try to reset some
+          # file other than those three, the command is successful but it
+          # spews warnings and gives a bad exit status
+          ExecUtil::execute("$git_cmd reset -q $revision --" .
+                            " @newly_added_files >/dev/null",
+                            ignore_ret => 1);
+        }
+
+        my ($revision_sha1, $head_sha1, $temp_ret);
+        if ($revision ne "HEAD") {
+          Util::push_debug(new_value => 0);
+          ($temp_ret, $revision_sha1) =
+            ExecUtil::execute_captured("$git_cmd rev-parse --verify $revision",
+                                       ignore_ret => 1);
+          ($temp_ret, $head_sha1) =
+            ExecUtil::execute_captured("$git_cmd rev-parse --verify HEAD",
+                                       ignore_ret => 1);
+          Util::pop_debug();
+        }
+
+        $ret = ExecUtil::execute("$git_cmd reset --hard $revision",
+                                 ignore_ret => 1);
+        exit $ret if $ret;
+
+        if ($revision ne "HEAD" && $revision_sha1 ne $head_sha1) {
+          # Note, cannot git reset --soft HEAD, since HEAD has changed in
+          # the above reset...
+          $ret = ExecUtil::execute("$git_cmd reset --soft HEAD\@{1}",
+                                   ignore_ret => 1);
+          exit $ret if $ret;
+        }
+      }
+
+      #
+      # Case: Selected staged and unstaged changes since some revision
+      #
+      if ($paths_specified) {
+        if (@newly_added_files) {
+          # See rant above about 'git reset is not quiet even when requested'
+          ExecUtil::execute("$git_cmd reset -q $revision --" .
+                            " @newly_added_files >/dev/null",
+                            ignore_ret => 1);
+        }
+        if (@new_since_rev_files) {
+          # Ugh, when --quiet doesn't actually mean "quiet".
+          # (Reproduce with git-1.6.0.6 on incomplete merge handling testcase)
+          $ret = ExecUtil::execute("$git_cmd rm --quiet --force " .
+                                   "--ignore-unmatch -- @new_since_rev_files" .
+                                   " > /dev/null",
+                                   ignore_ret => 1);
+          exit $ret if $ret;
+        }
+        if (@other_files) {
+          $ret = ExecUtil::execute("$git_cmd checkout $revision -- " .
+                                   "@other_files", ignore_ret => 1);
+          exit $ret if $ret;
+        }
+      }
     }
 
-    # Now undo mode changes, content changes, conflict markings, etc. by
-    # calling git checkout
-    if ($self->{unstaged} && (@{$self->{revert_files}} || !@files)) {
-      my $revert_list;
-      if (@files) {
-        my @revert_files = $self->quote_args( @{$self->{revert_files}} );
-        $revert_list = "-- @revert_files";
+    #
+    # Set: Reverting just staged changes
+    #
+    elsif ($self->{staged}) {
+      if ($paths_specified) {
+        $ret = ExecUtil::execute("$git_cmd reset -q $revision -- @all_files",
+                                 ignore_ret => 1);
+        exit $ret if $ret;
       } else {
-        $revert_list = "-- $top_dir";
+        $ret = ExecUtil::execute("$git_cmd read-tree $revision",
+                                 ignore_ret => 1);
+        exit $ret if $ret;
       }
-      ExecUtil::execute("git checkout $self->{revs} $revert_list");
-    }
-
-    if ($self->{unstaged} && !$self->{staged} && $self->{staged_info}) {
-      # Restore the index files stomped on by the above git checkout command,
-      # and by the git rm command above that
-      ExecUtil::execute("echo -nE '$self->{staged_info}' " .
-                        "| git update-index --index-info",
-                        ignore_ret => 1);
-    }
-
-    if (!$self->{unstaged} && $self->{staged} && $self->{old_staged_info}) {
-      # Write out new entries to the index file
-      ExecUtil::execute("echo -nE '$self->{old_staged_info}' " .
-                        "| git update-index --index-info",
-                        ignore_ret => 1);
     }
 
     #
-    # Remove any files recording an incomplete merge, if user is undoing
-    # the merge
+    # Set: Reverting just unstaged changes
     #
-    if (!@files && $self->{staged} && $self->{revs} eq "HEAD") {
-      if (-f "$self->{git_dir}/MERGE_MSG") {
-        unlink("$self->{git_dir}/MERGE_MSG") if $debug < 2;
-        print "    >>Running: rm $self->{git_dir}/MERGE_MSG\n" if $debug;
+    elsif ($self->{unstaged}) {
+      if ($self->{just_recent_unstaged}) {
+        die "Assertion failed: Paths not specified.\n" if (!$paths_specified);
+        $ret = ExecUtil::execute("$git_cmd checkout -- @all_files",
+                                 ignore_ret => 1);
+        exit $ret if $ret;
       }
-      if (-f "$self->{git_dir}/MERGE_HEAD") {
-        unlink("$self->{git_dir}/MERGE_HEAD") if $debug < 2;
-        print "    >>Running: rm $self->{git_dir}/MERGE_HEAD\n" if $debug;
-      }
-    }
+      else {
+        if (@newly_added_files) {
+          # This results in a no-op essentially, but at least it shows the
+          # equivalent commands when no new_since_rev_files and no other_files
+          push(@other_files, @newly_added_files);
+        }
 
-  }
+        if (@new_since_rev_files) {
+          $ret = ExecUtil::execute("rm -f @new_since_rev_files",
+                                   ignore_ret => 1);
+          exit $ret if $ret;
+        }
 
-  if ($self->{in}) {
-    # Must do unstaged changes first, or extra unknown files can "appear"
-    my @flags;
-    push(@flags, "")         if $self->{unstaged};
-    push(@flags, "--cached") if $self->{staged};
+        if (@other_files || !$paths_specified) {
+          my ($tmp_index) = Util::quote_args("$git_dir/tmp_index");
+          my $git_index = "GIT_INDEX_FILE=$tmp_index ";
 
-    foreach my $flag (@flags) {
-      my @diff_flags = ("--binary");
-      push(@diff_flags, $self->{in} ? "" : $flag);
-      my @apply_flags = ("--whitespace=nowarn");
-      push(@apply_flags, $flag);
+          my $cf = "@other_files";
+          if (!$paths_specified) {
+            my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
+            ($cf) = Util::reroot_paths__from_to_files($top_dir, $cur_dir, '.');
+          }
+          $ret = ExecUtil::execute("$git_index $git_cmd checkout $revision " .
+                                   "-- $cf", ignore_ret => 1);
+          exit $ret if $ret;
 
-      # Print out the (nearly) equivalent commands if the user asked for
-      # debugging information
-      if ($debug) {
-        print "    >>Running: " .
-              "git diff @diff_flags $self->{revs} $file_list | " .
-              "git apply @apply_flags -R\n";
-      }
-
-      # Sadly, using "git diff... | git apply ... -R" doesn't quite work,
-      # because apply complains very loudly if the diff is empty.  So,
-      # we have to run diff, slurp in its output, check if its nonempty,
-      # and then only pipe that output back out to git apply if we have
-      # an actual diff to revert.
-      if ($debug < 2) {
-        open(DIFF, "git diff @diff_flags $self->{revs} $file_list |");
-        my @output = <DIFF>;
-        my $diff = join("", @output);
-        # Listing unmerged paths doesn't count as nonempty
-        $diff =~ s/\* Unmerged path.*\n//g;
-        close(DIFF);
-        $ret = $?;
-        exit $ret >> 8 if $ret;
-
-        if ($diff) {
-          open(APPLY, "| git apply @apply_flags -R");
-          print APPLY $diff;
-          close(APPLY);
+          $ret = ExecUtil::execute("rm $tmp_index");
+          exit $ret if $ret;
         }
       }
     }
   }
 
-  #
-  # Make a commit if the user requested one
-  #
-  if ($self->{commit}) {
-    # We could just execute "eg commit $self->{staged}" if we 
-    # $self->{staged} =~ s/cached/staged/, but that isn't as helpful for
-    # debug output anyway, so split it into two commands...
-    if (!$self->{unstaged}) {
-      ExecUtil::execute("git commit")
-    } else {
-      ExecUtil::execute("git commit -a")
+  if ($self->{in}) {
+    # Must do unstaged changes first, or extra unknown files can "appear"
+    my $location_flag;
+    $location_flag = ""         if $self->{unstaged};
+    $location_flag = "--cached" if $self->{staged};
+    $location_flag = "--index"  if ($self->{staged} && $self->{unstaged});
+
+    my @files = @{$self->{files}};
+    my $marker = "";
+    $marker = "-- " if (@files);
+
+    my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
+
+    my @diff_flags = ("--binary");
+    my @apply_flags = ("--whitespace=nowarn", "--reject");
+    push(@apply_flags, $location_flag) if $location_flag;
+
+    # Print out the (nearly) equivalent commands if the user asked for
+    # debugging information
+    if ($debug) {
+      print "    >>Running: " .
+            "$git_cmd diff @diff_flags $self->{revs} ${marker}@files | ";
+      print "(cd $top_dir && " if ($top_dir ne $cur_dir);
+      print "$git_cmd apply @apply_flags -R";
+      print ")" if ($top_dir ne $cur_dir);
+      print "\n";
+    }
+
+    # Sadly, using "git diff... | git apply ... -R" doesn't quite work,
+    # because apply complains very loudly if the diff is empty.  So,
+    # we have to run diff, slurp in its output, check if its nonempty,
+    # and then only pipe that output back out to git apply if we have
+    # an actual diff to revert.
+    if ($debug < 2) {
+      open(DIFF, "$git_cmd diff @diff_flags $self->{revs} ${marker}@files |");
+      my @output = <DIFF>;
+      my $diff = join("", @output);
+      # Listing unmerged paths doesn't count as nonempty
+      $diff =~ s/\* Unmerged path.*\n//g;
+      close(DIFF);
+      $ret = $?;
+      exit $ret >> 8 if $ret;
+
+      if ($diff) {
+        chdir($top_dir) if $top_dir ne $cur_dir;
+        open(APPLY, "| $git_cmd apply @apply_flags -R");
+        print APPLY $diff;
+        close(APPLY);
+        chdir($cur_dir) if $top_dir ne $cur_dir;
+      }
     }
   }
 
-  # Return to original directory
-  chdir($cur_dir);
+  return 0;
 }
 
 ###########################################################################
@@ -4671,7 +5273,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -4731,10 +5333,147 @@ sub preprocess {
   my $self = shift;
   my $package_name = ref($self);
 
+  return if (scalar(@ARGV) > 0 && $ARGV[0] eq "--");
   my $result = main::GetOptions("--help" => sub { $self->help() });
+
   foreach my $i (0..$#ARGV) {
     $ARGV[$i] = "--cached" if $ARGV[$i] eq "--staged";
   }
+}
+
+###########################################################################
+# squash                                                                  #
+###########################################################################
+package squash;
+@squash::ISA = qw(subcommand);
+INIT {
+  $command{squash} = {
+    new_command => 1,
+    extra => 1,
+    section => 'modification',
+    about => 'Combine all changes since a given revision into a new commit'
+    };
+}
+
+sub new {
+  my $class = shift;
+  my $self = $class->SUPER::new(git_repo_needed => 1, git_equivalent => '', @_);
+  bless($self, $class);
+  $self->{'help'} = "
+Usage:
+  eg squash [--against REVISION]
+
+Description:
+  Combines all commits since REVISION into a single commit, and open an
+  editor with the concatenation of log messages for the user to edit to
+  create a new log message.
+
+  REVISION must be an ancestor of the current commit.  If REVISION is
+  not specified, the remote tracking branch for the current branch is
+  assumed.  (If there is no such branch, eg squash will abort with an
+  error.)
+
+Examples:
+  Combine all commits in the current branch that aren't in origin/master
+  into a single commit
+      \$ eg squash --against origin/master
+
+Options:
+  --against
+    An optional command line argument that makes it clearer what is
+    happening.  (In the example above, we are not \"squashing origin/master\",
+    we are squashing all changes since origin/master on top of origin/master.
+";
+  $self->{'differences'} = '
+  eg squash is a command new to eg that is not part of git.
+';
+  return $self;
+}
+
+sub preprocess {
+  my $self = shift;
+  my $package_name = ref($self);
+
+  my $since;
+  my $result = main::GetOptions(
+    "--help"    => sub { $self->help() },
+    "against=s" => sub { $since=$_[1] },
+    );
+  $since = shift @ARGV if !defined($since);
+  die "Aborting: Too many revisions specified.\n" if @ARGV > 1;
+  if (!defined($since)) {
+    my $branch = RepoUtil::current_branch();
+    die "Aborting: No revision specified.\n" if !defined($branch);
+    $merge_remote = RepoUtil::get_config("branch.$branch.remote");
+    $merge_branch = RepoUtil::get_config("branch.$branch.merge");
+    die "Aborting: No revision specified.\n" if !defined($merge_branch);
+    $merge_branch =~ s#^refs/heads/##;
+    $since = "$merge_remote/$merge_branch";
+  }
+
+  $self->{since} = $since;
+
+  Util::push_debug(new_value => 0);
+  my ($retval, $orig_head, $since_sha1sum);
+
+  # Get the sha1sum where HEAD points now, make sure HEAD is valid
+  ($retval, $orig_head) =
+    ExecUtil::execute_captured("$git_cmd rev-parse HEAD", ignore_ret => 1);
+  die "Aborting: You have no commits on HEAD.\n" if $retval != 0;
+  chomp($orig_head);
+  $self->{orig_head} = $orig_head;
+
+  # Get the sha1sum where $since points now, make sure it is valid
+  ($retval, $since_sha1sum) =
+    ExecUtil::execute_captured("$git_cmd rev-parse $self->{since}",
+                               ignore_ret => 1);
+  die "Invalid revision reference: $self->{since}\n" if $retval != 0;
+  chomp($since_sha1sum);
+
+  # Make sure user has no staged changes
+  my $output = `$git_cmd diff --cached --quiet`;
+  die "Aborting: You have staged changes; please commit them first.\n" if $?;
+
+  # Ensure $self->{since} is an ancestor of HEAD
+  my ($ret, $unmerged) =
+      ExecUtil::execute_captured("$git_cmd rev-list HEAD..$self->{since} | " .
+                                 " wc -l");
+  chomp($unmerged);
+  die "Aborting: $self->{since} is not an ancestor of HEAD.\n" if $unmerged;
+  die "Aborting: There are no commits since $self->{since}.\n"
+    if $orig_head eq $since_sha1sum;
+
+  Util::pop_debug();
+}
+
+sub run {
+  my $self = shift;
+  my $package_name = ref($self);
+
+  # Fill out a basic log message
+  my ($fh, $filename) = main::tempfile();
+  print $fh <<EOF;
+# Please combine the following commit messages into a single commit message.
+# Lines starting with a '#' will be ignored.
+
+EOF
+  close($fh);
+  $ret = ExecUtil::execute("$git_cmd log --no-merges --pretty=format:" .
+            "'#commit %H%n#Author: %an <%ae>%n#Date:   %ad%n%n%s%n%n%b' " .
+            " $self->{since}..$self->{orig_head} >> $filename");
+  exit $ret if $ret;
+
+  # Now, reset and commit
+  $ret = ExecUtil::execute("$git_cmd reset --soft $self->{since}");
+  exit $ret if $ret;
+  $ret = ExecUtil::execute("$git_cmd commit -F $filename --edit",
+                           ignore_ret => 1);
+
+  # Restore the branch pointer if the commit failed (e.g. empty log message)
+  ExecUtil::execute("$git_cmd reset --soft $self->{orig_head}") if $ret != 0;
+
+  unlink($filename);
+  return 0;
 }
 
 ###########################################################################
@@ -4752,7 +5491,9 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(git_equivalent => 'add', @_);
+  my $self = $class->SUPER::new(git_repo_needed => 1,
+                                git_equivalent => 'add',
+                                @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -4797,6 +5538,11 @@ Options:
     of files, (useful when filenames might be mistaken for command-line
     options).
 ";
+  $self->{'differences'} = '
+  eg stage is a command new to eg that is not part of git (update: it is
+  part of newer versions of git, with identical meaning to eg).  eg stage
+  merely calls git add.
+';
   return $self;
 }
 
@@ -4804,8 +5550,8 @@ sub run {
   my $self = shift;
   my $package_name = ref($self);
 
-  @ARGV = $self->quote_args(@ARGV);
-  return ExecUtil::execute("git add @ARGV", ignore_ret => 1);
+  @ARGV = Util::quote_args(@ARGV);
+  return ExecUtil::execute("$git_cmd add @ARGV", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -4823,6 +5569,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     initial_commit_error_msg => "Error: Cannot stash away changes when there " .
                                 "is no commit yet.",
     @_);
@@ -4916,8 +5663,8 @@ Options:
 
   eg stash apply and eg stash show also accept any string and will
   apply or show the stash whose description contains that string.
-  While stash and apply accept reflog syntax like their git stash
-  counterparts, i.e. while
+  Although stash and apply accept reflog syntax (like their git stash
+  counterparts), i.e. while
       $ eg stash apply stash@{3}
   will work, I think it will be easier for the user to run
       $ eg stash apply rudely interrupted changes
@@ -5075,7 +5822,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -5086,13 +5833,25 @@ Description:
   currently active branch, this command will list files with content in any
   of the following states:
 
-     Unknown
+     Unknown files
        Files that are not explicitly ignored (i.e. do not appear in an
        ignore list such as a .gitignore file) but whose contents are still
        not tracked by git.
 
        These files can become known by running 'eg stage FILENAME', or
        ignored by having their name added to a .gitignore file.
+
+     Newly created unknown files
+       Same as unknown files; the reason for splitting unknown files into
+       two sets is to make it easier to find the files users are more
+       likely to want to add.  Also, 'eg commit' will by default error out
+       with a warning message if there are any newly created unknown files
+       in order to prevent forgetting to add files that should be included
+       in a commit.
+
+     Modified submodules:
+       subdirectories that are tracked under their own git repository, and
+       that are being tracked via use of the 'git submodule' command.
 
      Changed but not updated (\"unstaged\")
        Files whose contents have been modified in the working copy.
@@ -5109,32 +5868,66 @@ Description:
        usage.
 
        Files enter this state through the use of 'eg stage'.  Files can
-       return to the unstaged state by running 'eg revert --staged FILE'.
-       See 'eg help topic staging' to learn about the staging area.
+       return to the unstaged state by running 'eg unstage' See 'eg help
+       topic staging' to learn about the staging area.
+
 ";
-  $self->{'differences'} = '
+  $self->{'differences'} = "
   eg status output is essentially just a streamlined and cleaned version of
-  git status output.
+  git status output, with the addition of a new section (newly created
+  untracked files) and an extra status message being displayed when in the
+  middle of a special state (am, bisect, merge, or rebase).
 
   The streamlining serves to avoid information overload to new users (which
-  is only possible with a less error prone "commit" command) and the
+  is only possible with a less error prone \"commit\" command) and the
   cleaning (removal of leading hash marks) serves to make the system more
   inviting to new users.
 
-  A slight wording change was done to transform "untracked" to "unknown"
-  since, as Havoc pointed out, the word "tracked" may not be very self
+  A slight wording change was done to transform \"untracked\" to \"unknown\"
+  since, as Havoc pointed out, the word \"tracked\" may not be very self
   explanatory (in addition to the real meaning, users might think of:
-  "tracked in the index?", "related to remote tracking branches?", "some
-  fancy new monitoring scheme unique to git that other vcses do not have?",
-  "is there some other meaning?").  I do not know if "known" will fully
+  \"tracked in the index?\", \"related to remote tracking branches?\", \"some
+  fancy new monitoring scheme unique to git that other vcses do not have?\",
+  \"is there some other meaning?\").  I do not know if \"known\" will fully
   solve this, but I suspect it will be more self-explanatory than
-  "tracked".
+  \"tracked\".
 
   There are also slight changes to the section names to reinforce
   consistent naming when referring to the same concept (staging, in this
   case), but the changes are very slight.
-';
+
+  The extra status message when in the middle of an am, bisect, merge,
+  or rebase serves two purposes: to remind users that they are in the
+  middle of some operation (some people don't use the special prompt
+  from git's bash-completion support), and to provide a command users
+  can run to get help resolving such situations.  (Many users were
+  confused about or unaware how to resolve incomplete merges and
+  rebases; providing them with a specially written help page they
+  could access seemed to effectively assist them figure out the
+  appropriate steps to take -- especially in tricky or special cases.)
+";
   return $self;
+}
+
+sub preprocess {
+  my $self = shift;
+
+  Getopt::Long::Configure("permute");
+  my $result = main::GetOptions(
+    "--help" => sub { $self->help() },
+    "v"      => sub { print STDERR "-v option is not supported.\n"; exit 1 },
+    );
+}
+
+sub run {
+  my $self = shift;
+  my $package_name = ref($self);
+
+  $self->{special_state} = RepoUtil::get_special_state($self->{git_dir});
+
+  @ARGV = Util::quote_args(@ARGV);
+  -t STDOUT and $ENV{"GIT_PAGER_IN_USE"}=1;
+  return ExecUtil::execute("$git_cmd status @ARGV", ignore_ret => 1);
 }
 
 sub postprocess {
@@ -5151,6 +5944,13 @@ sub postprocess {
   my %files = ( unknown => undef, unstaged => undef, staged => undef );
   my @basic_info;
 
+  # Exit early if git status had an error
+  if ($output =~ m/^fatal:/) {
+    print STDERR $output;
+    exit 128;
+  }
+
+  # Parse the output
   my @lines = split('\n', $output);
   my $cur_state = -1;
   while (@lines) {
@@ -5165,6 +5965,10 @@ sub postprocess {
       $cur_state = 1;
       $section = 'unknown';
       $title = "Unknown files:";
+    } elsif ($line =~ m/^# Modified submodules:$/) {
+      $cur_state = 3;
+      $section = 'submodules';
+      $title = "Modified submodules:";
     } elsif ($line =~ m/^# Changes to be committed:$/) {
       $cur_state = 2;
       $section = 'staged';
@@ -5181,10 +5985,17 @@ sub postprocess {
     # If we're inside a section type, parse it
     if ($cur_state > 0) {
       my @section_files;
-      my $hint = shift @lines;
-      shift @lines; # Get rid of blank line
+      my $hints;
 
+      # Parse the hints first
       $line = shift @lines;
+      while ($line =~ m/^#\s+\(use ".*/) {
+        $hints .= $line;
+        $line = shift @lines;
+      }
+      die("Bug parsing git status output") if $line ne '#';
+      $line = shift @lines; # Get rid of blank line
+
       while (defined $line && $line =~ m/^#.+$/) {
         if ($cur_state == 1) {
           if ($line =~ m/^#(\s+)(.*)/) { 
@@ -5196,6 +6007,11 @@ sub postprocess {
             my $file = $2;
             push(@section_files, "$1$file");
           }
+        } elsif ($cur_state == 3) {
+          if ($line =~ m/^#\s(.*)/) {
+            my $sub_info = $1;
+            push(@section_files, "$sub_info");
+          }
         }
         $line = shift @lines;
       }
@@ -5204,7 +6020,7 @@ sub postprocess {
         push(@{$files{$section}{'file_list'}}, @section_files);
       } else {
         $files{$section} = { title     => $title,
-                             hint      => $hint,
+                             hint      => $hints,
                              file_list => \@section_files };
       }
 
@@ -5218,21 +6034,93 @@ sub postprocess {
     print "(On branch $branch";
     print ", no commits yet" if $initial_commit;
     print ")\n";
-  } else {
-    print "(No active branch)\n";
   }
   foreach my $line (@basic_info) {
     print "($line)\n";
   }
 
-  # Print out all the various changes
-  foreach my $section ('staged', 'unstaged', 'unknown') {
-    if (defined($files{$section})) {
-      print "$files{$section}{'title'}\n";
-      foreach my $fileline (@{$files{$section}{'file_list'}}) {
-        print "$fileline\n";
+  # Print out info about any special state we're in
+  my $notice = "";
+  if (defined $self->{special_state}) {
+    my ($highlight, $reset) = ("", "");
+    if (-t STDOUT) {
+      $highlight=`$git_cmd config --get-color color.status.header "red reverse"`;
+      $reset=`$git_cmd config --get-color "" "reset"`;
+    }
+
+    $notice .= "($highlight";
+    $notice .= "YOU ARE IN THE MIDDLE OF A $self->{special_state}; ";
+    $notice .= "RUN 'eg help topic middle-of-";
+    if ($self->{special_state} eq "APPLY MAIL OR REBASE") {
+      # FIXME: How do we get into this state anyway, and what should they run?
+      # Well, printing nothing will just get them the general topic page, then
+      # they can pick between am and rebase
+    } elsif ($self->{special_state} =~ /REBASE$/) {
+      $notice .= "rebase";
+    } elsif ($self->{special_state} eq "APPLY MAIL") {
+      $notice .= "am";
+    } elsif ($self->{special_state} eq "MERGE") {
+      $notice .= "merge";
+    } elsif ($self->{special_state} eq "BISECT") {
+      $notice .= "bisect";
+    }
+    $notice .= "' FOR MORE INFO.";
+    $notice .= "$reset)\n";
+    print $notice;
+  }
+
+  # Split the unknown files into those that are newly created and those that
+  # have been around
+  if (defined($files{'unknown'})) {
+    # Get the list of unknown files that have been around for a while
+    my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
+    my %old_unknown;
+    if (-f "$git_dir/info/ignored-unknown") {
+      my @old_unknown_files = `cat "$git_dir/info/ignored-unknown"`;
+      chomp(@old_unknown_files);
+      @old_unknown_files =
+        Util::reroot_paths__from_to_files($top_dir, $cur_dir, @old_unknown_files);
+      map { $old_unknown{$_} = 1 } @old_unknown_files;
+    }
+
+    my @new_unknowns;
+    my @old_unknowns;
+    foreach my $fileline (@{$files{'unknown'}{'file_list'}}) {
+      $fileline =~ m#(\s+(?:\e\[.*?m)?)(.*?)((?:\e\[m)?)$# ||
+        die "Failed parsing git status output: '$fileline'\n";
+      if ($old_unknown{$2}) {
+        push(@old_unknowns, $fileline);
+      } else {
+        push(@new_unknowns, $fileline);
       }
     }
+    if (@new_unknowns) {
+      $files{'new_unknowns'} = { title     => 'Newly created unknown files:',
+                                 file_list => \@new_unknowns };
+    }
+    if (@old_unknowns) {
+      $files{'old_unknowns'} = { title     => 'Unknown files:',
+                                 file_list => \@old_unknowns };
+    }
+  }
+
+  # Print out all the various changes
+  my $linecount = 0;
+  foreach my $section ('staged', 'unstaged', 'submodules',
+                       'new_unknowns', 'old_unknowns') {
+    if (defined($files{$section})) {
+      print "$files{$section}{'title'}\n";
+      $linecount += 1;
+      foreach my $fileline (@{$files{$section}{'file_list'}}) {
+        print "$fileline\n";
+        $linecount += 1;
+      }
+    }
+  }
+
+  # Repeat the notice so users will see it
+  if (defined $self->{special_state} && $linecount > 0) {
+    print $notice;
   }
 
 }
@@ -5253,6 +6141,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     git_equivalent => 'checkout',
     initial_commit_error_msg => "Error: Cannot create or switch branches " .
                                 "until a commit has been made.",
@@ -5317,16 +6206,6 @@ EOF
     die "Invalid branch/revision reference: $ARGV[0]\n" if !$valid_ref;
   }
 
-  # Avoid switching to a remote tracking branch
-  if ($ARGV[-1] =~ m#/#) {
-    print STDERR<<EOF;
-Aborting: Should not switch to a remote tracking branch.  Please instead
-create a branch based on the remote tracking branch (use the command
-'eg branch NEWBRANCH $ARGV[-1]') and then switch to the new branch.
-EOF
-    exit 1;
-  }
-
   $self->SUPER::preprocess();
 }
 
@@ -5334,8 +6213,8 @@ sub run {
   my $self = shift;
   my $package_name = ref($self);
 
-  @ARGV = $self->quote_args(@ARGV);
-  return ExecUtil::execute("git checkout @ARGV", ignore_ret => 1);
+  @ARGV = Util::quote_args(@ARGV);
+  return ExecUtil::execute("$git_cmd checkout @ARGV", ignore_ret => 1);
 }
 
 ###########################################################################
@@ -5354,11 +6233,7 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(
-    initial_commit_error_msg => "No tags can be created, deleted, or " .
-                                "listed until a commit has been made.",
-    @_
-    );
+  my $self = $class->SUPER::new(git_repo_needed => 1, @_);
   bless($self, $class);
   $self->{'help'} = "
 Usage:
@@ -5415,10 +6290,10 @@ INIT {
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(git_equivalent => '', @_);
+  my $self = $class->SUPER::new(git_repo_needed => 1, git_equivalent => '', @_);
   bless($self, $class);
 
-  unshift(@ARGV, "--") if $ARGV[0] ne "--";
+  unshift(@ARGV, "--") if scalar(@ARGV) > 0 && $ARGV[0] ne "--";
   unshift(@ARGV, "--staged");
 
   $self->{'help'} = "
@@ -5448,6 +6323,11 @@ Examples:
       \$ eg stage foo
       \$ eg unstage foo
 ";
+  $self->{'differences'} = '
+  eg unstage is a command new to eg that is not part of git; it is implemented
+  on top of eg revert --staged, though it could as easily simply call through
+  to git reset.
+';
   return $self;
 }
 
@@ -5471,6 +6351,7 @@ INIT {
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(
+    git_repo_needed => 1,
     git_equivalent => 'pull',
     @_);
   bless($self, $class);
@@ -5481,6 +6362,8 @@ Usage:
 Description:
   Gets updates from the default remote repository if updating is safe, and
   provides suggestions on proceeding otherwise.
+
+  eg update does not accept any options...other than --help.
 
 Examples:
   Get any updates from the remote repository
@@ -5493,8 +6376,23 @@ Examples:
   changes; if anything more than this is needed, eg advises users to run
   other commands.
 
-  eg update does not accept any options.  Period.  Well, okay, other than
-  --help.
+  Here are the special cases eg update detects and provides tailored
+  messages for:
+    * User has local commits           => ask user to use eg pull instead
+    * User provides argument to update => tell user to use eg switch for
+                                          checking out an older revision or
+                                          eg revert to undo changes to a file
+    * User has locally deleted files   => tell user to use eg revert to
+                                          undo local changes (and that they do
+                                          not need to delete the file first as
+                                          they did with cvs)
+    * User has local modifications     => Tell user to stash or commit their
+                                          changes before pulling updates
+    * No default repository to contact => Tell user to run "eg remote add
+                                          origin REPOSITORY_URL"
+    * branch.BRANCH.merge not set and  => Warn user that we do not know which
+      more than one remote branch         branch to pull from and suggest eg
+      present                             pull or setting branch.BRANCH.merge
 ';
   return $self;
 }
@@ -5509,7 +6407,8 @@ sub preprocess {
   if (@ARGV) {
     print STDERR <<EOF;
 Aborting: No arguments to update are allowed.  If you are trying to switch
-to a different revision, use eg switch.
+to a different revision, use eg switch.  If you are trying to undo the changes
+to a particular file, use eg revert.
 EOF
     exit 1;
   }
@@ -5517,8 +6416,7 @@ EOF
   # Check if there are local changes
   my $status = RepoUtil::commit_push_checks();
   my $has_changes = $status->{has_staged_changes} ||
-    $status->{has_unstaged_changes} || $status->{has_unknown_files} ||
-    $status->{has_unmerged_changes};
+    $status->{has_unstaged_changes} || $status->{has_unmerged_changes};
   if ($has_changes) {
     print STDERR <<EOF;
 Aborting: You have local changes, and pulling updates could put your
@@ -5526,6 +6424,16 @@ working copy in a nonworking state.  Consider committing your changes
 before updating, or using eg stash to stash the changes away and reapply
 them after the update.
 EOF
+
+    if ($status->{output} =~ /^\s+deleted:/m) {
+      print STDERR "\n";
+      print STDERR <<EOF;
+NOTE: If you are trying to undo the changes in a file, just run
+  eg revert FILE
+This works whether or not the file has been deleted.
+EOF
+    }
+    
     exit 1;
   }
 
@@ -5545,8 +6453,9 @@ EOF
   if (!$merge_branch) {
     # Check if the remote repository has exactly 1 branch...if so, return it,
     # otherwise throw an error
+    my ($quoted_repo) = Util::quote_args("$self->{repository}");
     my ($ret, $output) = 
-      ExecUtil::execute_captured("git ls-remote -h $self->{repository}");
+      ExecUtil::execute_captured("$git_cmd ls-remote -h $quoted_repo");
     if ($ret == 0) {
       my @remote_refs = split('\n', $output);
       if (@remote_refs == 1) {
@@ -5560,8 +6469,14 @@ EOF
       }
     }
   }
-  die "No remote branch to update from (perhaps try eg pull instead?\n"
-    if !$merge_branch;
+  if (!$merge_branch) {
+    print STDERR <<EOF;
+Error: It is not clear which remote branch to update from.
+You can either use eg pull instead, or run 
+  eg config branch.$branch.merge BRANCHANME
+EOF
+    exit 1;
+  }
   $self->{merge_branch} = $merge_branch;
 }
 
@@ -5572,13 +6487,13 @@ sub run {
   # Get value to set ORIG_HEAD to (unless we are on the initial commit)
   Util::push_debug(new_value => 0);
   my ($retval, $orig_sha1sum) = 
-    ExecUtil::execute_captured("git rev-parse HEAD", ignore_ret => 1);
+    ExecUtil::execute_captured("$git_cmd rev-parse HEAD", ignore_ret => 1);
   my $has_orig_head = ($retval == 0);
   Util::pop_debug();
 
   # Do the fetch && reset, making sure to set ORIG_HEAD
   my ($ret, $output) = 
-    ExecUtil::execute_captured("git fetch $self->{repository} " .
+    ExecUtil::execute_captured("$git_cmd fetch $self->{repository} " .
                                "$self->{merge_branch}:$self->{local_branch}",
                                ignore_ret => 1);
   if ($output =~ /\[rejected\].*\(non fast forward\)/) {
@@ -5588,7 +6503,8 @@ sub run {
     die "Error updating (output = $output); please report the bug, and\n" .
         "try using 'eg pull' instead.\n";
   } else {
-    ExecUtil::execute_captured("git reset --hard $self->{local_branch}");
+    $ret = ExecUtil::execute_captured("$git_cmd reset --hard " .
+                                      "$self->{local_branch}");
     if ($has_orig_head && $debug < 2) {
       open(ORIG_HEAD, "> $self->{git_dir}/ORIG_HEAD");
       print ORIG_HEAD $output;
@@ -5596,6 +6512,7 @@ sub run {
     }
     print "Updated the current branch.\n" if ($debug < 2);
   }
+  return $ret;
 }
 
 ###########################################################################
@@ -5637,7 +6554,7 @@ sub run {
 
   print "eg version $version\n" if $debug < 2;
   print "    >>(We can print the eg version directly)<<\n" if $debug == 2;
-  $self->SUPER::run();
+  return $self->SUPER::run();
 }
 
 
@@ -5699,13 +6616,16 @@ sub _execute_impl {
     elsif ($? & 127) {
       print STDERR "eg: received signal ".($? & 127)."\n";
     }
-    elsif (! $options{ignore_ret}) {
-      print STDERR "eg: failed ($ret)\n" if $debug;
-      if ($ret >> 8 != 0) {
-        print STDERR "eg: command ($command) failed\n";
-      }
-      elsif ($ret != 0) {
-        print STDERR "eg: command ($command) died (retval=$ret)\n";
+    else {
+      $ret = ($ret >> 8);
+      if (! $options{ignore_ret}) {
+        print STDERR "eg: failed ($ret)\n" if $debug;
+        if ($ret >> 8 != 0) {
+          print STDERR "eg: command ($command) failed\n";
+        }
+        elsif ($ret != 0) {
+          print STDERR "eg: command ($command) died (retval=$ret)\n";
+        }
       }
     }
   }
@@ -5743,7 +6663,7 @@ package RepoUtil;
 # current_branch: Get the currently active branch
 sub current_branch {
   Util::push_debug(new_value => $debug ? 1 : 0);
-  my ($ret, $output) = ExecUtil::execute_captured("git symbolic-ref HEAD",
+  my ($ret, $output) = ExecUtil::execute_captured("$git_cmd symbolic-ref HEAD",
                                                   ignore_ret => 1);
   Util::pop_debug();
 
@@ -5754,11 +6674,14 @@ sub current_branch {
 }
 
 sub git_dir {
-  return $gitdir if ($gitdir);
+  my $options = {force => 0, @_};  # Hashref initialized as we're told
+  if (!$options->{force}) {
+    return $gitdir if ($gitdir);
+  }
 
   Util::push_debug(new_value => 0);
   my ($ret, $output) = 
-    ExecUtil::execute_captured("git rev-parse --git-dir", ignore_ret => 1);
+    ExecUtil::execute_captured("$git_cmd rev-parse --git-dir", ignore_ret => 1);
   Util::pop_debug();
 
   return undef if $ret != 0;
@@ -5767,7 +6690,9 @@ sub git_dir {
 }
 
 sub get_dirs {
-  if ($curdir) {
+  my $options = {force => 0, @_};  # Hashref initialized as we're told
+
+  if ($curdir && !$options->{force}) {
     return ($curdir, $topdir, $gitdir);
   }
 
@@ -5778,7 +6703,8 @@ sub get_dirs {
   # Get the toplevel repository directory
   $topdir = $curdir;
   my ($ret, $rel_dir) = 
-    ExecUtil::execute_captured("git rev-parse --show-prefix", ignore_ret => 1);
+    ExecUtil::execute_captured("$git_cmd rev-parse --show-prefix",
+                               ignore_ret => 1);
   chomp($rel_dir);
   if ($ret != 0) {
     $topdir = undef;
@@ -5788,7 +6714,7 @@ sub get_dirs {
     $topdir =~ s#/$##;  # Remove trailing slash
   }
 
-  $gitdir = git_dir();
+  $gitdir = git_dir(force => $options->{force});
 
   Util::pop_debug();
 
@@ -5796,20 +6722,20 @@ sub get_dirs {
 }
 
 sub initial_commit {
-  my @output = `git rev-parse --verify -q HEAD`;
+  my @output = `$git_cmd rev-parse --verify -q HEAD`;
   return $?;
 }
 
 sub valid_ref {
   my ($ref) = @_;
   my ($ret, $sha1sum) =
-    ExecUtil::execute_captured("git rev-parse --verify -q $ref",
+    ExecUtil::execute_captured("$git_cmd rev-parse --verify -q $ref",
                                ignore_ret => 1);
   return $ret == 0;
 }
 
 sub files_modified() {
-  my @output = `git status -a`;
+  my @output = `$git_cmd status -a`;
   return $? == 0;
 }
 
@@ -5817,15 +6743,39 @@ sub merge_branches {
   my $git_dir = RepoUtil::git_dir();
   my $active_branch = RepoUtil::current_branch() || 'HEAD';
   my @merge_branches =
-    `cat $git_dir/MERGE_HEAD | git name-rev --stdin`;
+    `cat "$git_dir/MERGE_HEAD" | $git_cmd name-rev --stdin`;
   @merge_branches = map { /^[0-9a-f]* \((.*)\)$/ && $1 } @merge_branches;
   my @all_merge_branches = ($active_branch, @merge_branches);
   return @all_merge_branches;
 }
 
+sub get_special_state {
+  my $git_dir = shift;
+
+  my $special_state;
+  if ( -d "$git_dir/rebase-apply" ) {
+    if ( -f "$git_dir/rebase-apply/rebasing" ) {
+      return "REBASE";
+    } elsif ( -f "$git_dir/rebase-apply/applying" ) {
+      return "APPLY MAIL";
+    } else {
+      return "APPLY MAIL OR REBASE";
+    }
+  } elsif ( -f "$git_dir/rebase-merge/interactive" ) {
+    return "INTERACTIVE REBASE";
+  } elsif ( -d "$git_dir/rebase-merge" ) {
+    return "MERGE REBASE";
+  } elsif ( -f "$git_dir/MERGE_HEAD" ) {
+    return "MERGE";
+  } elsif ( -f "$git_dir/BISECT_LOG" ) {
+    return "BISECT";
+  }
+  return $special_state;
+}
+
 sub get_config {
   my $key = shift;
-  my ($ret, $output) = ExecUtil::execute_captured("git config --get $key",
+  my ($ret, $output) = ExecUtil::execute_captured("$git_cmd config --get $key",
                                                   ignore_ret => 1);
   return undef if $ret != 0;
   chomp($output);
@@ -5835,25 +6785,71 @@ sub get_config {
 sub set_config {
   my $key = shift;
   my $value = shift;
-  ExecUtil::execute("git config $key \"$value\"");
+  ExecUtil::execute("$git_cmd config $key \"$value\"");
 }
 
 sub unset_config {
   my $key = shift;
-  ExecUtil::execute("git config --unset $key", ignore_ret => 1);
+  ExecUtil::execute("$git_cmd config --unset $key", ignore_ret => 1);
+}
+
+sub get_only_branch {
+  my $repository = shift;
+  my $check_type = shift;
+
+  if ($debug == 2) {
+    print "    >>Running: '$git_cmd ls-remote -h $repository'<<\n";
+    return;
+  }
+
+  # Check if the remote repository has exactly 1 branch...if so, return it,
+  # otherwise throw an error
+  my ($quoted_repo) = Util::quote_args("$repository");
+  my ($ret, $output) =
+    ExecUtil::execute_captured("$git_cmd ls-remote -h $quoted_repo",
+                               capture_stdout_only => 1, ignore_ret => 1);
+  die "Could not determine remote branches from repository '$repository'\n"
+    if $ret != 0;
+  my @remote_refs = split('\n', $output);
+
+  die "'$repository' has no branches to $check_type!\n" if @remote_refs == 0;
+  my @remote_branches = map { m#[0-9a-f]+.*/(.*)$# && $1 } @remote_refs;
+
+  if (@remote_branches > 1) {
+    if ($check_type && $check_type eq "push") {
+      print STDERR <<EOF;
+Aborting: It is not clear which remote branch to push changes to.  Please
+retry, specifying which branch(es) you want to push into from your current
+EOF
+    } else {
+    print STDERR <<EOF;
+Aborting: It is not clear which remote branch to pull changes from.  Please
+retry, specifying which branch(es) you want to be merged into your current
+EOF
+    }
+    print STDERR <<EOF;
+branch.  Existing remote branches of
+  $repository
+are
+  @remote_branches
+EOF
+    exit 1;
+  }
+
+  return $remote_branches[0];
 }
 
 sub get_default_push_pull_repository {
   my $branch = current_branch();
   return undef if !$branch;
 
-  my $default_remote = `git config --get branch.$branch.remote`;
+  my $default_remote = `$git_cmd config --get branch.$branch.remote`;
   if ($default_remote) {
     chomp($default_remote);
     return $default_remote;
   }
 
-  my @output = `git config --get-regexp remote\.origin\.*`;
+  my @output = `$git_cmd config --get-regexp remote\.origin\.*`;
   if (@output) {
     return "origin";
   } else {
@@ -5865,63 +6861,21 @@ EOF
   }
 }
 
-sub migrate_old_easy_git_pull_push_options()
-{
-  my @options = `git config --get-regexp "^default.*"`;
-  return if $? != 0;
-  my @remotes = `git remote`;
-  chomp(@remotes);
-
-  Util::push_debug(new_value => 0);
-
-  my ($ret, $output);
-  chomp(@options);
-  foreach my $option (@options) {
-    my ($key, $value) = split(' ', $option);
-    my $section = ($key =~ /^(.*)\./ && $1);
-    ($ret, $output) =
-      ExecUtil::execute_captured("git config --remove-section $section",
-                                 ignore_ret => 1);
-
-    next if $option =~ /^default\.push/;
-    next if $option =~ /^default\.branch\.[^ ]+\.url\b/;
-
-    if ($option =~ /^default\.(branch\.([^ ]+)\.remote) (.*)$/) {
-      my $newkey = $1;
-      my $branch = $2;
-      my $remote = $3;
-      if (grep {$remote eq $_} @remotes) {
-        ($ret, $output) = ExecUtil::execute_captured("git config --get $newkey",
-                                                     ignore_ret => 1);
-        if ($ret != 0) {
-          ($ret, $output) =
-            ExecUtil::execute_captured("git config $newkey $value");
-        }
-      }
-    } elsif ($option =~ /^default\.(branch\.([^ ]+)\.merge) (.*)$/) {
-      my $newkey = $1;
-      my $branch = $2;
-      ($ret, $output) = ExecUtil::execute_captured("git config --get $newkey",
-                                                   ignore_ret => 1);
-      if ($ret != 0) {
-        if (RepoUtil::valid_ref($branch)) {
-          ($ret, $output) =
-            ExecUtil::execute_captured("git config $newkey refs/heads/$value");
-        }
-      }
-    } else {
-      $option =~ s/\s+/ = /;
-      print STDERR<<EOF;
-Abort: Tried to migrate obsolete (and broken) EasyGit-specific configuration
-values, but ran across one I didn't recognize:
-  $option
-Please file a bug report, and or manually unset this configuration value
-EOF
-      exit 1;
-    }
+sub print_new_unknowns {
+  my ($new_unknowns) = @_;
+  my $num = scalar(@$new_unknowns);
+  print STDERR "New unknown files";
+  print STDERR " include" if $num > 5;
+  print STDERR ":\n";
+  my $i = 0;
+  foreach my $file (@$new_unknowns) {
+    print STDERR "  $file\n";
+    last if (++$i >= 5);
   }
-
-  Util::pop_debug();
+  if ($num > 5) {
+    print STDERR "Run 'eg status' to see a full list of new unknown files.\n";
+  }
+  exit 1;
 }
 
 # Error messages spewed by commit with non-clean working copies
@@ -5951,36 +6905,31 @@ EOF
     exit 1;
   }
   elsif ($check_for->{unknown} && $check_for->{partially_staged} &&
-         $status->{has_unknown_files} && 
+         $status->{has_new_unknown_files} && 
          $status->{has_unstaged_changes} && $status->{has_staged_changes}) {
     print STDERR <<EOF;
 Aborting: It is not clear which changes should be committed; you have new
 unknown files, staged (explictly marked as ready for commit) changes, and
-unstaged changes all present.  Run 'eg help $commit_type' for details.
-New unknown files:
+unstaged changes all present.  Run 'eg help $commit_type' for details (in
+particular, the -b option and either the -a or --staged options).
 EOF
-    foreach my $file (@$new_unknown) {
-      print STDERR "  $file\n";
-    }
-    exit 1;
+    print_new_unknowns($new_unknown);
   }
-  elsif ($check_for->{unknown} && $status->{has_unknown_files}) {
+  elsif ($check_for->{unknown} && $status->{has_new_unknown_files}) {
     print STDERR <<EOF;
 Aborting: You have new unknown files present and it is not clear whether
-they should be committed.  Run 'eg help $commit_type' for details.
-New unknown files:
+they should be committed.  Run 'eg help $commit_type' for details (in
+particular the -b option).
 EOF
-    foreach my $file (@$new_unknown) {
-      print STDERR "  $file\n";
-    }
-    exit 1;
+    print_new_unknowns($new_unknown);
   }
   elsif ($check_for->{partially_staged} &&
          $status->{has_unstaged_changes} && $status->{has_staged_changes}) {
     print STDERR <<EOF;
 Aborting: It is not clear which changes should be committed; you have both
 staged (explictly marked as ready for commit) changes and unstaged changes
-present.  Run 'eg help $commit_type' for details.
+present.  Run 'eg help $commit_type' for details (in particular, the -a and
+--staged options).
 EOF
     exit 1;
   }
@@ -6000,30 +6949,22 @@ EOF
   }
 
   if ($check_for->{unknown} && $check_for->{changes} &&
-      $status->{has_unknown_files} && 
+      $status->{has_new_unknown_files} && 
       ($status->{has_unstaged_changes} || $status->{has_staged_changes})) {
     print STDERR <<EOF;
 Aborting: You have new unknown files and changed files present.  You should
-first commit any such changes (or use the -b flag to bypass this check) before
-trying to $clean_check_type your work elsewhere.
-New unknown files:
+first commit any such changes (and/or use the -b flag to bypass this check)
+before trying to $clean_check_type your work elsewhere.
 EOF
-    foreach my $file (@$new_unknown) {
-      print STDERR "  $file\n";
-    }
-    exit 1;
+    print_new_unknowns($new_unknown);
   }
-  elsif ($check_for->{unknown} && $status->{has_unknown_files}) {
+  elsif ($check_for->{unknown} && $status->{has_new_unknown_files}) {
     print STDERR <<EOF;
 Aborting: You have new unknown files present.  You should either commit these
 new files before trying to $clean_check_type your work elsewhere, or use the
 -b flag to bypass this check.
-New unknown files:
 EOF
-    foreach my $file (@$new_unknown) {
-      print STDERR "  $file\n";
-    }
-    exit 1;
+    print_new_unknowns($new_unknown);
   }
   elsif ($check_for->{changes} &&
          ($status->{has_unstaged_changes} || $status->{has_staged_changes})) {
@@ -6051,10 +6992,10 @@ sub commit_push_checks {
     } else {
       print "    >>Commands to gather data for sanity checks:\n";
     }
-    print "        git status\n";
-    print "        git ls-files --unmerged\n";
-    print "        git symbolic-ref HEAD\n" if $check_for->{no_branch};
-    print "        cd $top_dir && git ls-files --exclude-standard --others --directory --no-empty-directory\n";
+    print "        $git_cmd status\n";
+    print "        $git_cmd ls-files --unmerged\n";
+    print "        $git_cmd symbolic-ref HEAD\n" if $check_for->{no_branch};
+    print "        cd $top_dir && $git_cmd ls-files --exclude-standard --others --directory --no-empty-directory\n";
   } else {
     Util::push_debug(new_value => 0);
   }
@@ -6062,26 +7003,28 @@ sub commit_push_checks {
   #
   # Determine which types of changes are present
   #
-  my ($ret, $output) = ExecUtil::execute_captured("$eg_exec status");
-  my @unmerged_files = `git ls-files --unmerged`;
-  $status{has_unknown_files}    = ($output =~ /^Unknown files:$/m);
-  $status{has_unstaged_changes} = ($output =~ /^Changed but not updated/m);
-  $status{has_staged_changes}   = ($output =~ /^Changes ready to be commit/m);
-  $status{has_no_changes}       =
+  my ($ret, $output) = ExecUtil::execute_captured("$eg_exec status",
+                                                  ignore_ret => 1);
+  my @unmerged_files = `$git_cmd ls-files --unmerged`;
+  $status{has_new_unknown_files} = ($output =~ /^Newly created unknown files:$/m);
+  $status{has_unstaged_changes}  = ($output =~ /^Changed but not updated/m);
+  $status{has_staged_changes}    = ($output =~ /^Changes ready to be commit/m);
+  $status{has_no_changes}        =
     ($output =~ /^nothing to commit \(working directory clean\)\n\z/m);
-  $status{has_unmerged_changes} = (scalar @unmerged_files > 0);
+  $status{has_unmerged_changes}  = (scalar @unmerged_files > 0);
+  $status{output} = $output;
 
   #
   # Determine which unknown files are "newly created"
   #
-  my @new_unknown = `(cd "$top_dir" && git ls-files --exclude-standard --others --directory --no-empty-directory)`;
+  my @new_unknown = `(cd "$top_dir" && $git_cmd ls-files --exclude-standard --others --directory --no-empty-directory)`;
   chomp(@new_unknown);
-  if ($check_for->{unknown} && $status{has_unknown_files} &&
+  if ($check_for->{unknown} && $status{has_new_unknown_files} &&
       -f "$git_dir/info/ignored-unknown") {
-    my @old_unknown_files = `cat $git_dir/info/ignored-unknown`;
+    my @old_unknown_files = `cat "$git_dir/info/ignored-unknown"`;
     chomp(@old_unknown_files);
     @new_unknown = Util::difference(\@new_unknown, \@old_unknown_files);
-    $status{has_unknown_files} = (scalar(@new_unknown) > 0);
+    $status{has_new_unknown_files} = (scalar(@new_unknown) > 0);
   }
   @new_unknown =
     Util::reroot_paths__from_to_files($top_dir, $cur_dir, @new_unknown);
@@ -6089,7 +7032,7 @@ sub commit_push_checks {
   Util::pop_debug();
 
   if ($check_for->{no_branch}) {
-    my $rc = system('git symbolic-ref -q HEAD >/dev/null');
+    my $rc = system('$git_cmd symbolic-ref -q HEAD >/dev/null');
     $status{has_no_branch} = $rc >> 8;
   }
 
@@ -6113,11 +7056,12 @@ sub commit_push_checks {
 }
 
 sub record_ignored_unknowns {
-  my $git_dir = RepoUtil::git_dir();
+  # Determine some useful directories
+  my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
 
   mkdir "$git_dir/info" unless -d "$git_dir/info";
   open(OUTPUT, "> $git_dir/info/ignored-unknown");
-  my @unknown_files = `git ls-files --exclude-standard --others --directory --no-empty-directory`;
+  my @unknown_files = `cd "$top_dir" && $git_cmd ls-files --exclude-standard --others --directory --no-empty-directory`;
   foreach my $file (@unknown_files) {
     print OUTPUT $file;
   }
@@ -6157,11 +7101,19 @@ sub parse_args {
         last;
       }
 
-      if (RepoUtil::valid_ref($arg)) {
-        push(@revs, $arg);
-      } else {
+      my @revs_to_check = split('\.\.\.?', $arg);
+      my $found_invalid_ref = 0;
+      foreach my $ref (@revs_to_check) {
+        if (!RepoUtil::valid_ref($ref)) {
+          $found_invalid_ref = 1;
+          last;
+        }
+      }
+      if ($found_invalid_ref) {
         unshift(@args, $arg);
         last;
+      } else {
+        push(@revs, $arg);
       }
     }
   }
@@ -6170,6 +7122,17 @@ sub parse_args {
   @files = @args;
   if (!$stop_marker_found && @files && $files[0] eq "--") {
     shift @files;
+  } else {
+    # If "--" appears in argument list and not at front, then some bad
+    # revisions specified by the user showed up in our @files list since
+    # they didn't validate as existing revisions.
+    my $i = -1;
+    foreach my $file (@files) {
+      if ($file eq "--") {
+        die "Bad revision(s): @files[0..$i]\n";
+      }
+      ++$i;
+    }
   }
 
   ## FIXME: I should add sanity checking: whether there are too many revs
@@ -6182,68 +7145,79 @@ sub parse_args {
   return (\@opts, \@revs, \@files);
 }
 
-sub _convert_tree_info_to_stage_info {
-  my @lines = @_;
-  @lines = map {m/(\d+) [a-z]+ ([0-9a-f]{40})\s+(.*)/ && "$1 $2 0\t$3\n"} @lines;
-  return @lines;
-}
-
-sub _get_files_from_stage_info {
-  my @lines = @_;
-  chomp(@lines);
-  my @files = map { m/.*[ \t]+(.*)/ && $1 } @lines;
-  @files = Util::uniquify_list(@files);
-  return @files;
-}
-
 sub get_revert_info {
   my ($revision, @quoted_files) = @_;
 
-  my @new_files;           # Files to remove from staging area
-  my @newish_files;        # Files to delete (can retrieve unmodified contents of
-                           # these files from previous revisions)
-  my @revert_files;        # Files whose contents should be reverted
-  my @removed_index_files; # Files that will be restored in the index when we
-                           # revert @revert_files; need to undo these restores if
-                           # we're only supposed to undo unstaged changes
-  my $staged_info;
-  my $old_staged_info;
+  my $marker = "";
+  $marker = "--" if (@quoted_files);
 
-  @staging_info = `git ls-files --full-name -s -- @quoted_files`;
-  $staged_info = join('', @staging_info);
-  @staged_files = _get_files_from_stage_info(@staging_info);
+  my @newly_added_files;
+  my @new_since_rev_files;
+  my @other_files = @quoted_files;
 
-  my @head_info    = `git ls-tree -r --full-name HEAD -- @quoted_files`;
-  @head_info = _convert_tree_info_to_stage_info(@head_info);
-  @head_files = _get_files_from_stage_info(@head_info);
-
-  @new_files = Util::difference(\@staged_files, \@head_files);
-
-  if ($revision ne "HEAD") {
-    my @rev_info = `git ls-tree -r --full-name $revision -- @quoted_files`;
-    @rev_info = _convert_tree_info_to_stage_info(@rev_info);
-    $old_staged_info = join('', @rev_info);
-    @revert_files = _get_files_from_stage_info(@rev_info);
-    
-    @newish_files = Util::difference(\@head_files, \@revert_files);
-  } else {
-    @revert_files = @head_files;
-    $old_staged_info = join('', @head_info);
+  # If this is a merge commit...
+  my ($cur_dir, $top_dir, $git_dir) = RepoUtil::get_dirs();
+  my @merge_branches;
+  if (-f "$git_dir/MERGE_HEAD") {
+    @merge_branches = `cat "$git_dir/MERGE_HEAD"`;
+    chomp(@merge_branches);
   }
 
-  @revert_files = () if !@quoted_files;
-  @removed_index_files = Util::difference(\@revert_files, \@staged_files);
-  if (@removed_index_files) {
-    my $stage_info_to_remove_files;
-    foreach my $file (@removed_index_files) {
-      $stage_info_to_remove_files .=
-        "0 0000000000000000000000000000000000000000\t$file\n";
+  # Define how to get newly added files since a commit, or new files added
+  # between two commits
+  my $get_newish_files = sub {
+    my $ref1 = shift;
+    my $ref2 = shift;
+    my (@files, @lines);
+    if (defined $ref2) {
+      @lines = `$git_cmd diff-tree -r $ref1 $ref2 $marker @quoted_files`;
+    } else {
+      @lines = `$git_cmd diff-index --cached $ref1 $marker @quoted_files`;
     }
-    $staged_info .= $stage_info_to_remove_files;
+    foreach my $line (@lines) {
+      # Check for newly added files (not previously tracked but now staged)
+      if ($line =~ /:000000 [0-9]+ 0{40} [0-9a-f]{40} A\t(.*)/) {
+        push(@files, $1);
+      }
+    }
+
+    # git diff-tree and diff-index return files relative to $top_dir, but
+    # we want filenames relative to $cur_dir
+    if ($top_dir ne $cur_dir) {
+      return Util::reroot_paths__from_to_files($top_dir, $cur_dir, @files);
+    } else {
+      return @files;
+    }
+  };
+
+  # Now, get the files added to the index since the "last commit"
+  @newly_added_files = &$get_newish_files("HEAD");
+  for my $branch (@merge_branches) {
+    my @files = &$get_newish_files($branch);
+    @newly_added_files = Util::intersect(\@newly_added_files, \@files);
+  }
+  if (@newly_added_files) {
+    @newly_added_files = Util::quote_args(@newly_added_files);
+    @other_files = Util::difference(\@quoted_files, \@newly_added_files);
   }
 
-  return (\@new_files, \@newish_files, \@revert_files,
-          $staged_info, $old_staged_info);
+  # Now, get the files that exist in the "last commit" but not the specified
+  # revision.
+  if ($revision ne "HEAD" || @merge_branches) {
+    my @branches;
+    push(@branches, "HEAD");
+    push(@branches, @merge_branches);
+    foreach my $branch (@branches) {
+      my @files = &$get_newish_files($revision, $branch);
+      @new_since_rev_files = Util::union(\@new_since_rev_files, \@files);
+    }
+    if (@new_since_rev_files) {
+      @new_since_rev_files = Util::quote_args(@new_since_rev_files);
+      @other_files = Util::difference(\@other_files, \@new_since_rev_files);
+    }
+  }
+
+  return (\@newly_added_files, \@new_since_rev_files, \@other_files);
 }
 
 ###########################################################################
@@ -6274,6 +7248,17 @@ sub intersect {
   return @both;
 }
 
+# Return items in either @$lista or @$listb
+sub union {
+  my ($lista, $listb) = @_;
+  my %either;
+
+  map { $either{$_} = 1 } @$lista;
+  map { $either{$_} = 1 } @$listb;
+
+  return keys %either;
+}
+
 # Returns whether @$list contains $item
 sub contains {
   my ($list, $item) = @_;
@@ -6295,6 +7280,32 @@ sub uniquify_list {
   return keys %unique;
 }
 
+sub quote_args {
+  my @args = @_;
+
+  # Quote arguments with special characters so that when we
+  # do something like
+  #   system("$command hardcoded_arg1 @args")
+  # that the @args will get passed correctly to the shell command $command
+  my @newargs;
+  foreach my $arg (@args) {
+    my $quotes_needed = 0;
+    if (!$arg || $arg =~ /[;'"<>()\[\]|`* 	\n\$\\]/) {
+      $quotes_needed = 1;
+    }
+
+    $arg =~ s#\\#\\\\#g;    # Backslash escape backslashes
+    $arg =~ s#"#\\"#g;      # Backslash escape quotes
+    $arg =~ s#`#\\`#g;      # Backslash escape backticks
+    $arg =~ s#\$#\\\$#g;    # Backslash escape dollar signs
+
+    $arg = '"'.$arg.'"' if $quotes_needed;
+
+    push(@newargs, $arg);
+  }
+  return @newargs;
+}
+
 # Have git's rev-parse command parse @args and decide which part is files,
 # which is options, and which are revisions.  Further, have git translate
 # revisions into full 40-character hexadecimal commit ids.
@@ -6303,16 +7314,27 @@ sub git_rev_parse {
 
   Util::push_debug(new_value => 0);
 
+  my @quoted_args = Util::quote_args(@args);
   my ($ret, $output) = 
-    ExecUtil::execute_captured("git rev-parse @ARGV", ignore_ret => 1);
+    ExecUtil::execute_captured("$git_cmd rev-parse @quoted_args",
+                               ignore_ret => 1);
   if ($ret != 0) {
     $output =~ /^(fatal:.*)$/m   && print STDERR "$1\n";
     $output =~ /^(Use '--'.*)$/m && print STDERR "$1\n";
     exit 1;
   }
-  my @opts  = split('\n', `git rev-parse --no-revs --flags    @ARGV`);
-  my @revs  = split('\n', `git rev-parse --revs-only          @ARGV`);
-  my @files = split('\n', `git rev-parse --no-revs --no-flags @ARGV`);
+  my @opts  =
+    split('\n', `$git_cmd rev-parse --no-revs --flags    @quoted_args`);
+  my @revs  =
+    split('\n', `$git_cmd rev-parse --revs-only          @quoted_args`);
+  my @files =
+    split('\n', `$git_cmd rev-parse --no-revs --no-flags @quoted_args`);
+
+  # Translate sha1sums back to human specified version of revisions.  Note that
+  # something like "REV1...REV2" is translated into "SHA1 SHA2 ^SHA3", so one
+  # argument may have become 3 revisions.  options and files should translate
+  # one to one, though, so we can back out the original revision names.
+  @revs = @args[scalar(@opts)..scalar(@args)-scalar(@files)-1];
 
   Util::pop_debug();
 
@@ -6397,11 +7419,14 @@ package main;
 
 sub launch {
   my $job=shift;
+  my $orig_job = $job;
+  $job =~ s/-/_/;  # Packages must have underscores, commands often have dashes
 
   # Create the action to execute
   my $action;
-  $action = $job->new()                      if  $job->can("new");
-  $action = subcommand->new(command => $job) if !$job->can("new");
+  $action = $job->new()                           if  $job->can("new");
+  $action = subcommand->new(command => $orig_job) if !$job->can("new");
+  my $ret;
 
   # preprocess
   if ($action->can("preprocess")) {
@@ -6418,12 +7443,12 @@ sub launch {
   # run & postprocess
   if (!$action->can("postprocess")) {
     print ">>Stage: Run<<\n" if $debug;
-    $action->run();
+    $ret = $action->run();
   } else {
     my $output = "";
     open($outfh, '>', \$output) || die "eg $job: cannot open \$outfh: $!";
     print ">>Stage: Run<<\n" if $debug;
-    $action->run();
+    $ret = $action->run();
     print ">>Stage: Postprocess<<\n" if $debug;
     $action->postprocess($output);
   }
@@ -6433,6 +7458,8 @@ sub launch {
     print ">>Stage: Wrapup<<\n" if $debug;
     $action->wrapup();
   }
+
+  exit $ret;
 }
 
 sub version {
@@ -6467,16 +7494,43 @@ sub main {
   #
   Getopt::Long::Configure("no_bundling", "no_permute",
                           "pass_through", "no_auto_abbrev", "no_ignore_case");
+  my $record_arg   = sub { $git_cmd .= " --$_[0]"; };
+  my $record_args  = sub { $git_cmd .= " --$_[0]=$_[1]"; };
   my $result=GetOptions(
                "--debug"     => sub { $debug = 1 },
-               "--help"      => sub { help() },
+               "--help"      => sub { help()     },
                "--translate" => sub { $debug = 2 },
-               "--version"   => sub { version() },
+               "--version"   => sub { version()  },
+               "exec-path=s" => sub { &$record_args(@_) },
+               "paginate|p"  => sub { $use_pager = 1; &$record_arg(@_)  },
+               "no-pager"    => sub { $use_pager = 0; &$record_arg(@_)  },
+               "bare"        => sub { &$record_arg(@_)  },
+               "git-dir=s"   => sub { &$record_args(@_) },
+               "work-tree=s" => sub { &$record_args(@_) },
                         );
+  # Make sure all global args are passed to eg subprocesses as well...
+  $eg_exec .= substr($git_cmd, index($git_cmd, ' ')) if $git_cmd ne "git";
+
+  # Sanity check the arguments
   die "eg: Error parsing arguments. (Try 'eg help')\n" if !$result;
   die "eg: No subcommand specified. (Try 'eg help')\n" if @ARGV < 1;
   die "eg: Invalid argument '$ARGV[0]'. (Try 'eg help')\n"
     if ($ARGV[0] !~ m#^[a-z]#);
+
+  #
+  # Fix the environment, if needed
+  #
+  if (defined $ENV{"EG_GIT_TEST_PATH"}) {
+    # Trim the first dir out of path, since it has a symlink git -> eg
+    my @oldpaths = split(/:/, $ENV{PATH});
+    my @newpaths = ();
+    foreach my $path (@oldpaths) {
+      if (! -l "$path/git" || readlink("$path/git") !~ m#/eg$# ) {
+        push(@newpaths, $path);
+      }
+    }
+    $ENV{PATH} = join(':', @newpaths);
+  }
 
   #
   # Now execute the action

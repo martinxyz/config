@@ -64,4 +64,5 @@ export LESS='-R'
 #  . /etc/bash_completion
 #fi
 . /etc/bash_completion.d/git
+. ~/scripts/bash-completion-eg.sh
 
