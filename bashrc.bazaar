@@ -6,7 +6,9 @@ source ~/config/bashrc.common
 ulimit -S -c unlimited
 
 export MAILCHECK=
-export PS1='\u@\h:\w`[ -r /home/martin/.newmail ] && echo -n "\$"`\$ '
+#export PS1='\u@\h:\w\[\033[31m\]$(__git_ps1 " %s")\[\033[00m\]`[ -r /home/martin/.newmail ] && echo -n "\$"`\$ '
+#export PS1='\u@\h:\w\[\033[33m\]$(__git_ps1 " %s")\[\033[00m\]`[ -r /home/martin/.newmail ] && echo -n "\$"`\$ '
+export PS1='\u \w$(__git_ps1 " \[\033[33m\]%s\[\033[00m\]")`[ -r /home/martin/.newmail ] && echo -n "\$"`\$ '
 #function l() {
 #  cd $@
 #  ls

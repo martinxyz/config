@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+git checkout master
+git fetch origin master
+echo "Commits since last update (oldest first):"
+GIT_PAGER="" git log --reverse --oneline master..origin/master
+echo "---"
+git merge --no-stat origin/master
+
