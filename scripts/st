@@ -1,2 +1,14 @@
 #!/bin/bash
-eg status $@
+
+if [ -d .svn ]; then
+    svn st $@
+    exit $?
+fi
+
+moreargs=''
+if [ x$1 = x-q ] ; then
+    shift
+    moreargs='-uno'
+fi
+eg status $@ $moreargs
+

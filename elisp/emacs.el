@@ -132,6 +132,9 @@
       (cons '(".*/linux.*/.*\\.[ch]$" . linux-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*/git/.*\\.[ch]$" . linux-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.cpp$" . wesnoth-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 

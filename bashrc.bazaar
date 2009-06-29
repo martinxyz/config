@@ -45,7 +45,7 @@ fi
 # bind -p | grep edit-and-execute-command --- fc command does it too
 
 # ccache
-export PATH="/usr/lib/ccache:${PATH}"
+#export PATH="/usr/lib/ccache:${PATH}"
 
 # (FIXME: why the heck does this work without export?)
 #   It is not exported! 'env' will not show it, but
