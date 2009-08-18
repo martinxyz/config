@@ -182,3 +182,5 @@ add     shift   = Shift_L Shift_R
 add     control = Control_L Control_R
 add     mod1    = Alt_L Alt_R
 
+clear mod4
+

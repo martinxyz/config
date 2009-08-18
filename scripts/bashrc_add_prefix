@@ -23,6 +23,7 @@ function add_prefix {
     prepend_to_pathlist CPATH               $1/include
     prepend_to_pathlist LIBRARY_PATH        $1/lib
     prepend_to_pathlist LD_LIBRARY_PATH     $1/lib
+    prepend_to_pathlist LD_LIBRARY_PATH     $1/lib/gtk-2.0/modules
     prepend_to_pathlist PKG_CONFIG_PATH     $1/lib/pkgconfig
     #prepend_to_pathlist PYTHONPATH          $1/lib/python2.3/site-packages
     prepend_to_pathlist PYTHONPATH          $1/lib/python2.4/site-packages
