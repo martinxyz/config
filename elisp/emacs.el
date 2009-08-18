@@ -116,6 +116,17 @@
         indent-tabs-mode t)
   )
 
+(defun ines-c-mode ()
+  "InES c coding style"
+  (interactive)
+  (c-mode)
+  ; indent with tabs only.
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode t)
+  (c-set-offset 'substatement-open 0)
+  )
+
 (defun gimp-c-mode ()
   (interactive)
   (c-mode)
@@ -139,6 +150,12 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/coldfire.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
@@ -555,3 +572,4 @@
 ;; overwrite viper function to remove silly question:
 (defun viper-set-register-macro (reg)
   (set-register reg last-kbd-macro))
+
