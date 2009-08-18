@@ -258,7 +258,8 @@ keycode 66 = Escape
 ! ö = slash
 keycode  47 = slash odiaeresis dead_acute dead_doubleacute
 ! ä = return
-keycode  48 = Return adiaeresis braceleft dead_caron
+!keycode  48 = Return adiaeresis braceleft dead_caron
+keycode  48 = Return adiaeresis adiaeresis agrave braceleft dead_caron
 
 ! "no dead keys" fuer die Tasten ^ ` ~
 keycode  21 = asciicircum grave asciicircum grave asciitilde ogonek
