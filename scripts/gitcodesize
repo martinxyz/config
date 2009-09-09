@@ -1,0 +1,20 @@
+#!/bin/sh
+
+git log --format="%H" > revisions.tmp
+
+(
+for sha1 in $(cat revisions.tmp); do
+    git co -q $sha1
+    git ls-files|egrep '\.(hpp|cpp|c|h|cc|hh|py|i)$'|xargs cat|wc -l
+done
+git co -q master
+) > codesize.tmp
+
+rm revisions.tmp
+
+python -c "
+from pylab import *
+d = load('codesize.tmp')
+plot(d[::-1])
+show()
+"
