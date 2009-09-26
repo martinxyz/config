@@ -1,4 +1,24 @@
-#!/bin/sh
+#!/bin/bash
+#set -x
+
+loc=true
+
+if $loc; then
+  git ls-files|egrep -i '\.(hpp|cpp|c|h|cc|hh|py|i|vhd|c++)$'|xargs wc -l|sort -n
+  echo "(lines of code)"
+else
+  (
+  (( total = 0 ))
+  for filename in $(git ls-files|egrep -i '\.(hpp|cpp|c|h|cc|hh|py|i|vhd|c++)$'); do
+      size=$(cat $filename | gzip | wc -c)
+      (( total += size ))
+      echo $size $filename
+  done
+  echo "$total compressed bytes of code"
+  ) | sort -n
+fi
+
+exit 0
 
 git log --format="%H" > revisions.tmp
 

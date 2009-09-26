@@ -40,4 +40,4 @@ Key section A N Exec exec m n
 Key section A S Exec exec m p
 Key section A C Exec exec m s
 Key print A N Exec cd /home/martin/screenshots; scrot
-Key print A 2 Exec cd /home/martin/screenshots; xterm -iconic -e 'scrot -s'
+Key print A 4 Exec cd /home/martin/screenshots; xterm -iconic -e 'scrot -s'
