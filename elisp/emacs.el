@@ -127,6 +127,13 @@
   (c-set-offset 'substatement-open 0)
   )
 
+(defun ines-vhdl-mode ()
+  (interactive)
+  (vhdl-mode)
+  (viper-mode)
+  (setq tab-width 4)
+  )
+
 (defun gimp-c-mode ()
   (interactive)
   (c-mode)
@@ -176,6 +183,10 @@
 
 (setq auto-mode-alist 
       (cons '(".*\\.d$" . c-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*\\.vhd$" . ines-vhdl-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
