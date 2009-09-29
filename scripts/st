@@ -10,5 +10,5 @@ if [ x$1 = x-q ] ; then
     shift
     moreargs='-uno'
 fi
-eg status $@ $moreargs
+eg status $moreargs $@ 
 

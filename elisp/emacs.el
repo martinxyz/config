@@ -142,6 +142,7 @@
   (c-set-style "gnu")
   (setq indent-tabs-mode nil)
   (setq show-trailing-whitespace t)
+  (setq tab-width 8)
   )
 
 ;; TODO: Im c-mode beim Laden einer Datei 
@@ -166,6 +167,9 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/gtk+.*/.*\\.[ch]$" . gimp-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*\\.mas$" . python-mode)
