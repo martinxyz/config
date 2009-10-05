@@ -29,4 +29,7 @@ echo "Symlinks done."
 
 xrdb -merge .Xdefaults
 
+if ! grep bashrc.common ~/.bashrc >/dev/null; then
+    echo "source ~/config/bashrc.common" >> ~/.bashrc
+fi
 
