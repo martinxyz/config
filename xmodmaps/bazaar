@@ -14,3 +14,9 @@ keycode 78 = Multi_key
 
 ! eliminate some dead keys
 keycode  21 = asciicircum grave asciicircum grave asciitilde ogonek
+
+! wtf
+!clear mod1
+!!mod1        Alt_L (0x40),  ISO_Level3_Shift (0x6c),  Meta_L (0xcd)
+!add     mod1    = Alt_L Alt_R
+

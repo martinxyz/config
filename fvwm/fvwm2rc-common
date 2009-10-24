@@ -150,9 +150,9 @@ Key s WTSF 4 StickAndStay
 AddToFunc Move-or-Raise I Raise
 + M Move
 + D Lower
-Mouse 1 W 2 Move-or-Raise
-Mouse 2 W 2 Lower
-Mouse 3 W 2 Resize
+Mouse 1 W 4 Move-or-Raise
+Mouse 2 W 4 Lower
+Mouse 3 W 4 Resize
 Key p A 4 Module FvwmPager *
 Key o A 4 KillModule FvwmPager
 Key x A 4 CursorStyle DEFAULT None

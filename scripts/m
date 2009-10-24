@@ -1,4 +1,0 @@
-#!/bin/sh -x
-/usr/sepp/bin/matlab -nosplash -nodesktop $@ #-nojvm $@
-
-

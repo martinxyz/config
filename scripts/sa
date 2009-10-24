@@ -33,6 +33,8 @@ for thing in things:
             command = 'cd /video/ && wget ' + thing
         else:
             command = 'mplayer ' + thing
+    elif thing.endswith('.html'):
+            command = 'firefox --new-tab ' + thing
     elif thing.endswith('.mp3'):
         command = 'mplayer ' + thing
     elif thing.endswith('.txt'):
