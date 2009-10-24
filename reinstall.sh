@@ -29,4 +29,8 @@ echo "Symlinks done."
 
 xrdb -merge .Xdefaults
 
+if ! grep bashrc.common ~/.bashrc >/dev/null; then
+    echo "source ~/config/bashrc.common" >> ~/.bashrc
+fi
+perl -p -i -e 's/bash_completion /bash_completion_disabled /g' ~/.bashrc
 
