@@ -2,7 +2,7 @@
 # Configure wmii
 
 # Configuration Variables
-MODKEY=Mod1
+MODKEY=Mod4
 UP=k
 DOWN=j
 LEFT=h
@@ -18,7 +18,7 @@ WMII_FONT='fixed'
 set -- $(echo $WMII_NORMCOLORS $WMII_FOCUSCOLORS)
 WMII_MENU="dmenu -b -fn '$WMII_FONT' -nf '$1' -nb '$2' -sf '$4' -sb '$5'"
 WMII_9MENU="wmii9menu -font '$WMII_FONT' -nf '$1' -nb '$2' -sf '$4' -sb '$5' -br '$6'"
-WMII_TERM="x-terminal-emulator"
+WMII_TERM="bigterm"
 
 # Column Rules
 wmiir write /colrules <<!
@@ -123,6 +123,8 @@ eventstuff() {
 	Key $MODKEY-t
 		wmiir xwrite /ctl "view $(tagsmenu)" &
 	Key $MODKEY-Return
+		eval $WMII_TERM &
+	Key $MODKEY-e
 		eval $WMII_TERM &
 	Key $MODKEY-Shift-space
 		wmiir xwrite /tag/sel/ctl send sel toggle
