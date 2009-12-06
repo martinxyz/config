@@ -31,6 +31,7 @@
 
 ;; Uralte Gewohnheiten aus Borland-Produkten
 (global-set-key  [f4]  'next-error)
+(global-set-key  [(shift f4)]  'previous-error)
 (global-set-key  [f5]  'delete-other-windows)
 (global-set-key  [f6]  'next-multiframe-window)
 ;(global-set-key  [f7]  'switch-to-other-buffer)

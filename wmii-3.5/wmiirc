@@ -35,7 +35,7 @@ wmiir write /tagrules <<!
 
 # Status Bar Info
 status() {
-	echo -n $(uptime | sed 's/.*://; s/,//g') '|' $(date)
+	echo -n $(/home/martin/bin/m i|grep -v '^.enter h'|sed -e s/^.*sammlung.//) '|' $(ps au|cut -d\  -f1|sort -n|uniq|egrep -v 'USER|root') '|' $(uptime | sed 's/.*://; s/,//g') '|' $(date)
 }
 
 # Event processing
@@ -126,6 +126,12 @@ eventstuff() {
 		eval $WMII_TERM &
 	Key $MODKEY-e
 		eval $WMII_TERM &
+	Key section
+		eval m n &
+	Key Shift-section
+		eval m p &
+	Key Control-section
+		eval m s &
 	Key $MODKEY-Shift-space
 		wmiir xwrite /tag/sel/ctl send sel toggle
 	Key $MODKEY-f
