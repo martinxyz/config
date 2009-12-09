@@ -236,7 +236,13 @@
       '(lambda () (auto-fill-mode 0) ) )
 
 ;; disable menu bar
-(menu-bar-mode 0)
+;(menu-bar-mode 0)
+
+;; Turn off mouse interface early in startup to avoid momentary display
+;; You really don't need these; trust me.
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
 ;; groessere Schrift
 ;(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
@@ -393,6 +399,7 @@
                                (find-tag nil t)
                                (ring-remove find-tag-marker-ring 0))
                            (tags-loop-continue))))
+(global-set-key (kbd "C-.") 'ido-imenu)
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
 ;(define-key viper-vi-local-user-map "W" 'kill-region)
@@ -589,3 +596,5 @@
 (defun viper-set-register-macro (reg)
   (set-register reg last-kbd-macro))
 
+; http://github.com/mattharrison/emacs-starter-kit
+(require 'starter-kit-defuns)

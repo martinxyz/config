@@ -132,6 +132,10 @@ eventstuff() {
 		eval m p &
 	Key Control-section
 		eval m s &
+	Key Print
+		eval cd /home/martin/screenshots/; scrot; cd
+	Key $MODKEY-Print
+		eval cd /home/martin/screenshots/; scrot -u; cd
 	Key $MODKEY-Shift-space
 		wmiir xwrite /tag/sel/ctl send sel toggle
 	Key $MODKEY-f
