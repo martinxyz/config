@@ -81,6 +81,13 @@
           (message "Compilation done."))))
 
 
+(require 'compile)
+
+; questa / vsim style errors
+(add-to-list 'compilation-error-regexp-alist 'vsim)
+(pushnew '(vsim "\\(ERROR\\|WARNING\\|\\*\\* Error\\|\\*\\* Warning\\)[^:]*: *\\(.+\\)(\\([0-9]+\\)):" 2 3)
+         compilation-error-regexp-alist-alist)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
@@ -414,8 +421,8 @@
 ;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
 (define-key viper-vi-local-user-map "M" 'delete-other-windows)
 ;(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
-;(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
-(define-key viper-vi-local-user-map "K" 'bury-buffer)
+(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
+;(define-key viper-vi-local-user-map "K" 'bury-buffer)
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
