@@ -1,0 +1,35 @@
+#!/bin/bash
+# script to find auto-mergable changes
+
+if [ $# -ne 2 ]; then
+    echo "usage: $(basename $0) <upstream> <changes>"
+    echo
+    echo "For example: $(basename $0) myrepo/master otherrepo/master"
+    exit 1
+fi
+
+git checkout $1 > /dev/null 2>&1
+git br -D cherry-check > /dev/null 2>&1
+branch=$(git br|grep ^*|sed -e 's/. //')
+
+set -e
+git br cherry-check $1
+git checkout cherry-check
+(( bad = 0 ))
+(( good = 0 ))
+for rev in $(git cherry $1 $2 | grep ^+ | sed -e s/^..// ); do
+  if git cherry-pick $rev > /dev/null 2>&1; then
+    (( good += 1 ))
+    #echo "$rev"
+    git log --oneline -1 $rev | cat
+  else
+    (( bad += 1 ))
+  fi
+  git reset --hard $1 > /dev/null
+done
+
+echo $bad bad, $good good
+
+git checkout "$branch" > /dev/null
+git br -D cherry-check > /dev/null
+
