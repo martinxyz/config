@@ -1,0 +1,2 @@
+#!/bin/bash
+vsim -c -onfinish exit -do "do $1 ; quit -f"

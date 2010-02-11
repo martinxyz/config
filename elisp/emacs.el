@@ -82,10 +82,14 @@
 
 
 (require 'compile)
-
 ; questa / vsim style errors
 (add-to-list 'compilation-error-regexp-alist 'vsim)
-(pushnew '(vsim "\\(ERROR\\|WARNING\\|\\*\\* Error\\|\\*\\* Warning\\)[^:]*: *\\(.+\\)(\\([0-9]+\\)):" 2 3)
+; # ** Error: ../../source/core/queue_fifo.vhd(22): (vcom-1195) Cannot find expanded name "work.ram".
+(pushnew '(vsim "^..\\(ERROR\\|WARNING\\|\\*\\* Error\\|\\*\\* Warning\\)[^:]*: \\(\\[[0-9]+\\] \\)?\\(.+\\)(\\([0-9]+\\)):" 3 4)
+         compilation-error-regexp-alist-alist)
+(add-to-list 'compilation-error-regexp-alist 'vsim2)
+; # Error in macro ./queue_fifo.do line 22
+(pushnew '(vsim2 "^..Error in macro \\([^ ]+\\) line \\([0-9]+\\)" 1 2)
          compilation-error-regexp-alist-alist)
 
 ;; passende Klammer anzeigen wenn man eine schliesst
