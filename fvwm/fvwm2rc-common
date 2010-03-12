@@ -1,7 +1,7 @@
 # ignore no modifiers
 IgnoreModifiers
 
-DesktopSize 4 3
+DesktopSize 3 2
 
 DestroyFunc InitFunction
 AddToFunc InitFunction
@@ -71,7 +71,7 @@ Style "FvwmIdent" CirculateHit
 
 Style "*" MinOverlapPercentPlacement
 #Style * TileCascadePlacement
-Style "*" SloppyFocus
+#Style "*" SloppyFocus
 #Style "*" ClickToFocus
 Style "*" GrabFocus
 Style "*" GrabFocusTransient
@@ -138,6 +138,7 @@ Key u A 4 Exec exec rxvt --print-pipe echo -cr yellow -bg black -fg gray80 -sl 9
 Key a A 4 Exec exec aterm -ls -bg black -fg gray80 -sl 9999 -tr +sb -sh 70 -fn 10x20
 # bound to maximize: Key m W 4 Move
 Key q WTSF 4 Close
+Key c WTSF 4S Close
 Key k W 4 Destroy
 Key 0 A 4 Exec exec xrandr -s 0
 Key 9 A 4 Exec exec xrandr -s 640x480
@@ -168,10 +169,10 @@ AddToFunc JumpK
 + I GotoPage +0p -1p
 AddToFunc JumpJ
 + I GotoPage +0p +1p
-Key Right A M Nop
-Key Left A M Nop
-Key Up A M Nop
-Key Down A M Nop
+#Key Right A M Nop
+#Key Left A M Nop
+#Key Up A M Nop
+#Key Down A M Nop
 Key Left A 4 GotoPage -1p +0p
 Key Right A 4 GotoPage +1p +0p
 Key Down A 4 GotoPage +0p +1p
@@ -182,6 +183,17 @@ Key k A 4 JumpK
 Key j A 4 JumpJ
 Key w A 4 Deicon
 Key w A 4S DeiconWorkrave
+
+#Key KP_Home  A N GotoPage 0 0
+#Key KP_Up    A N GotoPage 1 0
+#Key KP_Prior A N GotoPage 2 0
+#Key KP_Left  A N GotoPage 0 1
+#Key KP_Begin A N GotoPage 1 1
+#Key KP_Right A N GotoPage 2 1
+
+#Key 1 A 4 GotoPage 0 0
+#Key 2 A 4 GotoPage 1 0
+#Key 3 A 4 GotoPage 2 0
 
 AddToFunc Deicon
 + I Iconify off
@@ -227,13 +239,13 @@ Key n A 4M MoSwiN
 Key b A 4M MoSwiB
 Key space A 4M RaiseLower
 
-AddToFunc FocusNext
-+ I Next (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp # ?FlipFocus?
-+ I Current Raise
-Key Tab A 4 FocusNext
-Key Tab A M FocusNext
+#AddToFunc FocusNext
+#+ I Next (AcceptsFocus !Shaded CurrentPage) FlipFocus NoWarp # ?FlipFocus?
+#+ I Current Raise
+#Key Tab A 4 FocusNext
+#Key Tab A M FocusNext
 
-# remove unused keybindings
+# remove unused keybindings (FIXME: this grabs those keys from apps!?)
 Key F1 A M Nop
 Key F2 A M Nop
 Key F3 A M Nop
@@ -246,7 +258,6 @@ Key F9 A M Nop
 Key F10 A M Nop
 Key F11 A M Nop
 Key F12 A M Nop
-#Key Tab A M -
 
 AddToFunc Naked
 + I Style $[w.class] NoTitle
@@ -268,10 +279,10 @@ AddToFunc Eterm3
 AddToFunc Eterm4
 + I Maximize true 96 20
 + I Move 2 -2
-Key 1 A 4 Eterm1
-Key 4 A 4 Eterm2
-Key 3 A 4 Eterm3
-Key 4 A 4 Eterm4
+#Key 1 A 4 Eterm1
+#Key 4 A 4 Eterm2
+#Key 3 A 4 Eterm3
+#Key 4 A 4 Eterm4
 
 AddToFunc TestFunc
 + I FlipFocus NoWarp
@@ -288,7 +299,11 @@ AddToFunc WindowListFunc
 DestroyMenuStyle WindowList
 MenuStyle WindowList SelectOnRelease Meta_L
 #Key Tab A 4 Next (AcceptsFocus !Shaded CurrentDesc) Focus
-#Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+Key Tab A M WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+Key Tab A 4 WindowList (AcceptsFocus !Shaded CurrentPage) CurrentAtEnd, SelectOnRelease Meta_L, NoGeometry
+
+#Key Tab A M WindowList Root c c NoDeskSort
+#Key Tab A 4 WindowList Root c c NoDeskSort
 
 #Key Tab A 4 Next (AcceptsFocus !Shaded CurrentDesc) Focus
 
