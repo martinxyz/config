@@ -211,6 +211,10 @@
       (cons '(".*\\.vhd$" . ines-vhdl-mode)
           auto-mode-alist))
 
+(setq auto-mode-alist 
+      (cons '(".*\\.do$" . sh-mode)
+          auto-mode-alist))
+
 ;; Add my directories to load-path.
 (setq load-path (append
                  '("~/config/elisp")
@@ -430,6 +434,7 @@
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
+(define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #interval = 60*60
-interval = 60*60*5
+interval = 60*60*9
 
 import os, sys, time
 f = os.path.join(os.getenv('HOME'), 'notes', 'cal')
