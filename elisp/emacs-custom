@@ -97,6 +97,22 @@
 -- <date> | RELD   | file created
 --------------------------------------------------------------------
 
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.math_pack.all;
+use work.globals_pack.all;
+
+entity <filename> is
+
+    port (
+        reset_n : in std_logic;
+        clk     : in std_logic;
+
+        <cursor>
+        );
+
+end <filename>;
 ")
  '(vhdl-highlight-case-sensitive t)
  '(vhdl-highlight-signals t)
