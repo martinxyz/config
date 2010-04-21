@@ -28,6 +28,9 @@ for thing in things:
         command += ' | tar -xvj'
     elif thing.endswith('.tar'):
         command += ' | tar -xv'
+    elif thing.endswith('.zip'):
+        zipname = os.path.basename(thing)[:-4]
+        command = 'unzip -d "%s" "%s"' % (zipname, thing)
     elif thing.endswith('.avi'):
         if isurl:
             command = 'cd /video/ && wget ' + thing

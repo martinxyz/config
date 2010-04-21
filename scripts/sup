@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+if ! git svn rebase ; then
+    git stash
+    git svn rebase
+    git unstash
+fi
+
