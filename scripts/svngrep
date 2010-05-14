@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -d .svn ] ; then
+  grep --color $@ $(svn ls -R) | less
+else
+  echo 'No .svn directory found!'
+fi
+

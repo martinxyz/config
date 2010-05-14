@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+git ci -a -v
+git svn rebase
+git svn dcommit
+
