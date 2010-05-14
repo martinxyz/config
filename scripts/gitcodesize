@@ -18,13 +18,13 @@ else
   ) | sort -n
 fi
 
-exit 0
+#exit 0
 
 git log --format="%H" > revisions.tmp
 
 (
 for sha1 in $(cat revisions.tmp); do
-    git co -q $sha1
+    git co -f -q $sha1
     git ls-files|egrep '\.(hpp|cpp|c|h|cc|hh|py|i)$'|xargs cat|wc -l
 done
 git co -q master
@@ -34,7 +34,7 @@ rm revisions.tmp
 
 python -c "
 from pylab import *
-d = load('codesize.tmp')
+d = loadtxt('codesize.tmp')
 plot(d[::-1])
 show()
 "
