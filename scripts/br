@@ -1,3 +1,26 @@
 #!/bin/bash
-git branch $@
+#git branch $@
+for i in $(seq 100); do
+  if [ -d .git ]; then
+      break
+  fi
+  cd ..
+done
+
+if [ ! -d .git ]; then
+    echo "not a git repository"
+    exit 1
+fi
+
+current=$(cat .git/HEAD | sed -e 's/.*: refs.heads.//')
+
+ls -r -t --color=auto .git/refs/heads --file-type | tail | (
+  while read i; do
+    if [ "x$current" = "x$i" ] ; then
+        echo "* $i"
+    else
+        echo "  $i"
+    fi
+  done
+)
 
