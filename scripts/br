@@ -4,7 +4,7 @@ for i in $(seq 100); do
   if [ -d .git ]; then
       break
   fi
-  cd ..
+  cd -P ..
 done
 
 if [ ! -d .git ]; then

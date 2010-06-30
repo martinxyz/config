@@ -106,6 +106,13 @@ class PcapFile:
             raise EOFError()        
         return (hdr,data)
 
+    def __iter__(self):
+        while 1:
+            try:
+                yield self.read_frame()
+            except EOFError:
+                return
+
     def close(self):
         self.f.close()
 
