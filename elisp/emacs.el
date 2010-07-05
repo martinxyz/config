@@ -472,8 +472,11 @@
 (require 'recentf)
 (recentf-mode 1)
 
-; damit hungry delete auch in viper-insert mode geht
-(define-key viper-insert-global-user-map [backspace] 'c-electric-backspace)
+; info about modifying viper per-mode: http://www.cs.cmu.edu/cgi-bin/info2www?%28viper%29Key%20Bindings
+(setq my-python-modifier-map (make-sparse-keymap))
+(define-key my-python-modifier-map [backspace] 'py-electric-delete)
+;(viper-modify-major-mode 'python-mode 'vi-state my-python-modifier-map)
+(viper-modify-major-mode 'python-mode 'insert-state my-python-modifier-map)
 
 (defun w3m-copy-url-as-kill ()
   (interactive)
