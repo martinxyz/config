@@ -12,7 +12,7 @@ class PcapFile:
     def __init__(self, filename, mode='r', nanoseconds=False):
         self.mode = mode
         if mode == 'r':
-            self.f = file(filename,'r')
+            self.f = file(filename,'rb')
             self.__read_header()
         elif mode == 'w':
             self.nanoseconds = nanoseconds
