@@ -235,6 +235,10 @@
       (cons '(".*\\.do$" . sh-mode)
           auto-mode-alist))
 
+(setq auto-mode-alist 
+      (cons '(".*\\.pde$" . c-mode)
+          auto-mode-alist))
+
 ;; Add my directories to load-path.
 (setq load-path (append
                  '("~/config/elisp")
@@ -255,7 +259,7 @@
 ; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?ColorTheme
 (require 'color-theme)
 ;(color-theme-sitaramv-solaris)
-(color-theme-dark-laptop)
+(color-theme-dark-maxy)
 
 ; syntax highlighting on
 (global-font-lock-mode t)
@@ -286,8 +290,8 @@
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
 ;; groessere Schrift
-;(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
-(set-frame-font "-Misc-Fixed-Medium-R-Normal--15-140-75-75-C-90-ISO8859-1")
+(set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
+;(set-frame-font "-Misc-Fixed-Medium-R-Normal--15-140-75-75-C-90-ISO8859-1")
 
 ;; Neuerdings druecke ich Ctrl-x-c aus versehen...
 (defun ask-before-quit ()

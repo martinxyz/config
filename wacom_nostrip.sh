@@ -1,5 +1,5 @@
 #!/bin/bash
-pad='Wacom Intuos3 6x8 pad'
+pad='Wacom Intuos3 6x80 pad'
 xsetwacom set "$pad" StripLUp None
 xsetwacom set "$pad" StripRUp None
 xsetwacom set "$pad" StripLDn None

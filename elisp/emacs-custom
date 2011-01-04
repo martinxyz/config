@@ -62,6 +62,8 @@
  '(tool-bar-mode nil nil (tool-bar))
  '(toolbar-captioned-p nil)
  '(toolbar-visible-p nil)
+ '(tramp-prefix-format "//")
+ '(tramp-prefix-regexp "^//")
  '(transient-mark-mode nil)
  '(truncate-lines t)
  '(user-full-name "Martin Renold")
