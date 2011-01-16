@@ -12,6 +12,7 @@ if [ "$PS1" ]; then
     #eval `dircolors`
     #unalias ls
     alias ls='ls -r -t --color=auto '
+    alias l=ls
     alias pstree='pstree -G'
     alias qmv="qmv -e emacs --format=do"
     alias łess='less'
@@ -23,8 +24,7 @@ if [ "$PS1" ]; then
     alias ..="cd .."
     alias ...="cd ../.."
     alias ....="cd ../../.."
-
-    alias em='emacs -nw'
+    alias c=cd
 
     # set a fancy prompt
     PS1='\u@\h:\w\$ '
