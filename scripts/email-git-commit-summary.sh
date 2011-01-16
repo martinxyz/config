@@ -18,8 +18,10 @@ echo "new commits (oldest first):"
 echo
 if git log --reverse --oneline $tag..origin/master ; then
     echo
-    echo "details (oldest first):"
-    git log --reverse -p --stat $tag..origin/master
+    #echo "details (oldest first):"
+    #git log --reverse -p --stat $tag..origin/master
+    echo "Active Authors:"
+    git shortlog -n -s $tag..origin/master
 else
     echo
     echo "Hm, tag $tag does not exist yet?"

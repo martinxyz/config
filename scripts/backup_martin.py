@@ -2,7 +2,12 @@
 
 from os import system, path
 import rsyncbackup as rb
-targets = ['/backupstick', '/backupstick_sony']
+targets = [
+  '/backupstick',
+  '/backupstick_sony',
+  '/backupstick_sandisk',
+  '/backupstick_usbplatte',
+]
 success = 0
 for target in targets:
   system('mount ' + target + ' 2>/dev/null')

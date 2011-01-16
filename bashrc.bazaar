@@ -52,3 +52,5 @@ fi
 #   'echo $FOOBAR' will. This file seems to get "sourced".
 FOOBAR="blah"
 
+source /home/martin/config/cdargs-bash.sh
+

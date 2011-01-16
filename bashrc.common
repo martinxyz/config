@@ -68,3 +68,8 @@ export LESS='-R'
 
 ~/scripts/calshow.py
 
+# messy chdir history
+
+mkdir -p /home/martin/.chdir
+export PROMPT_COMMAND='( echo -n "$SECONDS " ; pwd ) >> /home/martin/.chdir/bash_$$.cwd'
+
