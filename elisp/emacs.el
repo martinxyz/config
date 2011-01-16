@@ -92,6 +92,14 @@
 (push '(vsim2 "^..Error in macro \\([^ ]+\\) line \\([0-9]+\\)" 1 2)
       compilation-error-regexp-alist-alist)
 
+; Error: Symbolic name "_clk3" is used but not defined File: /opt/altera9.1/quartus/libraries/megafunctions/altpll.tdf Line: 1376
+(add-to-list 'compilation-error-regexp-alist 'quartus1)
+; # Error in macro ./queue_fifo.do line 22
+;(push '(quartus1 "^Error.*File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
+;      compilation-error-regexp-alist-alist)
+(push '(quartus1 "File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
+      compilation-error-regexp-alist-alist)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
@@ -641,3 +649,5 @@
 ; http://github.com/mattharrison/emacs-starter-kit
 (require 'starter-kit-defuns)
 
+
+(put 'downcase-region 'disabled nil)

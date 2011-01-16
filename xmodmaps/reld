@@ -265,3 +265,6 @@ keycode  48 = Return adiaeresis adiaeresis agrave braceleft dead_caron
 keycode  21 = asciicircum grave asciicircum grave asciitilde ogonek
 ! "dead keys" fuer ¨
 keycode  35 = dead_diaeresis exclam dead_diaeresis exclam bracketright dead_macron
+
+keycode 135 = Multi_key
+
