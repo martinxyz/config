@@ -119,7 +119,12 @@ if __name__ == '__main__':
             line = sys.stdin.readline()
             if not line: sys.exit(0)
             s = process_line(line)
-            exec '_result_ = ' + s in userscope
+            try:
+                exec '_result_ = ' + s in userscope
+            except KeyboardInterrupt:
+                break
+            except Exception, e:
+                userscope['_result_'] = 'ERROR: ' + str(e)
             print userscope['_result_']
             print
     else:
