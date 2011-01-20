@@ -7,7 +7,7 @@ martin@reld:~$ timecalc
 
 09:30-12:00 + 13:10-17:06
 6.43 hours (6h 25min)
-9:25-11:30 + 12:40-19:50
+9.25-11.30 + 12.40-19.50
 9.25 hours (9h 14min)
 
 """
@@ -82,12 +82,14 @@ class Hours:
         
 def parsetime(s):
     "returns absolute time in hours (float)"
-    return time.mktime(time.strptime(s + '2000', '%H:%M%Y')) / (60.0*60.0)
+    s.replace(':', '.')
+    return time.mktime(time.strptime(s + '.2000', '%H.%M.%Y')) / (60.0*60.0)
 
 def process_line(line):
+    line = line.replace('/', ' + ')
     s = ''
     for part in line.split():
-        if part.count(':') == 2 and part.count('-') == 1:
+        if part.count(':')+part.count('.') == 2 and part.count('-') == 1:
             part = 'Hours("' + part + '")'
         s += part + ' '
     return s
