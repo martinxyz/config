@@ -1,15 +1,24 @@
 #!/usr/bin/env python
-"""Simple work-time calculator. Usage:
+"""Simple work-time calculator.
 
-martin@reld:~$ timecalc 
-# Enter time expressions in the form "07:30-10:54 + 13:15-18:15"
-# (python preprocessor replacing HH:MM-HH:MM with hours as float)
+Enter time expressions in the form "07:30-10:54 + 13:15-18:15"
+(python preprocessor replacing HH:MM-HH:MM with hours as float)
+
+Examples:
 
 09:30-12:00 + 13:10-17:06
 6.43 hours (6h 25min)
-9.25-11.30 + 12.40-19.50
-9.25 hours (9h 14min)
 
+09.30-12.00/13.10-17.06  # numpad friendly syntax
+6.43 hours (6h 25min)
+
+0.8*( 09.30-12.00/13.10-17.06 )
+5.15 hours (5h 8min)
+
+3*3+1 # use as calculator
+10
+
+---
 """
 
 import time
@@ -82,7 +91,7 @@ class Hours:
         
 def parsetime(s):
     "returns absolute time in hours (float)"
-    s.replace(':', '.')
+    s = s.replace(':', '.')
     return time.mktime(time.strptime(s + '.2000', '%H.%M.%Y')) / (60.0*60.0)
 
 def process_line(line):
@@ -104,9 +113,7 @@ def test():
 if __name__ == '__main__':
     import sys
     if len(sys.argv) == 1:
-        print '# Enter time expressions in the form "07:30-10:54 + 13:15-18:15"'
-        print '# (python preprocessor replacing HH:MM-HH:MM with hours as float)'
-        print
+        print __doc__
         userscope = {'Hours':Hours}
         while 1:
             line = sys.stdin.readline()
@@ -114,6 +121,7 @@ if __name__ == '__main__':
             s = process_line(line)
             exec '_result_ = ' + s in userscope
             print userscope['_result_']
+            print
     else:
         TODO
         """
