@@ -180,6 +180,16 @@
   (setq tab-width 8)
   )
 
+(defun wireshark-c-mode ()
+  "Wireshark c coding style"
+  (interactive)
+  (c-mode)
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode nil)
+  (c-set-offset 'substatement-open 0)
+  )
+
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
@@ -237,6 +247,10 @@
 
 (setq auto-mode-alist 
       (cons '(".*\\.pde$" . c-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
