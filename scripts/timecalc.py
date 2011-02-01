@@ -49,7 +49,7 @@ class Hours2(float):
         t = self.value
         days = int(t / 24.0)
         hours = int(t - days*24.0)
-        minutes = int((t - days*24.0 - hours) * 60.0)
+        minutes = int((t - days*24.0 - hours) * 60.0 + 0.5)
         s = str(minutes) + 'min)'
         if hours: s = str(hours) + 'h ' + s
         if days: s = str(days) + 'd ' + s
