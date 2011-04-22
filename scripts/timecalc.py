@@ -9,19 +9,19 @@ Examples:
 09:30-12:00 + 13:10-17:06
 6.43 hours (6h 25min)
 
-09.30-12.00/13.10-17.06  # numpad friendly syntax
+930-1200 + 1310-1706
+6.43 hours (6h 25min)
+
+09.30-12.00/1310-1706  # numpad friendly syntax
 6.43 hours (6h 25min)
 
 0.8*( 09.30-12.00/13.10-17.06 )
 5.15 hours (5h 8min)
 
-3*3+1 # use as calculator
-10
-
 ---
 """
 
-import time
+import time, re
 
 class Hours2(float):
     def __init__(self, value):
@@ -49,7 +49,7 @@ class Hours2(float):
         t = self.value
         days = int(t / 24.0)
         hours = int(t - days*24.0)
-        minutes = int((t - days*24.0 - hours) * 60.0)
+        minutes = int((t - days*24.0 - hours) * 60.0 + 0.5)
         s = str(minutes) + 'min)'
         if hours: s = str(hours) + 'h ' + s
         if days: s = str(days) + 'd ' + s
@@ -91,11 +91,18 @@ class Hours:
         
 def parsetime(s):
     "returns absolute time in hours (float)"
+
     s = s.replace(':', '.')
     return time.mktime(time.strptime(s + '.2000', '%H.%M.%Y')) / (60.0*60.0)
 
 def process_line(line):
     line = line.replace('/', ' + ')
+
+    # 1310-1706 --> 13:10-17:06
+    #  910-1706 --> 9:10-17:06
+    #       910 --> 910
+    line = re.sub(r'\b(\d?\d)[:.]?(\d\d)-(\d?\d)[:.]?(\d\d)\b', r'\1:\2-\3:\4', line)
+
     s = ''
     for part in line.split():
         if part.count(':')+part.count('.') == 2 and part.count('-') == 1:

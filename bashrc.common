@@ -72,5 +72,5 @@ complete -o bashdefault -o default -o nospace -F _git i
 # messy chdir history
 
 mkdir -p /home/martin/.chdir
-export PROMPT_COMMAND='( echo -n "$SECONDS " ; pwd ) >> /home/martin/.chdir/bash_$$.cwd'
+export PROMPT_COMMAND='(( echo -n "$SECONDS " ; pwd ) >> /home/martin/.chdir/bash_$$.cwd ) 2>/dev/null'
 
