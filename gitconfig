@@ -4,9 +4,11 @@
 
   [color]
     ui = auto
-	diff = auto
-	status = auto
-	branch = auto
+    #ui = always
+    #diff = auto
+    status = always
+    #branch = auto
+    
   [color "branch"]
     current = yellow reverse
     local = yellow
@@ -26,11 +28,21 @@
     ci = commit
     br = branch
     co = checkout
-    df = diff
-    lg = log -p
     ann = annotate
-	unstage = reset HEAD
-	unstash = stash pop
+    unstage = reset HEAD
+    unstash = stash pop
+    w = whatchanged
+    ds = !git --no-pager diff --stat -M -w HEAD
+
+    # from http://stackoverflow.com/questions/267761/what-does-your-gitconfig-contain
+
+    # show list of contributors in descending order by number of commits
+    rank = shortlog -sn --no-merges
+    # given a string for an author, try to figure out full name and email:
+    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    # given any git object, try to show it briefly
+    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+
 [core]
 	excludesfile = /home/martin/.gitignore
 [giggle]
@@ -46,3 +58,9 @@
 [gui]
 	fontui = -family \"DejaVu Sans\" -size 14 -weight normal -slant roman -underline 0 -overstrike 0
 	fontdiff = -family \"DejaVu Sans Mono\" -size 14 -weight normal -slant roman -underline 0 -overstrike 0
+[rerere]
+	enabled = 1
+[advice]
+    statusHints = false
+    detachedHead = false
+

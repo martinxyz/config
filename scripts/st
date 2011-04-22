@@ -5,10 +5,15 @@ if [ -d .svn ]; then
     exit $?
 fi
 
-moreargs=''
-if [ x$1 = x-q ] ; then
-    shift
-    moreargs='-uno'
-fi
-eg status $moreargs $@ 
+#moreargs=''
+#if [ x$1 = x-q ] ; then
+#    shift
+#    moreargs='-uno'
+#fi
+##eg status $moreargs $@ 
+#git status -u no $@ | grep -v '^# On branch .*'
+
+#git --no-pager diff --stat -M -w --relative
+
+git status --short | grep -v '^.....??'
 
