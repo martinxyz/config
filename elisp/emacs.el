@@ -208,6 +208,9 @@
       (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/coldfire.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
