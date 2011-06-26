@@ -52,7 +52,7 @@ fi
 #   'echo $FOOBAR' will. This file seems to get "sourced".
 FOOBAR="blah"
 
-add_prefix ~/compile/prefix_wine
+#add_prefix ~/compile/prefix_wine
 #export LIBGL_DRIVERS_PATH=/usr/lib32/dri
 
 source /home/martin/config/cdargs-bash.sh
