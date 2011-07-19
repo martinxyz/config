@@ -1,9 +1,11 @@
 #!/bin/bash
 # (this script is meant to run as cronjob)
+
+(
 set -e
 
-if [ $# -ne 1 ] ; then
-    echo "usage: $0 <path_to_git_repository>"
+if [ $# -ne 2 ] ; then
+    echo "usage: $0 <path_to_git_repository> <email subject>"
     exit 1
 fi
 
@@ -28,4 +30,8 @@ else
     echo "I am creating it now. See you later."
 fi
 git tag -f $tag origin/master
+
+) > /tmp/commits$$.txt 2>&1
+
+mail -s "[commits] $2" martin < /tmp/commits$$.txt
 
