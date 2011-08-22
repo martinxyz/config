@@ -233,6 +233,10 @@
           auto-mode-alist))
 
 (setq auto-mode-alist 
+      (cons '(".*\\.do$" . tcl-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
       (cons '(".*\\.m$" . octave-mode)
           auto-mode-alist))
 
