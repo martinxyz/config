@@ -28,6 +28,9 @@
     ci = commit
     br = branch
     co = checkout
+    ls = ls-files
+    cp = cherry-pick
+    pick = cherry-pick
     ann = annotate
     unstage = reset HEAD
     unstash = stash pop
@@ -42,6 +45,7 @@
     whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
     # given any git object, try to show it briefly
     whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+	staged = diff --cached
 
 [core]
 	excludesfile = /home/martin/.gitignore
@@ -63,4 +67,6 @@
 [advice]
     statusHints = false
     detachedHead = false
+    pushNonFastForward = false
+
 

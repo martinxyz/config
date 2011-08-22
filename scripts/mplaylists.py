@@ -377,7 +377,7 @@ def Main(pool, selectSongFunc = RandomPoolSong):
     # tcp connections
     factory = protocol.Factory()
     factory.protocol = Prompt
-    reactor.listenTCP(28443, factory)
+    reactor.listenTCP(28443, factory, interface="127.0.0.1")
 
     # commandline connection
     global commandline

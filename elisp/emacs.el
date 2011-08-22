@@ -180,6 +180,15 @@
   (setq tab-width 8)
   )
 
+(defun gtk-c-mode ()
+  (interactive)
+  (c-mode)
+  (c-set-style "gnu")
+  (setq indent-tabs-mode t)
+  (setq show-trailing-whitespace t)
+  (setq tab-width 8)
+  )
+
 (defun wireshark-c-mode ()
   "Wireshark c coding style"
   (interactive)
@@ -220,7 +229,7 @@
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*/gtk+.*/.*\\.[ch]$" . gimp-c-mode)
+      (cons '(".*/gtk+.*/.*\\.[ch]$" . gtk-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*\\.mas$" . python-mode)

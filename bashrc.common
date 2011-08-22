@@ -34,6 +34,8 @@ if [ "$PS1" ]; then
     # resize correctly, please
     #export PROMPT_COMMAND='kill -WINCH $$'
     shopt -s checkwinsize
+
+    alias en="export LC_MESSAGES=C"
 fi
 
 export HISTIGNORE='*#[Rr][Mm]:?:halt'
