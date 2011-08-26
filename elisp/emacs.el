@@ -223,6 +223,9 @@
       (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/coldfire.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
@@ -242,6 +245,10 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*SConstruct$" . python-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*\\.do$" . tcl-mode)
           auto-mode-alist))
 
 (setq auto-mode-alist 
