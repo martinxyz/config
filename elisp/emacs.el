@@ -100,6 +100,12 @@
 (push '(quartus1 "File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
       compilation-error-regexp-alist-alist)
 
+; fix from https://bugs.launchpad.net/ubuntu/+source/emacs23/+bug/814468
+(add-to-list 'compilation-error-regexp-alist 'gcc_include_fix)
+(push '(gcc_include_fix "^\\(?:In file included\\|                \\) from \
++\\([^:]+\\):\\([0-9]+\\)\\(?::[0-9]+\\)?[:,]$" 1 2)
+      compilation-error-regexp-alist-alist)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
