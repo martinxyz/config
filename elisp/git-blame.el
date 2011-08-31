@@ -384,6 +384,16 @@ See also function `git-blame-mode'."
           (puthash hash info git-blame-cache)
           info))))
 
+(defun mo-git-blame-commit-info-to-time (entry)
+  (let* ((tz "+0200")
+         (mult (if (string= "+" (substring tz 0 1)) 1 -1))
+         (hours (string-to-number (substring tz 1 3)))
+         (minutes (string-to-number (substring tz 3 5))))
+    (seconds-to-time (+ (string-to-number entry)
+                        (* mult
+                           (+ (* minutes 60)
+                              (* hours 3600)))))))
+
 (defun git-blame-create-overlay (info start-line num-lines)
   (save-excursion
     (set-buffer git-blame-file)
@@ -396,10 +406,11 @@ See also function `git-blame-mode'."
              (hash (car info))
              (spec `((?h . ,(substring hash 0 6))
                      (?H . ,hash)
-                     (?a . ,(git-blame-get-info info 'author))
+                     (?a . ,(car (split-string (git-blame-get-info info 'author))))
                      (?A . ,(git-blame-get-info info 'author-mail))
                      (?c . ,(git-blame-get-info info 'committer))
                      (?C . ,(git-blame-get-info info 'committer-mail))
+                     (?t . ,(format-time-string "%Y-%m-%d" (mo-git-blame-commit-info-to-time (git-blame-get-info info 'committer-time)) t))
                      (?s . ,(git-blame-get-info info 'summary)))))
         (push ovl git-blame-overlays)
         (overlay-put ovl 'git-blame info)
