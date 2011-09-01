@@ -148,6 +148,9 @@
        (c-set-offset 'substatement-open 0)
        (setq tab-width 8))
 
+;(setq-default c-electric-flag nil)
+(setq-default c-brace-newlines nil)
+
 (defun wesnoth-c-mode ()
   "Wesnoth cpp coding style"
   (interactive)
@@ -707,3 +710,24 @@
 
 
 (put 'downcase-region 'disabled nil)
+
+;; -----------------------------------------------------------------------------
+;; Git support
+;; -----------------------------------------------------------------------------
+;(load "/usr/share/git-core/emacs/git.el")
+;(load "/usr/share/git-core/emacs/vc-git.el")
+;(add-to-list 'vc-handled-backends 'GIT)
+
+(require 'git-blame) ; note: modified version of git-blame.el
+(define-key viper-vi-local-user-map "B" 'git-blame-mode)
+
+
+;(add-to-list 'load-path "~/compile/mo-git-blame")
+
+;(autoload 'mo-git-blame-file "mo-git-blame" nil t)
+;(autoload 'mo-git-blame-current "mo-git-blame" nil t)
+
+;Optionally bind keys to these functions, e.g.
+;
+;(global-set-key [?\C-c ?g ?c] 'mo-git-blame-current)
+;(global-set-key [?\C-c ?g ?f] 'mo-git-blame-file)
