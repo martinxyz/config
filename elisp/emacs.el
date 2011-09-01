@@ -106,6 +106,16 @@
 +\\([^:]+\\):\\([0-9]+\\)\\(?::[0-9]+\\)?[:,]$" 1 2)
       compilation-error-regexp-alist-alist)
 
+; own fix
+;(add-to-list 'compilation-error-regexp-alist 'unresolved_reference)
+;(push '(unresolved_reference "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+;      compilation-error-regexp-alist-alist)
+
+; own fix
+(add-to-list 'compilation-error-regexp-alist 'unresolved_reference2 t)
+(push '(unresolved_reference2 "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+      compilation-error-regexp-alist-alist)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
@@ -495,6 +505,16 @@
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
 (define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
+
+(global-set-key "%" 'match-paren)
+
+; from http://grok2.tripod.com/
+(defun match-paren (arg)
+  "Go to the matching paren if on a paren; otherwise insert %."
+  (interactive "p")
+  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+        (t (self-insert-command (or arg 1)))))
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
