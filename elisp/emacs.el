@@ -62,7 +62,7 @@
 
 ;(global-set-key "\C-z" 'undo)
 
-; Kleineres Fenster für die Fehlermeldungen
+; Kleineres Fenster fÃ¼r die Fehlermeldungen
 ;(setq compilation-window-height 8)
 
 ;;setq compile-command '("gmake"))
@@ -387,7 +387,7 @@
 
 (column-number-mode t)
 
-; Nützlich für "Search & Replace" in einer Region
+; NÃ¼tzlich fÃ¼r "Search & Replace" in einer Region
 (put 'narrow-to-region 'disabled nil)
 
 ; indent with spaces, never tabs (for details google "emacs tabs")
@@ -495,7 +495,7 @@
 (define-key viper-vi-local-user-map "K" 'kill-this-buffer)
 ;(define-key viper-vi-local-user-map "K" 'bury-buffer)
 ;(define-key viper-vi-local-user-map "P" 'yank-pop)
-;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
+;(define-key viper-vi-local-user-map "Ã¤" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
 (define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
 
@@ -530,6 +530,8 @@
 (global-set-key "\M-k"  'pager-some-rows-up)
 (global-set-key "\M-j"  'pager-some-rows-down)
 (define-key c-mode-base-map "\M-j"  'pager-some-rows-down)
+(define-key viper-vi-local-user-map "[" 'pager-some-rows-down) ; kinesis
+(define-key viper-vi-local-user-map "]" 'pager-some-rows-up) ; kinesis
 
 ; speichert liste von zuletzt geoeffneten dateien beim Beenden
 (require 'recentf)
@@ -588,7 +590,7 @@
 
 ; ... funktionniert alles nicht. Egal, ich lasse es mal da.
 
-;; Transparentes editieren über ssh, sudo, ftp, samba, ...
+;; Transparentes editieren Ã¼ber ssh, sudo, ftp, samba, ...
 ;; Einfach eine Datei mit folgendem Namen oeffnen:
 ;; ssh   /remotehost:filename
 ;; sudo  /sudo::/etc/X11/XF86Config-4
@@ -621,7 +623,7 @@
 ;
 ; Faster incremental search. (without pressing return)
 ; - bind viper / to isearch
-; - bind viper ä to reverse isearch
+; - bind viper Ã¤ to reverse isearch
 ; - remap keys within the search (disallow searching for:)
 ;   - type space to confirm the search.
 ;   - type / to find the next
@@ -660,6 +662,7 @@
 ;(prefer-coding-system 'mule-utf-8)
 
 (global-set-key "\M-l" 'dabbrev-expand) ; windows-tastaturen haben den / nicht in reichweite
+(global-set-key "Å‚" 'dabbrev-expand) ; kinesis AltGr-l
 
 ;(load-library "ispell")
 ;(setq ispell-program-name "aspell")

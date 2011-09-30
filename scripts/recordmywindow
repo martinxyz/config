@@ -1,0 +1,4 @@
+#!/bin/bash
+
+recordmydesktop --no-sound --windowid=$(xwininfo | awk '/Window id:/ {print $4}')
+
