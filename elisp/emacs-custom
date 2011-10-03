@@ -67,6 +67,7 @@
  '(tool-bar-mode nil nil (tool-bar))
  '(toolbar-captioned-p nil)
  '(toolbar-visible-p nil)
+ '(tramp-mode nil)
  '(tramp-prefix-format "//" t)
  '(tramp-prefix-regexp "^//" t)
  '(transient-mark-mode nil)
