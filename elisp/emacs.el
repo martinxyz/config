@@ -507,8 +507,8 @@
 (define-key viper-vi-local-user-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
 (define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
-(global-set-key (kbd "C-.") 'ido-imenu)
-(define-key viper-vi-local-user-map ":" 'ido-imenu)
+(global-set-key (kbd "C-.") 'my-jump-to-tag)
+(define-key viper-vi-local-user-map ":" 'my-jump-to-tag)
 
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
