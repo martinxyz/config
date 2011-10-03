@@ -232,9 +232,9 @@
 (setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
           auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
-          auto-mode-alist))
+;(setq auto-mode-alist 
+;      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
+;          auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
@@ -287,6 +287,10 @@
 (setq auto-mode-alist 
       (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
           auto-mode-alist))
+
+;(setq auto-mode-alist 
+;      (cons '(".*/ptp2_.*\\.[ch]$" . ines-c-mode)
+;          auto-mode-alist))
 
 ;; Add my directories to load-path.
 (setq load-path (append
