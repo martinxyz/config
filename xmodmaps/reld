@@ -268,3 +268,52 @@ keycode  35 = dead_diaeresis exclam dead_diaeresis exclam bracketright dead_macr
 
 keycode 135 = Multi_key
 
+! shift + shift = ShiftLock (CapsLock replacement)
+!keycode 50 =  Shift_L Shift_Lock
+!keycode 62 =  Shift_R Shift_Lock
+keycode 50 =  Shift_L Caps_Lock Caps_Lock Caps_Lock Caps_Lock
+keycode 62 =  Shift_R Caps_Lock Caps_Lock Caps_Lock Caps_Lock
+
+add     lock    = Caps_Lock
+
+keycode 135 = Menu
+
+! kinesis keyboard mappings (no AltGr)
+! pipe insted of backtick (`)
+keycode  21 = asciicircum bar asciicircum bar asciitilde ogonek
+! tilde(home) instead of sterling (£)
+! comment numbersign (#) instead of ccedilla (ç)
+keycode  13 = 4 numbersign 4 numbersign onequarter dollar onequarter dollar
+
+! Kinesis number row: AltGr works the same as Shift.
+! Row: 67890
+keycode  15 = 6 ampersand 6 ampersand ampersand ampersand ampersand ampersand 
+keycode  16 = 7 parenleft 7 parenleft parenleft parenleft parenleft parenleft 
+keycode  17 = 8 parenright 8 parenright parenright parenright parenright parenright
+keycode  18 = 9 backslash 9 backslash backslash backslash backslash backslash
+keycode  19 = 0 equal 0 equal equal equal equal equal
+keycode  20 = apostrophe question apostrophe question question question question question 
+
+! Kinesis AltGr mappings of normal right-hand letters
+! Row: zuiop
+keycode  29 = z Z z Z leftarrow yen leftarrow yen
+keycode  30 = u U u U less less less less
+keycode  31 = i I i I greater greater greater greater 
+keycode  32 = o O o O plus plus plus plus
+keycode  33 = p P p P XF86Paste XF86Paste XF86Paste XF86Paste
+keycode  51 = dollar asciitilde dollar asciitilde asciitilde asciitilde asciitilde asciitilde 
+
+! Row: hjMkl/
+keycode  43 = h H h H hstroke Hstroke hstroke Hstroke
+keycode  44 = j J j J bracketleft bracketleft bracketleft bracketleft
+keycode  45 = k K k K bracketright bracketright bracketright bracketright 
+keycode  46 = l L l L lstroke Lstroke lstroke Lstroke
+keycode  47 = slash semicolon slash semicolon semicolon semicolon semicolon semicolon
+keycode  48 = Return adiaeresis Return adiaeresis adiaeresis adiaeresis adiaeresis adiaeresis
+
+! Row: nm,.-
+keycode  57 = n N n N n N n N
+keycode  58 = m M m M braceleft braceleft braceleft braceleft
+keycode  59 = comma semicolon comma semicolon braceright braceright braceright
+keycode  60 = period colon period colon colon colon colon colon
+keycode  61 = minus underscore minus underscore underscore underscore underscore underscore

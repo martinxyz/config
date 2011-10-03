@@ -485,19 +485,31 @@
 ;(define-key viper-vi-local-user-map "-" 'hs-hide-all)
 ;(define-key viper-vi-local-user-map "+" 'hs-show-all)
 
-(global-set-key "\M-." (lambda () (interactive)
-                         (setq last-tags-jump-was-find-tag t)
-                         (call-interactively 'find-tag)))
-(define-key viper-vi-local-user-map "," (lambda () (interactive)
-                                          (setq last-tags-jump-was-find-tag nil)
-                                          (call-interactively 'tags-search)))
-(global-set-key "\M-," (lambda () (interactive)
-                         (if last-tags-jump-was-find-tag
-                             (progn
-                               (find-tag nil t)
-                               (ring-remove find-tag-marker-ring 0))
-                           (tags-loop-continue))))
+(defun my-jump-to-tag ()
+  (interactive)
+  (setq last-tags-jump-was-find-tag t)
+  (call-interactively 'find-tag))
+
+(defun my-continue-tag-search ()
+  (interactive)
+  (if last-tags-jump-was-find-tag
+      (progn
+        (find-tag nil t)
+        (ring-remove find-tag-marker-ring 0))
+    (tags-loop-continue)))
+
+(defun my-start-tag-grep ()
+  (interactive)
+  (setq last-tags-jump-was-find-tag nil)
+  (call-interactively 'tags-search))
+
+(global-set-key "\M-." 'my-jump-to-tag)
+(define-key viper-vi-local-user-map "," 'my-start-tag-grep)
+(global-set-key "\M-," 'my-continue-tag-search)
+(define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
 (global-set-key (kbd "C-.") 'ido-imenu)
+(define-key viper-vi-local-user-map ":" 'ido-imenu)
+
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
 ;(define-key viper-vi-local-user-map "W" 'kill-region)
