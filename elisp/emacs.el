@@ -106,6 +106,16 @@
 +\\([^:]+\\):\\([0-9]+\\)\\(?::[0-9]+\\)?[:,]$" 1 2)
       compilation-error-regexp-alist-alist)
 
+; own fix
+;(add-to-list 'compilation-error-regexp-alist 'unresolved_reference)
+;(push '(unresolved_reference "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+;      compilation-error-regexp-alist-alist)
+
+; own fix
+(add-to-list 'compilation-error-regexp-alist 'unresolved_reference2 t)
+(push '(unresolved_reference2 "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+      compilation-error-regexp-alist-alist)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
@@ -222,9 +232,9 @@
 (setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
           auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
-          auto-mode-alist))
+;(setq auto-mode-alist 
+;      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
+;          auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
@@ -277,6 +287,10 @@
 (setq auto-mode-alist 
       (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
           auto-mode-alist))
+
+;(setq auto-mode-alist 
+;      (cons '(".*/ptp2_.*\\.[ch]$" . ines-c-mode)
+;          auto-mode-alist))
 
 ;; Add my directories to load-path.
 (setq load-path (append
@@ -471,19 +485,31 @@
 ;(define-key viper-vi-local-user-map "-" 'hs-hide-all)
 ;(define-key viper-vi-local-user-map "+" 'hs-show-all)
 
-(global-set-key "\M-." (lambda () (interactive)
-                         (setq last-tags-jump-was-find-tag t)
-                         (call-interactively 'find-tag)))
-(define-key viper-vi-local-user-map "," (lambda () (interactive)
-                                          (setq last-tags-jump-was-find-tag nil)
-                                          (call-interactively 'tags-search)))
-(global-set-key "\M-," (lambda () (interactive)
-                         (if last-tags-jump-was-find-tag
-                             (progn
-                               (find-tag nil t)
-                               (ring-remove find-tag-marker-ring 0))
-                           (tags-loop-continue))))
-(global-set-key (kbd "C-.") 'ido-imenu)
+(defun my-jump-to-tag ()
+  (interactive)
+  (setq last-tags-jump-was-find-tag t)
+  (call-interactively 'find-tag))
+
+(defun my-continue-tag-search ()
+  (interactive)
+  (if last-tags-jump-was-find-tag
+      (progn
+        (find-tag nil t)
+        (ring-remove find-tag-marker-ring 0))
+    (tags-loop-continue)))
+
+(defun my-start-tag-grep ()
+  (interactive)
+  (setq last-tags-jump-was-find-tag nil)
+  (call-interactively 'tags-search))
+
+(global-set-key "\M-." 'my-jump-to-tag)
+(define-key viper-vi-local-user-map "," 'my-start-tag-grep)
+(global-set-key "\M-," 'my-continue-tag-search)
+(define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
+(global-set-key (kbd "C-.") 'my-jump-to-tag)
+(define-key viper-vi-local-user-map ":" 'my-jump-to-tag)
+
 (define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
 ;(define-key viper-vi-local-user-map "W" 'kill-region)
@@ -498,6 +524,16 @@
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
 (define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
+
+(global-set-key "%" 'match-paren)
+
+; from http://grok2.tripod.com/
+(defun match-paren (arg)
+  "Go to the matching paren if on a paren; otherwise insert %."
+  (interactive "p")
+  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+        (t (self-insert-command (or arg 1)))))
 
 ; better scrolling
 ; http://user.it.uu.se/~mic/emacs.html
