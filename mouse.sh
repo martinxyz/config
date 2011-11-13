@@ -24,5 +24,5 @@ xinput --set-prop $mouse "Device Accel Profile" 2
 xinput set-ptr-feedback $mouse 0 21 10
 
 #xinput list-props $mouse
-#echo mouse=$mouse
+echo mouse=$mouse
 

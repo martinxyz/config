@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ipython qtconsole --no-confirm-exit --pylab=inline >/dev/null 2>&1 &
+
