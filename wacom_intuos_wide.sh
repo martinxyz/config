@@ -22,8 +22,8 @@ xsetwacom set "$pad" button9 "core key ctrl alt 9"
 (( w = 40640 )) # intuos active area
 (( h = 30480 )) # intuos active area
 # 1920 1080 <-- wide screen (16:9)
-(( w2 = w*6/10 ))
-(( h2 = w2*9/16 ))
+(( w2 = w*6/10 )) # reduce active area, because it is too large for my taste
+(( h2 = w2*9/16 )) # calculate height required to get the correct ratio
 (( topx = 0 ))
 (( topy = h - h2 ))
 (( bottomx = topx + w2 ))
