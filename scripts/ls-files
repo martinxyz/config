@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+if test $# -eq 1; then
+  cd -P $1
+fi
+git ls-files | (
+while read line; do
+    echo "$(pwd)/$line"
+done
+)
+
