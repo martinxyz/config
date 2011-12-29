@@ -525,7 +525,8 @@
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
 (define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
 
-(global-set-key "%" 'match-paren)
+;(global-set-key "%" 'match-paren)
+(define-key viper-vi-local-user-map "%" 'match-paren)
 
 ; from http://grok2.tripod.com/
 (defun match-paren (arg)
