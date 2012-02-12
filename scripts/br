@@ -1,30 +1,17 @@
 #!/bin/bash
-if [ $# -ne 0 ]; then
-  git branch $@
-  exit $?
-fi
+# This is a replacement for the status display of "git branch". 
+# I found git's alphabetic sort very useless. This sorts the output by
+# usage (recently modified branches last) and only shows the 10 most
+# recent ones.
+#
+# (See also the 'brr' script for remote branches and stashes.)
 
-for i in $(seq 100); do
-  if [ -d .git ]; then
-      break
-  fi
-  cd -P ..
-done
-
-if [ ! -d .git ]; then
-    echo "not a git repository"
-    exit 1
-fi
-
-current=$(cat .git/HEAD | sed -e 's/.*: refs.heads.//')
-
-ls -r -t --color=auto .git/refs/heads --file-type | tail | (
-  while read i; do
-    if [ "x$current" = "x$i" ] ; then
-        echo "* $i"
-    else
-        echo "  $i"
-    fi
-  done
-)
+export GIT_PAGER= 
+git log --branches --not --tags\
+    --simplify-by-decoration\
+    -10 --reverse --decorate --oneline\
+    --format=%d \
+|sed -e 's/[()]/ /g'\
+|sed -e 's/  HEAD, /* /' \
+|sed -e 's/^\(.\).*, /\1 /'
 

@@ -1,0 +1,8 @@
+#!/bin/sh
+# List recently active branches, both local and remote.
+# See also 'br' and 'brg' commands.
+export GIT_PAGER=
+git log -13 --all --simplify-by-decoration --decorate\
+        --oneline --reverse --color=always \
+| sed -e 's/^[^ ]* //'\
+| less --chop-long-lines --no-init --QUIT-AT-EOF
