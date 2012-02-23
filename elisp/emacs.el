@@ -288,6 +288,10 @@
       (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
           auto-mode-alist))
 
+(setq auto-mode-alist 
+      (cons '(".*/linux_ts.*/.*\\.[ch]$" . ines-hsr-mode)
+          auto-mode-alist))
+
 ;(setq auto-mode-alist 
 ;      (cons '(".*/ptp2_.*\\.[ch]$" . ines-c-mode)
 ;          auto-mode-alist))
