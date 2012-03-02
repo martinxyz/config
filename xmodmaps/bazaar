@@ -30,7 +30,7 @@ keycode 62 =  Shift_R Caps_Lock
 
 keycode 135 = Menu
 
-! kinesis keyboard mappings (no AltGr)
+! kinesis keyboard mappings
 ! pipe insted of backtick (`)
 keycode  21 = asciicircum bar asciicircum bar asciitilde ogonek
 ! tilde(home) instead of sterling (£)

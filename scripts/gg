@@ -1,0 +1,5 @@
+#!/bin/bash
+# git grep, as used from emacs M-x grep
+export PAGER=
+git grep -nH --color=never -E "$@"
+

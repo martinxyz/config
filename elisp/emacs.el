@@ -540,6 +540,9 @@
 ; http://user.it.uu.se/~mic/emacs.html
 (require 'pager)
 
+; see emacs wiki
+(require 'wgrep)
+
 (defun pager-some-rows-down ()
   (interactive)
   (pager-row-down)
