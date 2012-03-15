@@ -6,6 +6,11 @@
 #
 # (See also the 'brr' script for remote branches and stashes.)
 
+if test $# -ne 0 ; then
+    git branch "$@"
+    exit $?
+fi
+
 export GIT_PAGER= 
 git log --branches --not --tags\
     --simplify-by-decoration\
