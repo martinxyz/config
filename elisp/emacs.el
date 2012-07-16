@@ -42,10 +42,13 @@
 (global-set-key  [f6]  'next-multiframe-window)
 ;(global-set-key  [f7]  'switch-to-other-buffer)
 (global-set-key  [f8]  'compile)
+;(global-set-key  [f9]  (lambda () (interactive)
+;						 (desktop-save-in-desktop-dir)
+;                         (if compilation-in-progress (kill-compilation))
+;                         (run-at-time 0.3 nil 'recompile)))
 (global-set-key  [f9]  (lambda () (interactive)
-						 (desktop-save-in-desktop-dir)
-                         (if compilation-in-progress (kill-compilation))
-                         (run-at-time 0.3 nil 'recompile)))
+                         (desktop-save-in-desktop-dir)
+                         (run-at-time 0.1 nil 'recompile)))
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
@@ -172,7 +175,7 @@
   (c-set-offset 'substatement-open 0)
   )
 
-(defun ines-hsr-mode ()
+(defun ines-notab-c-mode ()
   "InES c coding style"
   (interactive)
   (c-mode)
@@ -232,9 +235,9 @@
 (setq auto-mode-alist 
       (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
           auto-mode-alist))
-;(setq auto-mode-alist 
-;      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-c-mode)
-;          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-notab-c-mode)
+            auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
@@ -242,7 +245,7 @@
       (cons '(".*/coldfire.*\\.[ch]$" . ines-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
-      (cons '(".*/hsr.*\\.[ch]$" . ines-hsr-mode)
+      (cons '(".*/hsr.*\\.[ch]$" . ines-notab-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
@@ -289,12 +292,12 @@
           auto-mode-alist))
 
 (setq auto-mode-alist 
-      (cons '(".*/linux_ts.*/.*\\.[ch]$" . ines-hsr-mode)
+      (cons '(".*/linux_ts.*/.*\\.[ch]$" . ines-notab-c-mode)
           auto-mode-alist))
 
-;(setq auto-mode-alist 
-;      (cons '(".*/ptp2_.*\\.[ch]$" . ines-c-mode)
-;          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/ptp2_.*\\.[ch]$" . ines-notab-c-mode)
+          auto-mode-alist))
 
 ;; Add my directories to load-path.
 (setq load-path (append
