@@ -1469,7 +1469,7 @@ class PerfParser(LineParser):
     def parse_call(self):
         line = self.consume()
         mo = self.call_re.match(line)
-        assert mo
+        assert mo, repr(line)
         if not mo:
             return None
 
