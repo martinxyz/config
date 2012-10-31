@@ -9,6 +9,8 @@ keycode  48 = Return adiaeresis Return adiaeresis braceleft dead_caron
 
 keycode  49 = section degree notsign notsign notsign notsign
 
+keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
+
 ! (windows key = Mod4, not changing this any more)
 
 ! scroll-lock
@@ -37,7 +39,32 @@ keycode  21 = asciicircum bar asciicircum bar asciitilde ogonek
 ! comment numbersign (#) instead of ccedilla (ç)
 keycode  13 = 4 numbersign 4 numbersign onequarter dollar onequarter dollar
 
+!!! Check numberrow - shift:
+!       ^1234567890'  --- die Reihe ist okay, und memorisiert.
+! Shift |+"*#%&()\=?  --- 
+! Altgr ~|@*#%&()\=?
+!
+! Kommentare: ~ nehme ich eh immer von rechts
+!             # ist nicht konsistent mit Standardlayout (dort eins links)
+!             @ nehme ich immer auf dem Q (aber ist ein-hand murks)
+!             + muss ich immer suchen. Altgr-O ueben... (neu: Altgr-P = minus)
+! Frei:
+!   Altgr-Z
+!   Altgr-H
+!   Altgr-N
+!   Taste under dem L und . tippt zur Zeit üè[ (nie benutzt, auch nicht nah)
+!   Shift-Enter-Kleinfinger (ä) brauche ich nicht, glaubs, ist noch bequem.
+!   Links-Einhandkombos Altgr-Aæ,Dð,Fđ,Y«,X»,C¢,V“,B”,Gŋ,R¶
+
 ! Kinesis number row: AltGr works the same as Shift.
+! Row: 12345
+keycode  10 = 1 plus 1 plus bar exclamdown bar exclamdown 1 plus bar exclamdown
+keycode  11 = 2 quotedbl 2 quotedbl at oneeighth at oneeighth 2 quotedbl at oneeighth
+keycode  12 = 3 asterisk 3 asterisk asterisk asterisk asterisk asterisk 
+keycode  13 = 4 numbersign 4 numbersign numbersign numbersign numbersign numbersign
+keycode  14 = 5 percent 5 percent percent percent percent percent
+
+
 ! Row: 67890
 keycode  15 = 6 ampersand 6 ampersand ampersand ampersand ampersand ampersand 
 keycode  16 = 7 parenleft 7 parenleft parenleft parenleft parenleft parenleft 
@@ -52,7 +79,7 @@ keycode  29 = z Z z Z leftarrow yen leftarrow yen
 keycode  30 = u U u U less less less less
 keycode  31 = i I i I greater greater greater greater 
 keycode  32 = o O o O plus plus plus plus
-keycode  33 = p P p P XF86Paste XF86Paste XF86Paste XF86Paste
+keycode  33 = p P p P minus minus minus minus
 keycode  51 = dollar asciitilde dollar asciitilde asciitilde asciitilde asciitilde asciitilde 
 
 ! Row: hjMkl/
@@ -69,3 +96,5 @@ keycode  58 = m M m M braceleft braceleft braceleft braceleft
 keycode  59 = comma semicolon comma semicolon braceright braceright braceright
 keycode  60 = period colon period colon colon colon colon colon
 keycode  61 = minus underscore minus underscore underscore underscore underscore underscore
+
+

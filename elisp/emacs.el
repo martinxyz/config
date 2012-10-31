@@ -221,6 +221,16 @@
   (c-set-offset 'substatement-open 0)
   )
 
+(defun cura-py-mode ()
+  "Python with tabs instead of spaces"
+  (interactive)
+  (python-mode)
+  ; indent with tabs only.
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode t)
+  (c-set-offset 'substatement-open 0)
+  )
 ;; TODO: Im c-mode beim Laden einer Datei 
 ;; den fremden Stil erkennen und automatisch einstellen.
 (setq auto-mode-alist 
@@ -288,6 +298,10 @@
           auto-mode-alist))
 
 (setq auto-mode-alist 
+      (cons '(".*\\.ino$" . c-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
       (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
           auto-mode-alist))
 
@@ -297,6 +311,10 @@
 
 (setq auto-mode-alist 
       (cons '(".*/ptp2_.*\\.[ch]$" . ines-notab-c-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*/Cura.*\\.py$" . cura-py-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
