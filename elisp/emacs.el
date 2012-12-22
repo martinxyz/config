@@ -489,6 +489,11 @@
               (lambda (x) (if (string-equal (substring x 0 1) ".") x))
               ido-temp-list))))
 
+(setq ido-enable-flex-matching t)
+; ignore some build products (they are often more recent than whatever I want to select)
+(setq ido-ignore-files '("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./"
+                         "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"))
+
 (define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
 (defun martin-kill-whole-line ()
