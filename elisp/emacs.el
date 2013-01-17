@@ -492,7 +492,8 @@
 (setq ido-enable-flex-matching t)
 ; ignore some build products (they are often more recent than whatever I want to select)
 (setq ido-ignore-files '("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./"
-                         "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"))
+                         "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"
+                         "\\.elf\\'" "\\.hex\\'"  "\\.dblite\\'" ))
 
 (define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 

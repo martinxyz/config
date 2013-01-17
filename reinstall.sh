@@ -13,6 +13,8 @@ function symlink {
 cd $HOME
 symlink config/elisp/emacs.el .emacs
 symlink config/elisp/viper.el .viper
+mkdir -p .matplotlib
+symlink config/matplotlibrc .matplotlib/matplotlibrc
 
 for i in vimrc gvimrc vim cvsrc Xdefaults inputrc fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload; do
   symlink config/$i .$i
@@ -27,7 +29,7 @@ symlink config/scripts scripts
 
 echo "Symlinks done."
 
-xrdb -merge .Xdefaults
+xrdb -merge .Xdefaults >/dev/null 2>&1
 
 if ! grep bashrc.common ~/.bashrc >/dev/null; then
     echo "source ~/config/bashrc.common" >> ~/.bashrc

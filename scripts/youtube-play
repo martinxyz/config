@@ -7,5 +7,5 @@
 #
 
 COOKIE_FILE=/var/tmp/youtube-dl-cookies.txt
-mplayer2 -cookies -cookies-file ${COOKIE_FILE} $(youtube-dl -g --cookies ${COOKIE_FILE} $*)
+mplayer2 -framedrop -cookies -cookies-file ${COOKIE_FILE} $(youtube-dl -g --cookies ${COOKIE_FILE} $*)
 

@@ -70,3 +70,5 @@
     pushNonFastForward = false
 
 
+[url "git://git.debian.org/d-i/"]
+	insteadOf = git+ssh://git.debian.org/git/d-i/
