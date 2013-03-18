@@ -7,6 +7,7 @@ targets = [
   '/backupstick_sony',
   '/backupstick_sandisk',
   '/backupstick_usbplatte',
+  '/backupstick_sony2',
 ]
 success = 0
 for target in targets:
