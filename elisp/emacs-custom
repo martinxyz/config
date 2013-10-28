@@ -51,6 +51,7 @@
  '(py-smart-indentation nil)
  '(python-guess-indent nil)
  '(query-user-mail-address nil)
+ '(safe-local-variable-values (quote ((py-indent-offset . 4))))
  '(save-abbrevs nil)
  '(save-place t nil (saveplace))
  '(scroll-bar-mode nil)

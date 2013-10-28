@@ -18,9 +18,7 @@
 
 """Generate a dot graph from the output of several profilers."""
 
-__author__ = "Jose Fonseca"
-
-__version__ = "1.0"
+__author__ = "Jose Fonseca et al"
 
 
 import sys
@@ -30,6 +28,7 @@ import re
 import textwrap
 import optparse
 import xml.parsers.expat
+import collections
 
 
 try:
@@ -122,10 +121,22 @@ CALLS = Event("Calls", 0, add, times)
 SAMPLES = Event("Samples", 0, add)
 SAMPLES2 = Event("Samples", 0, add)
 
+# Count of samples where a given function was either executing or on the stack.
+# This is used to calculate the total time ratio according to the
+# straightforward method described in Mike Dunlavey's answer to
+# stackoverflow.com/questions/1777556/alternatives-to-gprof, item 4 (the myth
+# "that recursion is a tricky confusing issue"), last edited 2012-08-30: it's
+# just the ratio of TOTAL_SAMPLES over the number of samples in the profile.
+#
+# Used only when totalMethod == callstacks
+TOTAL_SAMPLES = Event("Samples", 0, add)
+
 TIME = Event("Time", 0.0, add, lambda x: '(' + str(x) + ')')
 TIME_RATIO = Event("Time ratio", 0.0, add, lambda x: '(' + percentage(x) + ')')
 TOTAL_TIME = Event("Total time", 0.0, fail)
 TOTAL_TIME_RATIO = Event("Total time ratio", 0.0, fail, percentage)
+
+totalMethod = 'callratios'
 
 
 class Object(object):
@@ -296,6 +307,53 @@ class Profile(Object):
                 sys.stderr.write("Cycle:\n")
                 for member in cycle.functions:
                     sys.stderr.write("\tFunction %s\n" % member.name)
+
+    def prune_root(self, root):
+        visited = set()
+        frontier = set([root])
+        while len(frontier) > 0:
+            node = frontier.pop()
+            visited.add(node)
+            f = self.functions[node]
+            newNodes = f.calls.keys()
+            frontier = frontier.union(set(newNodes) - visited)
+        subtreeFunctions = {}
+        for n in visited:
+            subtreeFunctions[n] = self.functions[n]
+        self.functions = subtreeFunctions
+
+    def prune_leaf(self, leaf):
+        edgesUp = collections.defaultdict(set)
+        for f in self.functions.keys():
+            for n in self.functions[f].calls.keys():
+                edgesUp[n].add(f)
+        # build the tree up
+        visited = set()
+        frontier = set([leaf])
+        while len(frontier) > 0:
+            node = frontier.pop()
+            visited.add(node)
+            frontier = frontier.union(edgesUp[node] - visited)
+        downTree = set(self.functions.keys())
+        upTree = visited
+        path = downTree.intersection(upTree)
+        pathFunctions = {}
+        for n in path:
+            f = self.functions[n]
+            newCalls = {}
+            for c in f.calls.keys():
+                if c in path:
+                    newCalls[c] = f.calls[c]
+            f.calls = newCalls
+            pathFunctions[n] = f
+        self.functions = pathFunctions
+
+
+    def getFunctionId(self, funcName):
+        for f in self.functions:
+            if self.functions[f].name == funcName:
+                return f
+        return False
     
     def _tarjan(self, function, order, stack, orders, lowlinks, visited):
         """Tarjan's strongly connected components algorithm.
@@ -336,28 +394,41 @@ class Profile(Object):
         function_totals = {}
         for function in self.functions.itervalues():
             function_totals[function] = 0.0
+
+        # Pass 1:  function_total gets the sum of call[event] for all
+        #          incoming arrows.  Same for cycle_total for all arrows
+        #          that are coming into the *cycle* but are not part of it.
         for function in self.functions.itervalues():
             for call in function.calls.itervalues():
                 if call.callee_id != function.id:
                     callee = self.functions[call.callee_id]
-                    function_totals[callee] += call[event]
-                    if callee.cycle is not None and callee.cycle is not function.cycle:
-                        cycle_totals[callee.cycle] += call[event]
+                    if event in call.events:
+                        function_totals[callee] += call[event]
+                        if callee.cycle is not None and callee.cycle is not function.cycle:
+                            cycle_totals[callee.cycle] += call[event]
+                    else:
+                        sys.stderr.write("call_ratios: No data for " + function.name + " call to " + callee.name + "\n")
 
-        # Compute the ratios
+        # Pass 2:  Compute the ratios.  Each call[event] is scaled by the
+        #          function_total of the callee.  Calls into cycles use the
+        #          cycle_total, but not calls within cycles.
         for function in self.functions.itervalues():
             for call in function.calls.itervalues():
                 assert call.ratio is None
                 if call.callee_id != function.id:
                     callee = self.functions[call.callee_id]
-                    if callee.cycle is not None and callee.cycle is not function.cycle:
-                        total = cycle_totals[callee.cycle]
+                    if event in call.events:
+                        if callee.cycle is not None and callee.cycle is not function.cycle:
+                            total = cycle_totals[callee.cycle]
+                        else:
+                            total = function_totals[callee]
+                        call.ratio = ratio(call[event], total)
                     else:
-                        total = function_totals[callee]
-                    call.ratio = ratio(call[event], total)
+                        # Warnings here would only repeat those issued above.
+                        call.ratio = 0.0
 
     def integrate(self, outevent, inevent):
-        """Propagate function time ratio allong the function calls.
+        """Propagate function time ratio along the function calls.
 
         Must be called after finding the cycles.
 
@@ -1070,6 +1141,287 @@ class GprofParser(Parser):
         return profile
 
 
+# Clone&hack of GprofParser for VTune Amplifier XE 2013 gprof-cc output.
+# Tested only with AXE 2013 for Windows.
+#   - Use total times as reported by AXE.
+#   - In the absence of call counts, call ratios are faked from the relative
+#     proportions of total time.  This affects only the weighting of the calls.
+#   - Different header, separator, and end marker.
+#   - Extra whitespace after function names.
+#   - You get a full entry for <spontaneous>, which does not have parents.
+#   - Cycles do have parents.  These are saved but unused (as they are
+#     for functions).
+#   - Disambiguated "unrecognized call graph entry" error messages.
+# Notes:
+#   - Total time of functions as reported by AXE passes the val3 test.
+#   - CPU Time:Children in the input is sometimes a negative number.  This
+#     value goes to the variable descendants, which is unused.
+#   - The format of gprof-cc reports is unaffected by the use of
+#       -knob enable-call-counts=true (no call counts, ever), or
+#       -show-as=samples (results are quoted in seconds regardless).
+class AXEParser(Parser):
+    "Parser for VTune Amplifier XE 2013 gprof-cc report output."
+
+    def __init__(self, fp):
+        Parser.__init__(self)
+        self.fp = fp
+        self.functions = {}
+        self.cycles = {}
+
+    def readline(self):
+        line = self.fp.readline()
+        if not line:
+            sys.stderr.write('error: unexpected end of file\n')
+            sys.exit(1)
+        line = line.rstrip('\r\n')
+        return line
+
+    _int_re = re.compile(r'^\d+$')
+    _float_re = re.compile(r'^\d+\.\d+$')
+
+    def translate(self, mo):
+        """Extract a structure from a match object, while translating the types in the process."""
+        attrs = {}
+        groupdict = mo.groupdict()
+        for name, value in groupdict.iteritems():
+            if value is None:
+                value = None
+            elif self._int_re.match(value):
+                value = int(value)
+            elif self._float_re.match(value):
+                value = float(value)
+            attrs[name] = (value)
+        return Struct(attrs)
+
+    _cg_header_re = re.compile(
+        '^Index |'
+        '^----- '
+    )
+
+    _cg_ignore_re = re.compile(
+        # internal calls (such as "mcount")
+        # FIXME: is this applicable?
+        r'^.*\((\d+)\)$'
+    )
+
+    _cg_primary_re = re.compile(
+        r'^\[(?P<index>\d+)\]?' + 
+        r'\s+(?P<percentage_time>\d+\.\d+)' + 
+        r'\s+(?P<self>\d+\.\d+)' + 
+        r'\s+(?P<descendants>\d+\.\d+)' + 
+        r'\s+(?P<name>\S.*?)' +
+        r'(?:\s+<cycle\s(?P<cycle>\d+)>)?' +
+        r'\s+\[(\d+)\]$'
+    )
+
+    _cg_parent_re = re.compile(
+        r'^\s+(?P<self>\d+\.\d+)?' + 
+        r'\s+(?P<descendants>\d+\.\d+)?' + 
+        r'\s+(?P<name>\S.*?)' +
+        r'(?:\s+<cycle\s(?P<cycle>\d+)>)?' +
+        r'\s+\[(?P<index>\d+)\]$'
+    )
+
+    _cg_child_re = _cg_parent_re
+
+    _cg_cycle_header_re = re.compile(
+        r'^\[(?P<index>\d+)\]?' + 
+        r'\s+(?P<percentage_time>\d+\.\d+)' + 
+        r'\s+(?P<self>\d+\.\d+)' + 
+        r'\s+(?P<descendants>\d+\.\d+)' + 
+        r'\s+<cycle\s(?P<cycle>\d+)\sas\sa\swhole>' +
+        r'\s+\[(\d+)\]$'
+    )
+
+    _cg_cycle_member_re = re.compile(
+        r'^\s+(?P<self>\d+\.\d+)?' + 
+        r'\s+(?P<descendants>\d+\.\d+)?' + 
+        r'\s+(?P<name>\S.*?)' +
+        r'(?:\s+<cycle\s(?P<cycle>\d+)>)?' +
+        r'\s+\[(?P<index>\d+)\]$'
+    )
+
+    def parse_function_entry(self, lines):
+        parents = []
+        children = []
+
+        while True:
+            if not lines:
+                sys.stderr.write('warning: unexpected end of entry\n')
+                return
+            line = lines.pop(0)
+            if line.startswith('['):
+                break
+        
+            # read function parent line
+            mo = self._cg_parent_re.match(line)
+            if not mo:
+                if self._cg_ignore_re.match(line):
+                    continue
+                sys.stderr.write('warning: unrecognized call graph entry (1): %r\n' % line)
+            else:
+                parent = self.translate(mo)
+                parents.append(parent)
+
+        # read primary line
+        mo = self._cg_primary_re.match(line)
+        if not mo:
+            sys.stderr.write('warning: unrecognized call graph entry (2): %r\n' % line)
+            return
+        else:
+            function = self.translate(mo)
+
+        while lines:
+            line = lines.pop(0)
+            
+            # read function subroutine line
+            mo = self._cg_child_re.match(line)
+            if not mo:
+                if self._cg_ignore_re.match(line):
+                    continue
+                sys.stderr.write('warning: unrecognized call graph entry (3): %r\n' % line)
+            else:
+                child = self.translate(mo)
+                children.append(child)
+        
+        function.parents = parents
+        function.children = children
+
+        self.functions[function.index] = function
+
+    def parse_cycle_entry(self, lines):
+
+        # Process the parents that were not there in gprof format.
+        parents = []
+        while True:
+            if not lines:
+                sys.stderr.write('warning: unexpected end of cycle entry\n')
+                return
+            line = lines.pop(0)
+            if line.startswith('['):
+                break
+            mo = self._cg_parent_re.match(line)
+            if not mo:
+                if self._cg_ignore_re.match(line):
+                    continue
+                sys.stderr.write('warning: unrecognized call graph entry (6): %r\n' % line)
+            else:
+                parent = self.translate(mo)
+                parents.append(parent)
+
+        # read cycle header line
+        mo = self._cg_cycle_header_re.match(line)
+        if not mo:
+            sys.stderr.write('warning: unrecognized call graph entry (4): %r\n' % line)
+            return
+        cycle = self.translate(mo)
+
+        # read cycle member lines
+        cycle.functions = []
+        for line in lines[1:]:
+            mo = self._cg_cycle_member_re.match(line)
+            if not mo:
+                sys.stderr.write('warning: unrecognized call graph entry (5): %r\n' % line)
+                continue
+            call = self.translate(mo)
+            cycle.functions.append(call)
+        
+        cycle.parents = parents
+        self.cycles[cycle.cycle] = cycle
+
+    def parse_cg_entry(self, lines):
+        if any("as a whole" in linelooper for linelooper in lines):
+            self.parse_cycle_entry(lines)
+        else:
+            self.parse_function_entry(lines)
+
+    def parse_cg(self):
+        """Parse the call graph."""
+
+        # skip call graph header
+        line = self.readline()
+        while self._cg_header_re.match(line):
+            line = self.readline()
+
+        # process call graph entries
+        entry_lines = []
+        # An EOF in readline terminates the program without returning.
+        while line != 'Index  Function':
+            if line.isspace():
+                self.parse_cg_entry(entry_lines)
+                entry_lines = []
+            else:
+                entry_lines.append(line)            
+            line = self.readline()
+
+    def parse(self):
+        sys.stderr.write('warning: for axe format, edge weights are unreliable estimates derived from\nfunction total times.\n')
+        self.parse_cg()
+        self.fp.close()
+
+        profile = Profile()
+        profile[TIME] = 0.0
+        
+        cycles = {}
+        for index in self.cycles.iterkeys():
+            cycles[index] = Cycle()
+
+        for entry in self.functions.itervalues():
+            # populate the function
+            function = Function(entry.index, entry.name)
+            function[TIME] = entry.self
+            function[TOTAL_TIME_RATIO] = entry.percentage_time / 100.0
+            
+            # populate the function calls
+            for child in entry.children:
+                call = Call(child.index)
+                # The following bogus value affects only the weighting of
+                # the calls.
+                call[TOTAL_TIME_RATIO] = function[TOTAL_TIME_RATIO]
+
+                if child.index not in self.functions:
+                    # NOTE: functions that were never called but were discovered by gprof's 
+                    # static call graph analysis dont have a call graph entry so we need
+                    # to add them here
+                    # FIXME: Is this applicable?
+                    missing = Function(child.index, child.name)
+                    function[TIME] = 0.0
+                    profile.add_function(missing)
+
+                function.add_call(call)
+
+            profile.add_function(function)
+
+            if entry.cycle is not None:
+                try:
+                    cycle = cycles[entry.cycle]
+                except KeyError:
+                    sys.stderr.write('warning: <cycle %u as a whole> entry missing\n' % entry.cycle) 
+                    cycle = Cycle()
+                    cycles[entry.cycle] = cycle
+                cycle.add_function(function)
+
+            profile[TIME] = profile[TIME] + function[TIME]
+
+        for cycle in cycles.itervalues():
+            profile.add_cycle(cycle)
+
+        # Compute derived events.
+        profile.validate()
+        profile.ratio(TIME_RATIO, TIME)
+        # Lacking call counts, fake call ratios based on total times.
+        profile.call_ratios(TOTAL_TIME_RATIO)
+        # The TOTAL_TIME_RATIO of functions is already set.  Propagate that
+        # total time to the calls.  (TOTAL_TIME is neither set nor used.)
+        for function in profile.functions.itervalues():
+            for call in function.calls.itervalues():
+                if call.ratio is not None:
+                    callee = profile.functions[call.callee_id]
+                    call[TOTAL_TIME_RATIO] = call.ratio * callee[TOTAL_TIME_RATIO];
+
+        return profile
+
+
 class CallgrindParser(LineParser):
     """Parser for valgrind's callgrind tool.
     
@@ -1199,9 +1551,12 @@ class CallgrindParser(LineParser):
 
         if calls is None:
             # Unlike other aspects, call object (cob) is relative not to the
-            # last call object, but to the caller's object (ob), so update it
-            # when processing a functions cost line
-            self.positions['cob'] = self.positions['ob']
+            # last call object, but to the caller's object (ob), so try to
+            # update it when processing a functions cost line
+            try:
+                self.positions['cob'] = self.positions['ob']
+            except KeyError:
+                pass
 
         values = line.split()
         assert len(values) <= self.num_positions + self.num_events
@@ -1422,7 +1777,21 @@ class PerfParser(LineParser):
         profile.find_cycles()
         profile.ratio(TIME_RATIO, SAMPLES)
         profile.call_ratios(SAMPLES2)
-        profile.integrate(TOTAL_TIME_RATIO, TIME_RATIO)
+        if totalMethod == "callratios":
+            # Heuristic approach.  TOTAL_SAMPLES is unused.
+            profile.integrate(TOTAL_TIME_RATIO, TIME_RATIO)
+        elif totalMethod == "callstacks":
+            # Use the actual call chains for functions.
+            profile[TOTAL_SAMPLES] = profile[SAMPLES]
+            profile.ratio(TOTAL_TIME_RATIO, TOTAL_SAMPLES)
+            # Then propagate that total time to the calls.
+            for function in profile.functions.itervalues():
+                for call in function.calls.itervalues():
+                    if call.ratio is not None:
+                        callee = profile.functions[call.callee_id]
+                        call[TOTAL_TIME_RATIO] = call.ratio * callee[TOTAL_TIME_RATIO];
+        else:
+            assert False
 
         return profile
 
@@ -1453,6 +1822,11 @@ class PerfParser(LineParser):
 
             callee = caller
 
+        # Increment TOTAL_SAMPLES only once on each function.
+        stack = set(callchain)
+        for function in stack:
+            function[TOTAL_SAMPLES] += 1
+
     def parse_callchain(self):
         callchain = []
         while self.lookahead():
@@ -1469,7 +1843,7 @@ class PerfParser(LineParser):
     def parse_call(self):
         line = self.consume()
         mo = self.call_re.match(line)
-        assert mo, repr(line)
+        assert mo
         if not mo:
             return None
 
@@ -1487,6 +1861,7 @@ class PerfParser(LineParser):
             function = Function(function_id, function_name)
             function.module = os.path.basename(module)
             function[SAMPLES] = 0
+            function[TOTAL_SAMPLES] = 0
             self.profile.add_function(function)
 
         return function
@@ -1872,101 +2247,6 @@ class SysprofParser(XmlParser):
         profile.find_cycles()
         profile.ratio(TIME_RATIO, SAMPLES)
         profile.call_ratios(SAMPLES2)
-        profile.integrate(TOTAL_TIME_RATIO, TIME_RATIO)
-
-        return profile
-
-
-class SharkParser(LineParser):
-    """Parser for MacOSX Shark output.
-
-    Author: tom@dbservice.com
-    """
-
-    def __init__(self, infile):
-        LineParser.__init__(self, infile)
-        self.stack = []
-        self.entries = {}
-
-    def add_entry(self, function):
-        try:
-            entry = self.entries[function.id]
-        except KeyError:
-            self.entries[function.id] = (function, { })
-        else:
-            function_total, callees_total = entry
-            function_total.samples += function.samples
-    
-    def add_callee(self, function, callee):
-        func, callees = self.entries[function.id]
-        try:
-            entry = callees[callee.id]
-        except KeyError:
-            callees[callee.id] = callee
-        else:
-            entry.samples += callee.samples
-        
-    def parse(self):
-        self.readline()
-        self.readline()
-        self.readline()
-        self.readline()
-
-        match = re.compile(r'(?P<prefix>[|+ ]*)(?P<samples>\d+), (?P<symbol>[^,]+), (?P<image>.*)')
-
-        while self.lookahead():
-            line = self.consume()
-            mo = match.match(line)
-            if not mo:
-                raise ParseError('failed to parse', line)
-
-            fields = mo.groupdict()
-            prefix = len(fields.get('prefix', 0)) / 2 - 1
-
-            symbol = str(fields.get('symbol', 0))
-            image = str(fields.get('image', 0))
-
-            entry = Struct()
-            entry.id = ':'.join([symbol, image])
-            entry.samples = int(fields.get('samples', 0))
-
-            entry.name = symbol
-            entry.image = image
-
-            # adjust the callstack
-            if prefix < len(self.stack):
-                del self.stack[prefix:]
-
-            if prefix == len(self.stack):
-                self.stack.append(entry)
-
-            # if the callstack has had an entry, it's this functions caller
-            if prefix > 0:
-                self.add_callee(self.stack[prefix - 1], entry)
-                
-            self.add_entry(entry)
-                
-        profile = Profile()
-        profile[SAMPLES] = 0
-        for _function, _callees in self.entries.itervalues():
-            function = Function(_function.id, _function.name)
-            function[SAMPLES] = _function.samples
-            profile.add_function(function)
-            profile[SAMPLES] += _function.samples
-
-            if _function.image:
-                function.module = os.path.basename(_function.image)
-
-            for _callee in _callees.itervalues():
-                call = Call(_callee.id)
-                call[SAMPLES] = _callee.samples
-                function.add_call(call)
-                
-        # compute derived data
-        profile.validate()
-        profile.find_cycles()
-        profile.ratio(TIME_RATIO, SAMPLES)
-        profile.call_ratios(SAMPLES)
         profile.integrate(TOTAL_TIME_RATIO, TIME_RATIO)
 
         return profile
@@ -2421,6 +2701,8 @@ class Theme:
             mincolor = (0.0, 0.0, 0.0),
             maxcolor = (0.0, 0.0, 1.0),
             fontname = "Arial",
+            fontcolor = "white",
+            nodestyle = "filled",
             minfontsize = 10.0,
             maxfontsize = 10.0,
             minpenwidth = 0.5,
@@ -2431,6 +2713,8 @@ class Theme:
         self.mincolor = mincolor
         self.maxcolor = maxcolor
         self.fontname = fontname
+        self.fontcolor = fontcolor
+        self.nodestyle = nodestyle
         self.minfontsize = minfontsize
         self.maxfontsize = maxfontsize
         self.minpenwidth = minpenwidth
@@ -2444,6 +2728,9 @@ class Theme:
     def graph_fontname(self):
         return self.fontname
 
+    def graph_fontcolor(self):
+        return self.fontcolor
+
     def graph_fontsize(self):
         return self.minfontsize
 
@@ -2451,10 +2738,16 @@ class Theme:
         return self.color(weight)
 
     def node_fgcolor(self, weight):
-        return self.graph_bgcolor()
+        if self.nodestyle == "filled":
+            return self.graph_bgcolor()
+        else:
+            return self.color(weight)
 
     def node_fontsize(self, weight):
         return self.fontsize(weight)
+
+    def node_style(self):
+        return self.nodestyle
 
     def edge_color(self, weight):
         return self.color(weight)
@@ -2558,6 +2851,17 @@ BW_COLORMAP = Theme(
     maxpenwidth = 8.0,
 )
 
+PRINT_COLORMAP = Theme(
+    minfontsize = 18.0,
+    maxfontsize = 30.0,
+    fontcolor = "black",
+    nodestyle = "solid",
+    mincolor = (0.0, 0.0, 0.0), # black
+    maxcolor = (0.0, 0.0, 0.0), # black
+    minpenwidth = 0.1,
+    maxpenwidth = 8.0,
+)
+
 
 class DotWriter:
     """Writer for the DOT language.
@@ -2594,9 +2898,11 @@ class DotWriter:
         self.begin_graph()
 
         fontname = theme.graph_fontname()
+        fontcolor = theme.graph_fontcolor()
+        nodestyle = theme.node_style()
 
         self.attr('graph', fontname=fontname, ranksep=0.25, nodesep=0.125)
-        self.attr('node', fontname=fontname, shape="box", style="filled", fontcolor="white", width=0, height=0)
+        self.attr('node', fontname=fontname, shape="box", style=nodestyle, fontcolor=fontcolor, width=0, height=0)
         self.attr('edge', fontname=fontname)
 
         for function in profile.functions.itervalues():
@@ -2748,129 +3054,113 @@ class Main:
             "pink": PINK_COLORMAP,
             "gray": GRAY_COLORMAP,
             "bw": BW_COLORMAP,
+            "print": PRINT_COLORMAP,
     }
 
     def main(self):
         """Main program."""
 
-        parser = optparse.OptionParser(
-            usage="\n\t%prog [options] [file] ...",
-            version="%%prog %s" % __version__)
-        parser.add_option(
+        global totalMethod
+
+        optparser = optparse.OptionParser(
+            usage="\n\t%prog [options] [file] ...")
+        optparser.add_option(
             '-o', '--output', metavar='FILE',
             type="string", dest="output",
             help="output filename [stdout]")
-        parser.add_option(
+        optparser.add_option(
             '-n', '--node-thres', metavar='PERCENTAGE',
             type="float", dest="node_thres", default=0.5,
             help="eliminate nodes below this threshold [default: %default]")
-        parser.add_option(
+        optparser.add_option(
             '-e', '--edge-thres', metavar='PERCENTAGE',
             type="float", dest="edge_thres", default=0.1,
             help="eliminate edges below this threshold [default: %default]")
-        parser.add_option(
+        optparser.add_option(
             '-f', '--format',
-            type="choice", choices=('prof', 'callgrind', 'perf', 'oprofile', 'hprof', 'sysprof', 'pstats', 'shark', 'sleepy', 'aqtime', 'xperf'),
+            type="choice", choices=('prof', 'axe', 'callgrind', 'perf', 'oprofile', 'hprof', 'sysprof', 'pstats', 'sleepy', 'aqtime', 'xperf'),
             dest="format", default="prof",
-            help="profile format: prof, callgrind, oprofile, hprof, sysprof, shark, sleepy, aqtime, pstats, or xperf [default: %default]")
-        parser.add_option(
+            help="profile format: prof, callgrind, oprofile, hprof, sysprof, sleepy, aqtime, pstats, axe, perf, or xperf [default: %default]")
+        optparser.add_option(
+            '--total',
+            type="choice", choices=('callratios', 'callstacks'),
+            dest="totalMethod", default=totalMethod,
+            help="preferred method of calculating total time: callratios or callstacks (currently affects only perf format) [default: %default]")
+        optparser.add_option(
             '-c', '--colormap',
-            type="choice", choices=('color', 'pink', 'gray', 'bw'),
+            type="choice", choices=('color', 'pink', 'gray', 'bw', 'print'),
             dest="theme", default="color",
-            help="color map: color, pink, gray, or bw [default: %default]")
-        parser.add_option(
+            help="color map: color, pink, gray, bw, or print [default: %default]")
+        optparser.add_option(
             '-s', '--strip',
             action="store_true",
             dest="strip", default=False,
             help="strip function parameters, template parameters, and const modifiers from demangled C++ function names")
-        parser.add_option(
+        optparser.add_option(
             '-w', '--wrap',
             action="store_true",
             dest="wrap", default=False,
             help="wrap function names")
+        # add option to create subtree or show paths
+        optparser.add_option(
+            '-z', '--root',
+            type="string",
+            dest="root", default="",
+            help="prune call graph to show only descendants of specified root function")
+        optparser.add_option(
+            '-l', '--leaf',
+            type="string",
+            dest="leaf", default="",
+            help="prune call graph to show only ancestors of specified leaf function")
         # add a new option to control skew of the colorization curve
-        parser.add_option(
+        optparser.add_option(
             '--skew',
             type="float", dest="theme_skew", default=1.0,
-            help="skew the colorization curve.  Values < 1.0 give more variety to lower percentages.  Value > 1.0 give less variety to lower percentages")
-        (self.options, self.args) = parser.parse_args(sys.argv[1:])
+            help="skew the colorization curve.  Values < 1.0 give more variety to lower percentages.  Values > 1.0 give less variety to lower percentages")
+        (self.options, self.args) = optparser.parse_args(sys.argv[1:])
 
         if len(self.args) > 1 and self.options.format != 'pstats':
-            parser.error('incorrect number of arguments')
+            optparser.error('incorrect number of arguments')
 
         try:
             self.theme = self.themes[self.options.theme]
         except KeyError:
-            parser.error('invalid colormap \'%s\'' % self.options.theme)
+            optparser.error('invalid colormap \'%s\'' % self.options.theme)
         
         # set skew on the theme now that it has been picked.
         if self.options.theme_skew:
             self.theme.skew = self.options.theme_skew
+            
+        stdinFormats = {
+            "prof": GprofParser,
+            "axe": AXEParser,
+            "callgrind": CallgrindParser,
+            "perf": PerfParser,
+            "oprofile": OprofileParser,
+            "sysprof": SysprofParser,
+            "hprof": HProfParser,
+            "xperf": XPerfParser, 
+            "aqtime": AQtimeParser
+        }
+        
+        totalMethod = self.options.totalMethod
 
-        if self.options.format == 'prof':
+        if self.options.format in stdinFormats:
             if not self.args:
                 fp = sys.stdin
             else:
                 fp = open(self.args[0], 'rt')
-            parser = GprofParser(fp)
-        elif self.options.format == 'callgrind':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = CallgrindParser(fp)
-        elif self.options.format == 'perf':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = PerfParser(fp)
-        elif self.options.format == 'oprofile':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = OprofileParser(fp)
-        elif self.options.format == 'sysprof':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = SysprofParser(fp)
-        elif self.options.format == 'hprof':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = HProfParser(fp)        
+            parser = stdinFormats[self.options.format](fp)
         elif self.options.format == 'pstats':
             if not self.args:
-                parser.error('at least a file must be specified for pstats input')
+                optparser.error('at least a file must be specified for pstats input')
             parser = PstatsParser(*self.args)
-        elif self.options.format == 'xperf':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = XPerfParser(fp)
-        elif self.options.format == 'shark':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = SharkParser(fp)
         elif self.options.format == 'sleepy':
             if len(self.args) != 1:
-                parser.error('exactly one file must be specified for sleepy input')
+                optparser.error('exactly one file must be specified for sleepy input')
             parser = SleepyParser(self.args[0])
-        elif self.options.format == 'aqtime':
-            if not self.args:
-                fp = sys.stdin
-            else:
-                fp = open(self.args[0], 'rt')
-            parser = AQtimeParser(fp)
         else:
-            parser.error('invalid format \'%s\'' % self.options.format)
+            optparser.error('invalid format \'%s\'' % self.options.format)
 
         self.profile = parser.parse()
         
@@ -2888,6 +3178,19 @@ class Main:
 
         profile = self.profile
         profile.prune(self.options.node_thres/100.0, self.options.edge_thres/100.0)
+        
+        if self.options.root:
+            rootId = profile.getFunctionId(self.options.root)
+            if not rootId:
+                sys.stderr.write('root node ' + self.options.root + ' not found (might already be pruned : try -e0 -n0 flags)\n')
+                sys.exit(1)
+            profile.prune_root(rootId)
+        if self.options.leaf:
+            leafId = profile.getFunctionId(self.options.leaf)
+            if not leafId:
+                sys.stderr.write('leaf node ' + self.options.leaf + ' not found (maybe already pruned : try -e0 -n0 flags)\n')
+                sys.exit(1)
+            profile.prune_leaf(leafId)
 
         dot.graph(profile, self.theme)
 

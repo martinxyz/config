@@ -36,3 +36,6 @@ if ! grep bashrc.common ~/.bashrc >/dev/null; then
 fi
 perl -p -i -e 's/bash_completion /bash_completion_disabled /g' ~/.bashrc
 
+echo 
+
+

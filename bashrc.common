@@ -63,7 +63,13 @@ export LESS='-R'
 #if [ -f /etc/bash_completion ]; then
 #  . /etc/bash_completion
 #fi
-. /etc/bash_completion.d/git
+
+if [ -e /etc/bash_completion.d/git-prompt ]; then  
+  . /etc/bash_completion.d/git-prompt
+elif [ -e /usr/share/bash-completion/completions/git ]; then
+  . /usr/share/bash-completion/completions/git
+fi
+
 . ~/scripts/bash-completion-eg.sh
 complete -o bashdefault -o default -o nospace -F _git i
 
