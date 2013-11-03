@@ -66,7 +66,8 @@ export LESS='-R'
 
 if [ -e /etc/bash_completion.d/git-prompt ]; then  
   . /etc/bash_completion.d/git-prompt
-elif [ -e /usr/share/bash-completion/completions/git ]; then
+fi
+if [ -e /usr/share/bash-completion/completions/git ]; then
   . /usr/share/bash-completion/completions/git
 fi
 
