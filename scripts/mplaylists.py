@@ -368,7 +368,7 @@ def play(song):
     if song.startswith('-'): return
     mplayer = Mplayer()
     # ?? why does 'wc' work without full path, but not 'mplayer'?
-    reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", song], {})
+    reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
 
 def RandomPoolSong():
     return random.choice(User_pool)

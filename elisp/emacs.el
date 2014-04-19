@@ -211,6 +211,17 @@
   (setq tab-width 8)
   )
 
+(defun cura-c-mode ()
+  "CuraEngine c coding style"
+  (interactive)
+  (c++-mode)
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode nil)
+  (c-set-offset 'substatement-open 0)
+  (remove-dos-eol)
+  )
+
 (defun wireshark-c-mode ()
   "Wireshark c coding style"
   (interactive)
@@ -315,6 +326,12 @@
 
 (setq auto-mode-alist 
       (cons '(".*/Cura.*\\.py$" . cura-py-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/Cura.*\\.h$" . cura-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
+      (cons '(".*/Cura.*\\.cpp" . cura-c-mode)
           auto-mode-alist))
 
 ;; Add my directories to load-path.
@@ -785,3 +802,12 @@
 ;
 ;(global-set-key [?\C-c ?g ?c] 'mo-git-blame-current)
 ;(global-set-key [?\C-c ?g ?f] 'mo-git-blame-file)
+
+
+; http://stackoverflow.com/questions/730751/hiding-m-in-emacs
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
+(add-hook 'text-mode-hook 'remove-dos-eol)
