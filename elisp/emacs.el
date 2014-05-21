@@ -258,6 +258,9 @@
       (cons '(".*/hsr.*\\.[ch]$" . ines-notab-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
+      (cons '(".*/h.pp.*\\.[ch]$" . ines-notab-c-mode)
+          auto-mode-alist))
+(setq auto-mode-alist 
       (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
           auto-mode-alist))
 (setq auto-mode-alist 
@@ -340,7 +343,7 @@
 (color-theme-dark-maxy)
 
 ; syntax highlighting on
-(global-font-lock-mode t)
+;(global-font-lock-mode t)
 ;; do more syntax-highlighting
 ;;(setq-default font-lock-maximum-decoration t)
 ;;(setq-default font-menu-ignore-scaled-fonts nil)
