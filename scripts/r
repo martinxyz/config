@@ -1,0 +1,9 @@
+#!/bin/sh
+if wmctrl -a "MICROCOM $@" ; then
+    echo "already running over there -->"
+    exit 0
+fi
+wmctrl -r :ACTIVE: -N "MICROCOM $@ =============== MICROCOM $@ =============== MICROCOM $@"
+microcom $@
+wmctrl -r :ACTIVE: -N "Terminal"
+
