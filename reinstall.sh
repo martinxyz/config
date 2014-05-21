@@ -13,8 +13,8 @@ function symlink {
 cd $HOME
 symlink config/elisp/emacs.el .emacs
 symlink config/elisp/viper.el .viper
-mkdir -p .matplotlib
-symlink ../config/matplotlibrc .matplotlib/matplotlibrc
+mkdir -p .config/matplotlib
+symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
 for i in vimrc gvimrc vim cvsrc Xdefaults inputrc fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload; do
   symlink config/$i .$i

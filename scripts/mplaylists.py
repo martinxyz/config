@@ -263,7 +263,19 @@ class Prompt(basic.LineReceiver):
     def lineReceived(self, line):
         global mplayer
         line = line.strip()
-        if not line or line.strip() == 'n':
+
+        # wireless numpad hacks
+        line = line.replace('\x1b[2~', '0')
+        line = line.replace('\x1b[8~', '1')
+        line = line.replace('\x1b[B', '2')
+        line = line.replace('\x1b[6~', '3')
+        if line == '0': line = 's'
+        if line == '1': line = ''
+        if line == '2': line = 'p'
+        if line == '3': line = 'n'
+        if line == '*': line = 'm http'
+
+        if not line or line == 'n':
             if mplayer.paused:
                 mplayer.pause()
                 self.sendLine('[continued]')
@@ -356,7 +368,7 @@ def play(song):
     if song.startswith('-'): return
     mplayer = Mplayer()
     # ?? why does 'wc' work without full path, but not 'mplayer'?
-    reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", song], {})
+    reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
 
 def RandomPoolSong():
     return random.choice(User_pool)
