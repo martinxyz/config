@@ -7,7 +7,8 @@ keycode  47 = slash odiaeresis slash odiaeresis dead_acute dead_doubleacute
 ! ä = return
 keycode  48 = Return adiaeresis Return adiaeresis braceleft dead_caron
 
-keycode  49 = section degree notsign notsign notsign notsign
+!keycode  49 = section degree notsign notsign notsign notsign
+keycode  49 = grave degree notsign notsign notsign notsign
 
 keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
 

@@ -630,7 +630,7 @@
 
 ; info about modifying viper per-mode: http://www.cs.cmu.edu/cgi-bin/info2www?%28viper%29Key%20Bindings
 (setq my-python-modifier-map (make-sparse-keymap))
-(define-key my-python-modifier-map [backspace] 'py-electric-delete)
+(define-key my-python-modifier-map [backspace] 'py-electric-backspace)
 ;(viper-modify-major-mode 'python-mode 'vi-state my-python-modifier-map)
 (viper-modify-major-mode 'python-mode 'insert-state my-python-modifier-map)
 
