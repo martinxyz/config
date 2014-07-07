@@ -63,6 +63,19 @@
   ; background it to avoid "active processes exist" question when exiting emacs
   (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&"))
 
+(defun point-grep()
+  "git grep in a terminal in the current directory"
+  (interactive)
+  ;;(start-process "terminal" nil "~/scripts/bigterm"))
+  ;; background it to avoid "active processes exist" question when exiting emacs
+  ;(start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&"))
+  (compilation-start (concat
+                      "git grep -nH --color=never -i "
+                      (thing-at-point 'symbol)
+                      " | cat"
+                      )
+		     'grep-mode))
+
 ;(global-set-key "\C-z" 'undo)
 
 ; Kleineres Fenster für die Fehlermeldungen
@@ -552,7 +565,7 @@
 (defun my-start-tag-grep ()
   (interactive)
   (setq last-tags-jump-was-find-tag nil)
-  (call-interactively 'tags-search))
+  (call-interactively 'tags-search (thing-at-point 'symbol)))
 
 (global-set-key "\M-." 'my-jump-to-tag)
 (define-key viper-vi-local-user-map "," 'my-start-tag-grep)
@@ -575,6 +588,8 @@
 ;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
 (define-key viper-vi-local-user-map "v" 'ido-find-file)
 (define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
+
+(define-key viper-vi-local-user-map "H" 'point-grep)
 
 ;(global-set-key "%" 'match-paren)
 (define-key viper-vi-local-user-map "%" 'match-paren)
@@ -814,3 +829,14 @@
   (setq buffer-display-table (make-display-table))
   (aset buffer-display-table ?\^M []))
 (add-hook 'text-mode-hook 'remove-dos-eol)
+
+(defadvice tags-loop-continue (around protect-search-end activate)
+  (let ((oldbuf (current-buffer)))
+    (unless (ignore-errors ad-do-it t)
+      (switch-to-buffer oldbuf)
+      (message "No more matches."))))
+
+;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
+(setq x-select-enable-clipboard t)
+;; after mouse selection in X11, you can paste by `yank' in emacs
+(setq x-select-enable-primary t)

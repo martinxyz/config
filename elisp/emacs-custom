@@ -1,8 +1,8 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(auto-revert-interval 1)
  '(bar-cursor 2)
  '(c-strict-syntax-p nil)
@@ -18,6 +18,7 @@
  '(desktop-globals-to-save (quote (desktop-missing-file-warning search-ring regexp-search-ring register-alist compile-command compile-history extended-command-history tags-file-name tags-table-list compilation-directory)))
  '(desktop-load-locked-desktop t)
  '(desktop-locals-to-save (quote (desktop-locals-to-save truncate-lines case-fold-search case-replace fill-column overwrite-mode change-log-default-name line-number-mode column-number-mode size-indication-mode buffer-file-coding-system indicate-buffer-boundaries indicate-empty-lines show-trailing-whitespace)))
+ '(desktop-path (quote (".")))
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
  '(fast-lock-mode nil t (fast-lock))
@@ -137,8 +138,8 @@ end <filename>;
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  )

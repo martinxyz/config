@@ -10,7 +10,6 @@ keycode  48 = Return adiaeresis Return adiaeresis braceleft dead_caron
 !keycode  49 = section degree notsign notsign notsign notsign
 keycode  49 = grave degree notsign notsign notsign notsign
 
-keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
 
 ! (windows key = Mod4, not changing this any more)
 
@@ -18,18 +17,15 @@ keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
 keycode 78 = Multi_key
 
 ! eliminate some dead keys
+! "no dead keys" fuer die Tasten ^ ` ~
 keycode  21 = asciicircum grave asciicircum grave asciitilde ogonek
-
-! wtf
-!clear mod1
-!!mod1        Alt_L (0x40),  ISO_Level3_Shift (0x6c),  Meta_L (0xcd)
-!add     mod1    = Alt_L Alt_R
+! "dead keys" fuer ¨
+!keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
+keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam bracketright dead_macron
 
 ! shift + shift = ShiftLock (CapsLock replacement)
-!keycode 50 =  Shift_L Shift_Lock
-!keycode 62 =  Shift_R Shift_Lock
-keycode 50 =  Shift_L Caps_Lock
-keycode 62 =  Shift_R Caps_Lock
+keycode 50 =  Shift_L Shift_Lock
+keycode 62 =  Shift_R Shift_Lock
 
 keycode 135 = Menu
 
