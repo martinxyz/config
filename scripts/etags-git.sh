@@ -1,5 +1,7 @@
 #!/bin/sh
-git ls-files | grep -v -E '(xcf|jpg|jpeg|png|svgz|po|svg|gz)$' | xargs -d\\n etags
+
+rm -f TAGS
+git ls-files | grep -v -E '(xcf|jpg|jpeg|png|svgz|po|svg|gz)$' | xargs -d\\n etags --append
 
 # Hm, does this really help?
 #rm -f TAGS

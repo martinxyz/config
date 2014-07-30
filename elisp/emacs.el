@@ -70,7 +70,8 @@
   ;; background it to avoid "active processes exist" question when exiting emacs
   ;(start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&"))
   (compilation-start (concat
-                      "git grep -nH --color=never -i "
+                      ;"git grep -nH --color=never -i "
+                      "ag -n -i "
                       (thing-at-point 'symbol)
                       " | cat"
                       )
@@ -553,6 +554,11 @@
   (interactive)
   (setq last-tags-jump-was-find-tag t)
   (call-interactively 'find-tag))
+
+; Problem:
+; M-x tags-search since emacs24 visits every buffer where there is NO match,
+;                               destroying my most-recent ido buffer sorting.
+;                               (Same for tags-loop-continue.)
 
 (defun my-continue-tag-search ()
   (interactive)

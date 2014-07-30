@@ -1,6 +1,6 @@
 #!/bin/sh
 # apt-get install rxvt-unicode
-urxvt -si -sw -cr yellow --print-pipe echo -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 "$@" -e bash
+urxvt -si -sw -cr yellow --print-pipe echo -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -e bash "$@"
 #gnome-terminal $@
 
 

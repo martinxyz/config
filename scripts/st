@@ -16,5 +16,5 @@ fi
 #git --no-pager diff --stat -M -w --relative
 
 git status|grep Your\ branch
-git status --short | grep -v '^.....??'
+git status --short $@ | grep -v '^.....??'
 
