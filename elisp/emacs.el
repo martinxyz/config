@@ -873,3 +873,24 @@
 
 ; http://www.emacswiki.org/emacs/pabbrev.el
 (require 'pabbrev)
+
+(defun pabbrev-suggestions-ido (suggestion-list)
+  "Use ido to display menu of all pabbrev suggestions."
+  (when suggestion-list
+    (pabbrev-suggestions-insert-word pabbrev-expand-previous-word)
+    (pabbrev-suggestions-insert-word
+     (ido-completing-read "Completions: " (mapcar 'car suggestion-list)))))
+
+(defun pabbrev-suggestions-insert-word (word)
+  "Insert word in place of current suggestion, with no attempt to kill pabbrev-buffer."
+  (let ((point))
+    (save-excursion
+      (let ((bounds (pabbrev-bounds-of-thing-at-point)))
+	(progn
+	  (delete-region (car bounds) (cdr bounds))
+	  (insert word)
+	  (setq point (point)))))
+    (if point
+	(goto-char point))))
+
+(fset 'pabbrev-suggestions-goto-buffer 'pabbrev-suggestions-ido)
