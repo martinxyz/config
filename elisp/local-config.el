@@ -1,2 +1,2 @@
-;(load "~/config/elisp/neuronics")
+;(load "~/config/elisp/something")
 

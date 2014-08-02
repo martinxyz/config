@@ -31,10 +31,13 @@
  '(global-auto-revert-ignore-modes (quote (tags-table-mode)))
  '(global-auto-revert-mode t nil (autorevert))
  '(global-font-lock-mode t nil (font-lock))
+ '(ido-decorations (quote (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
  '(ido-enabled (quote both) t (ido))
  '(ido-everywhere t)
  '(ido-ignore-files (quote ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "\\`.svn/" "\\`~")))
  '(ido-max-directory-size 3000000)
+ '(ido-max-prospects 30)
+ '(ido-max-window-height 2)
  '(indent 2 t)
  '(inhibit-local-menu-bar-menus t)
  '(line-number-mode t)
@@ -135,6 +138,7 @@ end <filename>;
  '(vhdl-underscore-is-part-of-word t)
  '(viper-auto-indent t)
  '(viper-replace-overlay-cursor-color "yellow")
+ '(viper-syntax-preference (quote extended))
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
@@ -142,4 +146,7 @@ end <filename>;
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(ido-first-match ((t (:weight bold))))
+ '(ido-subdir ((t (:foreground "#729FCF"))))
+ '(viper-minibuffer-emacs ((t nil)))
+ '(viper-minibuffer-insert ((t nil))))

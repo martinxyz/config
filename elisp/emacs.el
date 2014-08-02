@@ -11,6 +11,9 @@
 
 (set-cursor-color "yellow")
 
+; some nice ideas there, but nothing wrong with ido, imo
+;(require 'icicles)
+
 ;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
 ;; vi/emacs input modes, causing confusion in non-viper buffers
 (global-unset-key "\C-z")
@@ -493,6 +496,7 @@
 ; ido = iswitchb fork + same functionality for finding files
 (require 'ido)
 (ido-mode t)
+(setq ido-enable-flex-matching t)
 
 ; not really working anyway
 ;; (add-hook 'ido-define-mode-map-hook 'ido-my-keys)
@@ -507,20 +511,35 @@
 
 ; sort ido filelist by mtime instead of alphabetically
 ; my own implementation, watch for feedback at http://www.emacswiki.org/cgi-bin/wiki/InteractivelyDoThings
+;; (add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
+;; (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
+;; (defun ido-sort-mtime ()
+;;   (setq ido-temp-list
+;;         (sort ido-temp-list 
+;;               (lambda (a b)
+;;                 (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
+;;                       (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
+;;                   (if (= (nth 0 ta) (nth 0 tb))
+;;                       (> (nth 1 ta) (nth 1 tb))
+;;                     (> (nth 0 ta) (nth 0 tb)))))))
+;;   (ido-to-end  ;; move . files to end (again)
+;;    (delq nil (mapcar
+;;               (lambda (x) (if (string-equal (substring x 0 1) ".") x))
+;;               ido-temp-list))))
+;
+; Updated version from emacs wiki after a couple of years:
 (add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
 (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
 (defun ido-sort-mtime ()
   (setq ido-temp-list
         (sort ido-temp-list 
               (lambda (a b)
-                (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
-                      (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
-                  (if (= (nth 0 ta) (nth 0 tb))
-                      (> (nth 1 ta) (nth 1 tb))
-                    (> (nth 0 ta) (nth 0 tb)))))))
+                (time-less-p
+                 (sixth (file-attributes (concat ido-current-directory b)))
+                 (sixth (file-attributes (concat ido-current-directory a)))))))
   (ido-to-end  ;; move . files to end (again)
    (delq nil (mapcar
-              (lambda (x) (if (string-equal (substring x 0 1) ".") x))
+              (lambda (x) (and (char-equal (string-to-char x) ?.) x))
               ido-temp-list))))
 
 (setq ido-enable-flex-matching t)
@@ -851,3 +870,4 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
+
