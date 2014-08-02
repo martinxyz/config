@@ -871,3 +871,5 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
 
+; http://www.emacswiki.org/emacs/pabbrev.el
+(require 'pabbrev)
