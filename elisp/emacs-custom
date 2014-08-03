@@ -30,7 +30,6 @@
  '(global-auto-revert-ignore-modes (quote (tags-table-mode)))
  '(global-auto-revert-mode t nil (autorevert))
  '(global-font-lock-mode t nil (font-lock))
- '(global-pabbrev-mode t)
  '(ido-decorations (quote (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
  '(ido-enabled (quote both) t (ido))
  '(ido-everywhere t)

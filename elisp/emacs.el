@@ -894,3 +894,5 @@
 	(goto-char point))))
 
 (fset 'pabbrev-suggestions-goto-buffer 'pabbrev-suggestions-ido)
+
+(global-pabbrev-mode)
