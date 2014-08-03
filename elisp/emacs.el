@@ -14,12 +14,16 @@
 ; some nice ideas there, but nothing wrong with ido, imo
 ;(require 'icicles)
 
-;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
-;; vi/emacs input modes, causing confusion in non-viper buffers
-(global-unset-key "\C-z")
-;; start viper on startup (vim keybindings), siehe auch viper.el
-(setq viper-mode t)
-(require 'viper)
+;; ;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
+;; ;; vi/emacs input modes, causing confusion in non-viper buffers
+;; (global-unset-key "\C-z")
+;; ;; start viper on startup (vim keybindings), siehe auch viper.el
+;; (setq viper-mode t)
+;; (require 'viper)
+
+(add-to-list 'load-path "~/config/elisp/evil")
+(require 'evil)
+(evil-mode 1)
 
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
@@ -55,8 +59,8 @@
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
-(define-key viper-vi-local-user-map "\C-e" 'bigterm-in-current-directory)
-;(global-set-key  "\C-e" 'bigterm-in-current-directory)
+;(define-key viper-vi-local-user-map "\C-e" 'bigterm-in-current-directory)
+;;(global-set-key  "\C-e" 'bigterm-in-current-directory)
 (global-set-key  [F12] 'bigterm-in-current-directory)
 
 (defun bigterm-in-current-directory ()
@@ -201,12 +205,12 @@
   (c-set-offset 'substatement-open 0)
   )
 
-(defun ines-vhdl-mode ()
-  (interactive)
-  (vhdl-mode)
-  (viper-mode)
-  (setq tab-width 4)
-  )
+;(defun ines-vhdl-mode ()
+;  (interactive)
+;  (vhdl-mode)
+;  (viper-mode)
+;  (setq tab-width 4)
+;  )
 
 (defun gimp-c-mode ()
   (interactive)
@@ -363,7 +367,7 @@
                  load-path))
 
 ;(require 'vimpulse) ; only visual mode, not much more...
-(setq viper-ex-style-editing nil)  ; can backspace past start of insert / line
+;(setq viper-ex-style-editing nil)  ; can backspace past start of insert / line
 
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
@@ -442,14 +446,6 @@
     ;(setq show-trailing-whitespace t)
     ))
 
-; Der Octave-Mode braucht eine extraaufforderung den viper zu benutzen
-(add-hook 'octave-mode-hook
-  (lambda () 
-    (viper-mode)
-    (setq tab-width 4)
-    (setq octave-block-offset 4)
-    ))
-
 ; Tabs fuer eclipse java zeugs
 (add-hook 'java-mode-hook
   (lambda () 
@@ -459,7 +455,7 @@
 (auto-compression-mode t)
 
 (global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
-(define-key viper-vi-local-user-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
+;(define-key viper-vi-local-user-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
 
 (column-number-mode t)
 
@@ -470,23 +466,18 @@
 (setq-default indent-tabs-mode nil)
 
 ;; Enter soll im c-modus auto-indent machen
-(setq viper-auto-indent t)
-(custom-set-variables
- '(viper-auto-indent t))
+;(setq viper-auto-indent t)
+;(custom-set-variables
+; '(viper-auto-indent t))
 
 ;; always use viper for a buffer if appropriate
-(setq viper-always t)
+;(setq viper-always t)
 
 ;; Buffer Wechseln mit Tastatur
 ; Paket swbuff von: http://perso.wanadoo.fr/david.ponce/more-elisp.html
 (require 'swbuff)
 ; keine internen buffer *scratch* *help* etc. (regex aus doku)
 (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
-(define-key viper-vi-local-user-map "q" 'swbuff-switch-to-next-buffer)
-;(define-key viper-vi-local-user-map "f" 'swbuff-switch-to-next-buffer)
-(define-key viper-vi-local-user-map "Q" 'swbuff-switch-to-previous-buffer)
-;(define-key viper-vi-local-user-map "F" 'swbuff-switch-to-previous-buffer)
-;(define-key viper-vi-local-user-map "s" 'swbuff-switch-to-previous-buffer)
 
 ; TODO: replace swbuff?
 ;Another vote for iswitchb-mode. It's so immensely useful, and does not seem to be very well known. I set it up like this:
@@ -548,26 +539,18 @@
                          "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"
                          "\\.elf\\'" "\\.hex\\'"  "\\.dblite\\'" ))
 
-(define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
+;(define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
 
-(defun martin-kill-whole-line ()
-  (interactive)
-  (viper-beginning-of-line (cons ?d ?d))
-)
+;(defun martin-kill-whole-line ()
+;  (interactive)
+;  (viper-beginning-of-line (cons ?d ?d))
+;)
 
-;  (viper-beginning-of-line 1)
-;  (viper-kill-line 1)
-;  )
 ;; insert a new comment with space
-(defun martin-insert-comment ()
-  (interactive)
-  (comment-dwim nil)
-  (viper-insert nil))
-
-; for outline-mode
-;(define-key viper-vi-local-user-map " " 'hs-toggle-hiding)
-;(define-key viper-vi-local-user-map "-" 'hs-hide-all)
-;(define-key viper-vi-local-user-map "+" 'hs-show-all)
+;(defun martin-insert-comment ()
+;  (interactive)
+;  (comment-dwim nil)
+;  (viper-insert nil))
 
 (defun my-jump-to-tag ()
   (interactive)
@@ -592,32 +575,36 @@
   (setq last-tags-jump-was-find-tag nil)
   (call-interactively 'tags-search (thing-at-point 'symbol)))
 
+
+
+
+
 (global-set-key "\M-." 'my-jump-to-tag)
-(define-key viper-vi-local-user-map "," 'my-start-tag-grep)
+;(define-key viper-vi-local-user-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
-(define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
+;(define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
 (global-set-key (kbd "C-.") 'my-jump-to-tag)
-(define-key viper-vi-local-user-map ":" 'my-jump-to-tag)
+;(define-key viper-vi-local-user-map ":" 'my-jump-to-tag)
 
-(define-key viper-vi-local-user-map "*" 'pop-tag-mark)
+;(define-key viper-vi-local-user-map "*" 'pop-tag-mark)
 
-;(define-key viper-vi-local-user-map "W" 'kill-region)
-(define-key viper-vi-local-user-map "W" 'copy-region-as-kill)
-(define-key viper-vi-local-user-map " " 'set-mark-command)
-;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
-(define-key viper-vi-local-user-map "M" 'delete-other-windows)
-;(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
-(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
-;(define-key viper-vi-local-user-map "K" 'bury-buffer)
-;(define-key viper-vi-local-user-map "P" 'yank-pop)
-;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
-(define-key viper-vi-local-user-map "v" 'ido-find-file)
-(define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
-
-(define-key viper-vi-local-user-map "H" 'point-grep)
-
-;(global-set-key "%" 'match-paren)
-(define-key viper-vi-local-user-map "%" 'match-paren)
+;;(define-key viper-vi-local-user-map "W" 'kill-region)
+;(define-key viper-vi-local-user-map "W" 'copy-region-as-kill)
+;(define-key viper-vi-local-user-map " " 'set-mark-command)
+;;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
+;(define-key viper-vi-local-user-map "M" 'delete-other-windows)
+;;(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
+;(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
+;;(define-key viper-vi-local-user-map "K" 'bury-buffer)
+;;(define-key viper-vi-local-user-map "P" 'yank-pop)
+;;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
+;(define-key viper-vi-local-user-map "v" 'ido-find-file)
+;(define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
+;
+;(define-key viper-vi-local-user-map "H" 'point-grep)
+;
+;;(global-set-key "%" 'match-paren)
+;(define-key viper-vi-local-user-map "%" 'match-paren)
 
 ; from http://grok2.tripod.com/
 (defun match-paren (arg)
@@ -651,9 +638,6 @@
   (back-to-indentation)
   )
 
-(define-key viper-vi-basic-map "\C-u" 'pager-page-up)
-(define-key viper-vi-basic-map "\C-d" 'pager-page-down)
-
 (global-set-key [next] 	   'pager-page-down)
 (global-set-key [prior]	   'pager-page-up)
 
@@ -661,8 +645,6 @@
 (global-set-key "\M-k"  'pager-some-rows-up)
 (global-set-key "\M-j"  'pager-some-rows-down)
 (define-key c-mode-base-map "\M-j"  'pager-some-rows-down)
-(define-key viper-vi-local-user-map "[" 'pager-some-rows-down) ; kinesis
-(define-key viper-vi-local-user-map "]" 'pager-some-rows-up) ; kinesis
 
 ; speichert liste von zuletzt geoeffneten dateien beim Beenden
 (require 'recentf)
@@ -671,8 +653,8 @@
 ; info about modifying viper per-mode: http://www.cs.cmu.edu/cgi-bin/info2www?%28viper%29Key%20Bindings
 (setq my-python-modifier-map (make-sparse-keymap))
 (define-key my-python-modifier-map [backspace] 'py-electric-backspace)
-;(viper-modify-major-mode 'python-mode 'vi-state my-python-modifier-map)
-(viper-modify-major-mode 'python-mode 'insert-state my-python-modifier-map)
+;;(viper-modify-major-mode 'python-mode 'vi-state my-python-modifier-map)
+;(viper-modify-major-mode 'python-mode 'insert-state my-python-modifier-map)
 
 (defun w3m-copy-url-as-kill ()
   (interactive)
@@ -815,9 +797,9 @@
 (setq scroll-step 1) ; maybe this did interfer with "pager"?
 (setq scroll-conservatively 1) ; maybe this did interfer with "pager"?
 
-;; overwrite viper function to remove silly question:
-(defun viper-set-register-macro (reg)
-  (set-register reg last-kbd-macro))
+;;; overwrite viper function to remove silly question:
+;(defun viper-set-register-macro (reg)
+;  (set-register reg last-kbd-macro))
 
 ; http://github.com/mattharrison/emacs-starter-kit
 (require 'starter-kit-defuns)
@@ -832,8 +814,8 @@
 ;(load "/usr/share/git-core/emacs/vc-git.el")
 ;(add-to-list 'vc-handled-backends 'GIT)
 
-(require 'git-blame) ; note: modified version of git-blame.el
-(define-key viper-vi-local-user-map "B" 'git-blame-mode)
+;(require 'git-blame) ; note: modified version of git-blame.el
+;(define-key viper-vi-local-user-map "B" 'git-blame-mode)
 
 
 ;(add-to-list 'load-path "~/compile/mo-git-blame")
@@ -896,3 +878,28 @@
 (fset 'pabbrev-suggestions-goto-buffer 'pabbrev-suggestions-ido)
 
 (global-pabbrev-mode)
+
+;(define-key viper-vi-basic-map "\C-u" 'pager-page-up)
+;(define-key viper-vi-basic-map "\C-d" 'pager-page-down)
+(fill-keymap evil-normal-state-map
+            "q" 'swbuff-switch-to-next-buffer
+            "Q" 'swbuff-switch-to-previous-buffer
+            "[" 'pager-some-rows-down ; kinesis
+            "]" 'pager-some-rows-up ; kinesis
+
+                                        ;             "Y" (kbd "y$")
+;             "+" 'evil-numbers/inc-at-pt
+;             "-" 'evil-numbers/dec-at-pt
+;             "SPC" 'evil-ace-jump-char-mode
+;             "S-SPC" 'evil-ace-jump-word-mode
+;             "C-SPC" 'evil-ace-jump-line-mode
+;             "go" 'goto-char
+;             "C-t" 'transpose-chars
+;             "C-:" 'eval-expression
+;             ":" 'evil-repeat-find-char-reverse
+;             "gH" 'evil-window-top
+;             "gL" 'evil-window-bottom
+;             "gM" 'evil-window-middle
+;             "H" 'beginning-of-line
+;             "L" 'end-of-line
+             )
