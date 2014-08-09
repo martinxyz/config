@@ -14,16 +14,31 @@
 ; some nice ideas there, but nothing wrong with ido, imo
 ;(require 'icicles)
 
-;; ;; C-z is usually 'iconify-or-deiconify-frame, but viper uses it to toggle
-;; ;; vi/emacs input modes, causing confusion in non-viper buffers
-;; (global-unset-key "\C-z")
-;; ;; start viper on startup (vim keybindings), siehe auch viper.el
-;; (setq viper-mode t)
-;; (require 'viper)
-
 (add-to-list 'load-path "~/config/elisp/evil")
 (require 'evil)
 (evil-mode 1)
+
+; Evil normal emacs commands when in insert state
+(setcdr evil-insert-state-map nil)
+;(define-key evil-insert-state-map "\C-k" 'evil-insert-digraph)
+;(define-key evil-insert-state-map "\C-o" 'evil-execute-in-normal-state)
+;(define-key evil-insert-state-map "\C-r" 'evil-paste-from-register)
+;(define-key evil-insert-state-map "\C-y" 'evil-copy-from-above)
+;(define-key evil-insert-state-map "\C-e" 'evil-copy-from-below)
+;(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
+;(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
+;(define-key evil-insert-state-map "\C-x\C-n" 'evil-complete-next-line)
+;(define-key evil-insert-state-map "\C-x\C-p" 'evil-complete-previous-line)
+;(define-key evil-insert-state-map "\C-t" 'evil-shift-right-line)
+;(define-key evil-insert-state-map "\C-d" 'evil-shift-left-line)
+(define-key evil-insert-state-map [remap delete-backward-char] 'evil-delete-backward-char-and-join)
+;(define-key evil-insert-state-map [delete] 'delete-char)
+(define-key evil-insert-state-map [remap newline] 'evil-ret)
+(define-key evil-insert-state-map [remap newline-and-indent] 'evil-ret-and-indent)
+(define-key evil-insert-state-map [escape] 'evil-normal-state)
+(define-key evil-insert-state-map
+  (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
+
 
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
@@ -59,8 +74,8 @@
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
-;(define-key viper-vi-local-user-map "\C-e" 'bigterm-in-current-directory)
-;;(global-set-key  "\C-e" 'bigterm-in-current-directory)
+(define-key evil-normal-state-map "\C-e" 'bigterm-in-current-directory)
+;(global-set-key  "\C-e" 'bigterm-in-current-directory)
 (global-set-key  [F12] 'bigterm-in-current-directory)
 
 (defun bigterm-in-current-directory ()
@@ -366,9 +381,6 @@
                  '("~/config/elisp/python-mode-1.0")
                  load-path))
 
-;(require 'vimpulse) ; only visual mode, not much more...
-;(setq viper-ex-style-editing nil)  ; can backspace past start of insert / line
-
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
 ;(pymacs-load "pymacstest" "pytest-")
@@ -454,8 +466,8 @@
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
 (auto-compression-mode t)
 
-(global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
-;(define-key viper-vi-local-user-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
+;(global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
+(define-key evil-normal-state-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
 
 (column-number-mode t)
 
@@ -470,14 +482,13 @@
 ;(custom-set-variables
 ; '(viper-auto-indent t))
 
-;; always use viper for a buffer if appropriate
-;(setq viper-always t)
-
 ;; Buffer Wechseln mit Tastatur
 ; Paket swbuff von: http://perso.wanadoo.fr/david.ponce/more-elisp.html
 (require 'swbuff)
 ; keine internen buffer *scratch* *help* etc. (regex aus doku)
 (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
+(define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
+(define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
 
 ; TODO: replace swbuff?
 ;Another vote for iswitchb-mode. It's so immensely useful, and does not seem to be very well known. I set it up like this:
@@ -539,7 +550,7 @@
                          "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"
                          "\\.elf\\'" "\\.hex\\'"  "\\.dblite\\'" ))
 
-;(define-key viper-vi-local-user-map "t" 'martin-kill-whole-line)
+;(define-key evil-normal-state-map "t" 'martin-kill-whole-line)
 
 ;(defun martin-kill-whole-line ()
 ;  (interactive)
@@ -580,31 +591,27 @@
 
 
 (global-set-key "\M-." 'my-jump-to-tag)
-;(define-key viper-vi-local-user-map "," 'my-start-tag-grep)
+(define-key evil-normal-state-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
-;(define-key viper-vi-local-user-map "}" 'my-continue-tag-search)
 (global-set-key (kbd "C-.") 'my-jump-to-tag)
-;(define-key viper-vi-local-user-map ":" 'my-jump-to-tag)
+;(define-key evil-normal-state-map ":" 'my-jump-to-tag)
 
-;(define-key viper-vi-local-user-map "*" 'pop-tag-mark)
+(define-key evil-normal-state-map "*" 'pop-tag-mark)
 
-;;(define-key viper-vi-local-user-map "W" 'kill-region)
-;(define-key viper-vi-local-user-map "W" 'copy-region-as-kill)
-;(define-key viper-vi-local-user-map " " 'set-mark-command)
-;;(define-key viper-vi-local-user-map "F" 'pop-global-mark)
-;(define-key viper-vi-local-user-map "M" 'delete-other-windows)
-;;(define-key viper-vi-local-user-map "D" 'kill-this-buffer)
-;(define-key viper-vi-local-user-map "K" 'kill-this-buffer)
-;;(define-key viper-vi-local-user-map "K" 'bury-buffer)
-;;(define-key viper-vi-local-user-map "P" 'yank-pop)
-;;(define-key viper-vi-local-user-map "ä" 'viper-bol-and-skip-white)
-;(define-key viper-vi-local-user-map "v" 'ido-find-file)
-;(define-key viper-vi-local-user-map "V" 'ido-switch-buffer)
+(define-key evil-normal-state-map "\C-W" 'kill-region)
+(define-key evil-normal-state-map "W" 'copy-region-as-kill)
+(define-key evil-normal-state-map " " 'set-mark-command)
+;(define-key evil-normal-state-map "F" 'pop-global-mark)
+(define-key evil-normal-state-map "M" 'delete-other-windows)
+;;(define-key evil-normal-state-map "D" 'kill-this-buffer)
+(define-key evil-normal-state-map "K" 'kill-this-buffer)
+;;(define-key evil-normal-state-map "K" 'bury-buffer)
+;;(define-key evil-normal-state-map "P" 'yank-pop)
+;;(define-key evil-normal-state-map "ä" 'viper-bol-and-skip-white)
+(define-key evil-normal-state-map "v" 'ido-find-file)
+(define-key evil-normal-state-map "V" 'ido-switch-buffer)
 ;
-;(define-key viper-vi-local-user-map "H" 'point-grep)
-;
-;;(global-set-key "%" 'match-paren)
-;(define-key viper-vi-local-user-map "%" 'match-paren)
+(define-key evil-normal-state-map "H" 'point-grep)
 
 ; from http://grok2.tripod.com/
 (defun match-paren (arg)
@@ -815,7 +822,7 @@
 ;(add-to-list 'vc-handled-backends 'GIT)
 
 ;(require 'git-blame) ; note: modified version of git-blame.el
-;(define-key viper-vi-local-user-map "B" 'git-blame-mode)
+;(define-key evil-normal-state-map "B" 'git-blame-mode)
 
 
 ;(add-to-list 'load-path "~/compile/mo-git-blame")
@@ -879,15 +886,16 @@
 
 (global-pabbrev-mode)
 
-;(define-key viper-vi-basic-map "\C-u" 'pager-page-up)
-;(define-key viper-vi-basic-map "\C-d" 'pager-page-down)
-(fill-keymap evil-normal-state-map
-            "q" 'swbuff-switch-to-next-buffer
-            "Q" 'swbuff-switch-to-previous-buffer
-            "[" 'pager-some-rows-down ; kinesis
-            "]" 'pager-some-rows-up ; kinesis
+;(define-key evil-normal-state-map "\C-u" 'pager-page-up)
+;(define-key evil-normal-state-map "\C-d" 'pager-page-down)
+(define-key evil-normal-state-map "\C-u" 'evil-scroll-up)
+(define-key evil-normal-state-map "\C-d" 'evil-scroll-down)
+(define-key evil-normal-state-map "[" 'pager-some-rows-down) ; kinesis
+(define-key evil-normal-state-map "]" 'pager-some-rows-up) ; kinesis
 
-                                        ;             "Y" (kbd "y$")
+;(fill-keymap evil-normal-state-map
+;            "SPC" 'evil-ace-jump-char-mode
+;             "Y" (kbd "y$")
 ;             "+" 'evil-numbers/inc-at-pt
 ;             "-" 'evil-numbers/dec-at-pt
 ;             "SPC" 'evil-ace-jump-char-mode
@@ -902,4 +910,4 @@
 ;             "gM" 'evil-window-middle
 ;             "H" 'beginning-of-line
 ;             "L" 'end-of-line
-             )
+;             )
