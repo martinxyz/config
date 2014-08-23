@@ -22,6 +22,7 @@
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
  '(evil-cross-lines t)
+ '(evil-symbol-word-search t)
  '(font-lock-maximum-decoration t)
  '(font-lock-use-colors nil)
  '(frame-background-mode (quote dark))

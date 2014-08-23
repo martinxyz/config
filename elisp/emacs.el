@@ -593,6 +593,7 @@
 (global-set-key "\M-." 'my-jump-to-tag)
 (define-key evil-normal-state-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
+(define-key evil-normal-state-map "}" 'my-continue-tag-search)
 (global-set-key (kbd "C-.") 'my-jump-to-tag)
 ;(define-key evil-normal-state-map ":" 'my-jump-to-tag)
 
@@ -911,3 +912,15 @@
 ;             "H" 'beginning-of-line
 ;             "L" 'end-of-line
 ;             )
+
+; visual line movements
+(define-key evil-motion-state-map "j" #'evil-next-visual-line)
+(define-key evil-motion-state-map "k" #'evil-previous-visual-line)
+(define-key evil-motion-state-map "$" #'evil-end-of-visual-line)
+(define-key evil-motion-state-map "^" #'evil-first-non-blank-of-visual-line)
+(define-key evil-motion-state-map "0" #'evil-beginning-of-visual-line)
+
+; evil should count underscores as part of a word, like vim does
+; https://bitbucket.org/lyro/evil/wiki/Home
+(modify-syntax-entry ?_ "w")
+(add-hook 'c-mode-common-hook #'(lambda () (modify-syntax-entry ?_ "w")))
