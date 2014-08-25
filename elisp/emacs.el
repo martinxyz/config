@@ -226,12 +226,11 @@
   (c-set-offset 'substatement-open 0)
   )
 
-;(defun ines-vhdl-mode ()
-;  (interactive)
-;  (vhdl-mode)
-;  (viper-mode)
-;  (setq tab-width 4)
-;  )
+(defun ines-vhdl-mode ()
+  (interactive)
+  (vhdl-mode)
+  (setq tab-width 4)
+  )
 
 (defun gimp-c-mode ()
   (interactive)
