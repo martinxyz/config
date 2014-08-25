@@ -14,9 +14,15 @@
 ; some nice ideas there, but nothing wrong with ido, imo
 ;(require 'icicles)
 
+; undo-tree is required for evil's redo to work (and is also nice on its own)
+(add-to-list 'load-path "~/config/elisp/evil/lib")
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 (add-to-list 'load-path "~/config/elisp/evil")
 (require 'evil)
 (evil-mode 1)
+
 
 ; Evil normal emacs commands when in insert state
 (setcdr evil-insert-state-map nil)
@@ -913,12 +919,12 @@
 ;             "L" 'end-of-line
 ;             )
 
-; visual line movements
-(define-key evil-motion-state-map "j" #'evil-next-visual-line)
-(define-key evil-motion-state-map "k" #'evil-previous-visual-line)
-(define-key evil-motion-state-map "$" #'evil-end-of-visual-line)
-(define-key evil-motion-state-map "^" #'evil-first-non-blank-of-visual-line)
-(define-key evil-motion-state-map "0" #'evil-beginning-of-visual-line)
+; visual line movements (instead of typing gj, gk, etc.)
+;(define-key evil-motion-state-map "j" #'evil-next-visual-line)
+;(define-key evil-motion-state-map "k" #'evil-previous-visual-line)
+;(define-key evil-motion-state-map "$" #'evil-end-of-visual-line)
+;(define-key evil-motion-state-map "^" #'evil-first-non-blank-of-visual-line)
+;(define-key evil-motion-state-map "0" #'evil-beginning-of-visual-line)
 
 ; evil should count underscores as part of a word, like vim does
 ; https://bitbucket.org/lyro/evil/wiki/Home
