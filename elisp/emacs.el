@@ -893,12 +893,22 @@
 
 (global-pabbrev-mode)
 
+
 ;(define-key evil-normal-state-map "\C-u" 'pager-page-up)
 ;(define-key evil-normal-state-map "\C-d" 'pager-page-down)
 (define-key evil-normal-state-map "\C-u" 'evil-scroll-up)
 (define-key evil-normal-state-map "\C-d" 'evil-scroll-down)
 (define-key evil-normal-state-map "[" 'pager-some-rows-down) ; kinesis
 (define-key evil-normal-state-map "]" 'pager-some-rows-up) ; kinesis
+(define-key evil-normal-state-map "\C-d" 'evil-scroll-down)
+
+; from http://dnquark.com/blog/2012/02/emacs-evil-ecumenicalism/
+(defun evil-undefine ()
+ (interactive)
+ (let (evil-mode-map-alist)
+   (call-interactively (key-binding (this-command-keys)))))
+; use tab for indentation, not for evil-jump-forward
+(define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
 
 ;(fill-keymap evil-normal-state-map
 ;            "SPC" 'evil-ace-jump-char-mode
