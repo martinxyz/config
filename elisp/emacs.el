@@ -596,6 +596,7 @@
 
 
 (global-set-key "\M-." 'my-jump-to-tag)
+(define-key evil-normal-state-map "\M-." 'my-jump-to-tag)
 (define-key evil-normal-state-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
 (define-key evil-normal-state-map "}" 'my-continue-tag-search)
