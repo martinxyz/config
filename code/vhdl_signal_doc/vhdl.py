@@ -40,6 +40,9 @@ class Codebase:
     def __init__(self, sourcefiles):
         self.files = []
         for filename in sourcefiles:
+            if not path.exists(filename):
+                print filename, 'does not exist, skipping!'
+                continue
             f = SourceFile(self)
             f.filename = filename
             self.files.append(f)
