@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "$@" | festival --tts --pipe
+
