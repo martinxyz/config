@@ -1,0 +1,3 @@
+#!/bin/sh
+gprof2dot.py -f pstats "$@" | dot -Tpng -o tmp.png && feh tmp.png
+

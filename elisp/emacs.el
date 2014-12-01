@@ -472,7 +472,7 @@
 (auto-compression-mode t)
 
 ;(global-set-key "\M- " 'pop-global-mark) ; <-- den kann ich mir nicht merken
-(define-key evil-normal-state-map "<" 'pop-global-mark) ; vielleicht kann ich mir ja einen davon merken...
+;(define-key evil-normal-state-map "<" 'pop-global-mark) ; <-- konflikt mit indent command
 
 (column-number-mode t)
 

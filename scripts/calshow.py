@@ -14,6 +14,8 @@ data = open(f).read()
 data = data.split('\n---')[1]
 lines = [s for s in data.split('\n')[1:] if s.strip()]
 lines = lines[:3]
+if not ''.join(lines).strip():
+    sys.exit(0) # calendar empty
 print
 for line in lines:
     print line[:80]
