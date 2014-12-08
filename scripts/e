@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ $(pwd) = $HOME ] ; then
+    echo Home.
+    files=$(find -maxdepth 2 -name .emacs.desktop)
+else
+    files=$(find -maxdepth 4 -name .emacs.desktop)
+fi
+
+(( cnt = 0 ))
+dirs=""
+for fn in $files ; do
+    (( cnt = cnt + 1 ))
+    echo $fn
+    dirname=$(dirname $fn)
+    dirs="$dirs $dirname"
+done
+
+if [ $cnt -eq 1 ] ; then
+    echo using $dirname
+    cd $dirname
+    emacs > /dev/null 2>&1 &
+else
+    PS3='Directory: '
+    select dirname in $dirs; do
+        if [ -z $dirname ] ; then
+            echo "Never mind."
+            exit 0
+        fi
+        echo "using $dirname"
+        cd $dirname
+        emacs > /dev/null 2>&1 &
+        exit 0
+    done
+fi
+
