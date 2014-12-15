@@ -11,7 +11,6 @@ fi
 dirs=""
 for fn in $files ; do
     (( cnt = cnt + 1 ))
-    echo $fn
     dirname=$(dirname $fn)
     dirs="$dirs $dirname"
 done
@@ -33,4 +32,9 @@ else
         exit 0
     done
 fi
+
+echo "No .emacs.desktop found."
+#echo -n "No .emacs.desktop. Start anyway? (Return/Ctrl-C) "
+#read
+#emacs > /dev/null 2>&1 &
 
