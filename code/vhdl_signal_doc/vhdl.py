@@ -3,9 +3,9 @@
 """
 Module to analyze and manipulate an existing VHDL codebase.
 
-This is not a correct VHDL parser, it assumes certain basic
-conventions (entity and architecture must be in the same file,
-newlines must be as they usually are, etc).
+This is not a correct VHDL parser. It works line-by-line and assumes
+certain basic conventions. (Entity and architecture must be in the
+same file, newlines must be as they usually are, etc.)
 """
 import re
 from os import path

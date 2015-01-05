@@ -2,7 +2,7 @@
 # file created 2010-08-19, Martin Renold
 # public domain
 """
-Generate HTML documentation from vhdl code structure and comments.
+Generate HTML documentation from vhdl source.
 """
 import vhdl
 import os, cgi, sys, optparse
@@ -11,10 +11,11 @@ parser = optparse.OptionParser(
     usage = '%prog <filelist1.txt|projectfile1.qsf> [<filelist2.txt|projectfile2.qsf> ...]',
     description = __doc__.lstrip()
     )
+parser.add_option("-e", "--eval-constants",
+                  action="store_true", default=False,
+                  help="evaluate vhdl constants using use python eval(); not safe, only for trusted code")
 
 options, args = parser.parse_args()
-
-parse_globals = False
 
 if not args:
     parser.print_help()
@@ -91,19 +92,31 @@ for e in top.entities:
         else:
             lines = [c]
         for line in lines:
-            # grab special comments
-            l = line.split('--#', 1)[1:]
-            if not l: continue
-            comment = l[0].strip()
-            if comment.startswith('#'):
-                # new group
+            print repr(line)
+            ## grab special comments
+            #l = line.split('--#', 1)[1:]
+            # grab all comments
+            if '--' not in line:
+                signal = None
+                continue
+            statement, comment = line.split('--', 1)
+            statement = statement.strip()
+            comment = comment.strip()
+            if not comment:
+                signal = None # if there is a comment on the next line, it's not a multi-line continuation
+                continue
+
+            # treat special comments (--!, --#, --##) like normal comments
+            comment = comment.lstrip('!').lstrip('#')
+
+            if not signal: # comment refers to all signals below
+                # new signal group
                 group = SignalGroup()
                 #group.name = comment[1:].split(None, 1)[1] # remove first word
                 group.name = comment[1:].strip()
                 group.signals = []
                 e.signal_groups.append(group)
             else:
-                assert signal is not None, 'signal comment continuation without signal (bad section comment?)%r\n%r\n' % (e, line)
                 if signal.doc:
                     signal.doc += '\n'
                 signal.doc += comment
@@ -114,27 +127,47 @@ for e in top.entities:
 
 global_constants = {}
 
-if parse_globals:
-    for line in open('../core/hsr_prp_globals_pack.vhd'):
-        if line.strip().startswith('--'):
-            continue
-        if 'constant' in line and ':=' in line:
-            name = line.replace(':', ' ').split()[1]
-            value = line.split(':=')[1].split(';')[0]
-            try:
-                value = eval(value, global_constants)
-            except:
+def resolve_constants(s):
+    if not options.eval_constants:
+        return s
+    try:
+        res = eval(s, global_constants)
+    except:
+        res = s
+    return res
+
+if True:
+    invalid_constants = []
+    for fn in files:
+        for line in open(fn):
+            if line.strip().startswith('--'):
                 continue
-            global_constants[name] = value
-            #print name, value
+            if 'constant' in line and ':=' in line:
+                name = line.replace(':', ' ').split()[1].strip()
+                if not ';' in line: continue
+                value = line.split(':=')[1].split(';')[0].strip()
+                #print 'found constant:', name, value
+                if name in global_constants:
+                    if value != global_constants[name]:
+                        print 'WARNING: multiple definitions of constant', name + '; not resolving it (' + repr(global_constants[name]), 'vs', repr(value) + ')'
+                        invalid_constants.append(name)
+                global_constants[name] = value
+    for name in invalid_constants:
+        if name in global_constants:
+            global_constants.pop(name)
+    stale = False
+    while not stale:
+        stale = True
+        for name in list(global_constants.keys()):
+            value = resolve_constants(global_constants[name])
+            if value != global_constants[name]:
+                global_constants[name] = value
+                stale = False
 
 entities = []
 for e in top.entities:
     #if e.name.endswith('_top'):
     #    continue
-    #if e.name in ['cpu_rx_controller', 'cpu_tx_controller']:
-    #    continue
-
     entities.append(e)
 
 signal_pages = []
@@ -338,24 +371,18 @@ def make_entity_page(e, print_version):
             t = t.replace('( ', '(').replace(' )', ')')
             t = t.replace(' DOWNTO ', ' downto ')
             t = t.replace(' TO ', ' to ')
-            # Hack to evaluate contants. Should probably tokenize a bit instead.
-            try:
+            # evaluate contants
+            if '(' in t and (' downto ' in t or ' to ' in t):
+                separator = ' downto ' if ' downto ' in t else ' to '
                 before, after = t.split('(', 1)
-                expression, after = after.split(' downto ')
-                expression = str(eval(expression, global_constants))
-                t = '%s(%s downto %s' % (before, expression, after)
-                #print before, expression, after
-            except:
-                pass
-            try:
-                before, after = t.split('(', 1)
-                expression, after = after.split(' to ')
-                after, trash = after.split(')', 1)
-                expression = str(eval(expression, global_constants))
-                after = str(eval(after, global_constants))
-                t = '%s(%s to %s)' % (before, expression, after)
-            except:
-                pass
+                expression1, after = after.split(separator)
+                expression2, after = after.split(')', 1)
+                e1 = resolve_constants(expression1)
+                e2 = resolve_constants(expression2)
+                if expression1 != str(e1): expression1 = str(e1) + ' {=' + expression1 + '}'
+                if expression2 != str(e2): expression2 = str(e2) + ' {=' + expression2 + '}'
+                t = '%s(%s %s %s)%s' % (before, expression1, separator, expression2, after)
+
             t = t.replace(' ', '&nbsp;')
             t = t.replace('(', '&#8203;(') # zero-width space in front of every '(' for table layout.
             name = signal.name
@@ -375,3 +402,5 @@ for e in entities:
 make_main_index_page()
 
 print 'Finished.'
+
+print 'Now run: sensible-browser %s/index.html' % outdir
