@@ -494,6 +494,8 @@
 (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
 (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
 (define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
+;(define-key evil-normal-state-map "t" 'evil-record-macro)    ; does not work; but using "q" does work (uncommenting the above)
+;(define-key evil-normal-state-map "T" 'evil-execute-macro)   ; same
 
 ; TODO: replace swbuff?
 ;Another vote for iswitchb-mode. It's so immensely useful, and does not seem to be very well known. I set it up like this:
@@ -811,13 +813,8 @@
 (setq scroll-step 1) ; maybe this did interfer with "pager"?
 (setq scroll-conservatively 1) ; maybe this did interfer with "pager"?
 
-;;; overwrite viper function to remove silly question:
-;(defun viper-set-register-macro (reg)
-;  (set-register reg last-kbd-macro))
-
 ; http://github.com/mattharrison/emacs-starter-kit
 (require 'starter-kit-defuns)
-
 
 (put 'downcase-region 'disabled nil)
 
