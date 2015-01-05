@@ -41,16 +41,16 @@ class Codebase:
         self.files = []
         for filename in sourcefiles:
             if not path.exists(filename):
-                print filename, 'does not exist, skipping!'
+                print(filename, 'does not exist, skipping!')
                 continue
             f = SourceFile(self)
             f.filename = filename
             self.files.append(f)
-            for lineno, line in enumerate(open(filename)):
+            for lineno, line in enumerate(open(filename, encoding='utf8', errors='ignore')):
                 try:
                     f.feed(line)
                 except:
-                    print '%s:%d error while parsing %s' % (filename, lineno, repr(line.strip()))
+                    print('%s:%d error while parsing %s' % (filename, lineno, repr(line.strip())))
                     raise
         self.connect_entities()
         self.connect_signals()
@@ -60,13 +60,13 @@ class Codebase:
         self.name2entity = {}
         for f in self.files:
             if f.entity:
-                #print f.filename, 'defines entity', f.entity.name
+                #print(f.filename, 'defines entity', f.entity.name)
                 assert not f.entity.name in self.name2entity, 'Entitiy %s defined in several files!\n  %s and %s\n' % (repr(f.entity.name), repr(f.filename), repr(self.name2entity[f.entity.name].parent.filename))
                 self.name2entity[f.entity.name] = f.entity
                 self.entities.append(f.entity)
                 assert f.arch, 'Entity %s has no architecture in the same file!' % f.entity.name
                 f.entity.arch = f.arch
-        print 'Found %d entities in design' % len(self.entities)
+        print('Found %d entities in design' % len(self.entities))
         for e in self.entities:
             e.children = []
             #e.internal_signals = {}
@@ -77,7 +77,7 @@ class Codebase:
                     if e2 not in e.children:  # only once (flattened)
                         e.children.append(e2)
                 else:
-                    print 'WARNING: entity', e.name, 'contains instance of unknown entity', inst.entity_name
+                    print('WARNING: entity', e.name, 'contains instance of unknown entity', inst.entity_name)
                     inst.entity = None
                 #for portname, signalname in e.connections:
                 #    internal_signals.append(signalname)
@@ -117,17 +117,17 @@ class Codebase:
                 e2 = inst.entity
                 if e2 is None:
                     continue
-                #print 'parsing instance', inst, 'in entity', e
+                #print('parsing instance', inst, 'in entity', e)
                 for a_str, b_str in inst.connections:
                     #if inst.name == 'u_path_tx':
-                    #    print 'resolving %r -> %r' % (a_str, b_str)
+                    #    print('resolving %r -> %r' % (a_str, b_str))
                     original_b_str = b_str
                     b_str = b_str.replace('(', '.').split('.')[0].strip()
                     a_str = a_str.replace('(', '.').split('.')[0].strip()
                     a = e2.name2port_signal.get(a_str)
                     b = e.arch.name2signal.get(b_str)
                     if not a:
-                        print 'WARNING: port', repr(a_str), 'does not exist in entity', repr(e2.name)
+                        print('WARNING: port', repr(a_str), 'does not exist in entity', repr(e2.name))
                         continue
                     if not b:
                         b_str = b_str.lower()
@@ -136,10 +136,10 @@ class Codebase:
                         elif b_str in ['open']:
                             pass # ignore open ports
                         else:
-                            print 'WARNING: architecture namespace of', repr(e.name), 'has no signal named', repr(original_b_str)
+                            print('WARNING: architecture namespace of', repr(e.name), 'has no signal named', repr(original_b_str))
                         continue
                     #if inst.name == 'u_path_tx':
-                    #    print 'successful connection:', a.name, '<-->', b.name
+                    #    print('successful connection:', a.name, '<-->', b.name)
                     a.connections.add(b)
                     b.connections.add(a)
                     if a.dir == 'in':
@@ -151,21 +151,13 @@ class Codebase:
                         a.sinks.add(b)
                         b.sources.add(a)
                     else:
-                        #print 'INOUT', a, b
+                        #print('INOUT', a, b)
                         a.inout.add(b)
                         b.inout.add(a)
 
-    def write(self):
-        for sf in self.files:
-            data_new = ''.join(content2lines(sf.content))
-            data_old = open(sf.filename).read()
-            if data_old != data_new:
-                print 'writing', sf.filename
-                open(sf.filename, 'w').write(data_new)
-            
 def content2lines(content):
     lines = []
-    #print content
+    #print(content)
     for thing in content:
         if isinstance(thing, str):
             lines.append(thing)
@@ -193,7 +185,7 @@ class SourceFile:
         else:
             if l:
                 self.ignoring = True
-                print 'WARNING: accepting only one entity per file, ignoring rest of the file:', self.filename
+                print('WARNING: accepting only one entity per file, ignoring rest of the file:', self.filename)
             #assert not l, 'accepting only one entity per file'
             l = re.findall(r'architecture\s+\w*\s+of\s+\w*\s+is', s, flags=re.IGNORECASE)
             if not self.arch:
@@ -277,7 +269,7 @@ class Architecture:
                     assert not self.expecting_signals
                     name = l[0][0]
                     entity = l[0][1].replace('work.', '')
-                    #print 'found instance of', entity, 'named', name
+                    #print('found instance of', entity, 'named', name)
                     self.parsing_instance = Instance(self, entity, name)
                     self.content.append(self.parsing_instance)
                     self.instances.append(self.parsing_instance)
@@ -303,7 +295,7 @@ class Instance:
             left = left.strip()
             right = right.strip().rstrip(',').strip()
             #if self.name == 'u_path_tx':
-            #    print left, '=>', right
+            #    print(left, '=>', right)
             self.connections.append((left, right))
 
     def __repr__(self):
@@ -327,7 +319,7 @@ class LocalSignal(Signal):
         self.name = name
         self.type = type
         self.dir = None
-        #print 'sig', self.name, 'type', self.type
+        #print('sig', self.name, 'type', self.type)
 
     def __repr__(self):
         return 'LocalSignal(name=%r, entity=%r)' %  (self.name, self.entity.name)
@@ -351,7 +343,7 @@ class PortSignal(Signal):
         self.name = name
         self.type = type
         self.dir = direction.lower()
-        #print 'port', self.name, 'type', self.type, 'dir', self.dir
+        #print('port', self.name, 'type', self.type, 'dir', self.dir)
 
     def __repr__(self):
         return 'PortSignal(name=%r, entity=%r)' %  (self.name, self.entity.name)

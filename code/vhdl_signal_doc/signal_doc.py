@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # file created 2010-08-19, Martin Renold
 # public domain
 """
@@ -50,23 +50,16 @@ for e in top.entities:
     # grab entity description from the top-of-file comment
     sourcefile = e.parent
     e.doc = ''
-    found = False
     for s in sourcefile.content:
         if not isinstance(s, str):
             break
         s = s.strip()
         if s.startswith('--'):
-            s = s[2:].strip()
-            if s.startswith('Description') and ':' in s:
-                s = s.split(':', 1)[1]
-                found = True
-            if found:
-                if '--------------------' in s:
-                    break
-                e.doc += s + '\n'
-        elif found:
-            break # end of commented section
-    e.doc = e.doc.strip()
+            s = s[2:]
+            if not s.strip(): continue
+            e.doc += s + '\n'
+    e.doc = '<pre>' + e.doc.strip() + '</pre>'
+    #e.doc = e.doc.strip()
 
 #
 # collect signal comments
@@ -92,7 +85,6 @@ for e in top.entities:
         else:
             lines = [c]
         for line in lines:
-            print repr(line)
             ## grab special comments
             #l = line.split('--#', 1)[1:]
             # grab all comments
@@ -139,7 +131,7 @@ def resolve_constants(s):
 if True:
     invalid_constants = []
     for fn in files:
-        for line in open(fn):
+        for line in open(fn, encoding='utf8', errors='ignore'):
             if line.strip().startswith('--'):
                 continue
             if 'constant' in line and ':=' in line:
@@ -149,7 +141,7 @@ if True:
                 #print 'found constant:', name, value
                 if name in global_constants:
                     if value != global_constants[name]:
-                        print 'WARNING: multiple definitions of constant', name + '; not resolving it (' + repr(global_constants[name]), 'vs', repr(value) + ')'
+                        print('WARNING: multiple definitions of constant', name + '; not resolving it (' + repr(global_constants[name]), 'vs', repr(value) + ')')
                         invalid_constants.append(name)
                 global_constants[name] = value
     for name in invalid_constants:
@@ -203,7 +195,7 @@ def make_signal_info_page(signal):
     filename = sig2url(signal)
     signal_pages.append((signal.name, signal.entity.name, filename))
     f = open(outdir + '/' + filename, 'w')
-    f.write('<html><body><h1>%s::%s</h1>' % (signal.entity.name, signal.name))
+    f.write('<html><head><meta charset="UTF-8"></head><body><h1>%s::%s</h1>' % (signal.entity.name, signal.name))
     f.write('<h3>from</h3>')
 
     def get_orig_sources(sig1):
@@ -252,7 +244,7 @@ def make_signal_info_page(signal):
                     line2 = line2.replace(name2, '<b>'+name2+'</b>')
                 line2 = line2.replace(' ', '&nbsp;')
                 f.write('%04d:&nbsp;%s<br>\n' % (lineno2, line2))
-            for lineno, line in enumerate(open(fn)):
+            for lineno, line in enumerate(open(fn, encoding='utf8', errors='ignore')):
                 context.append((lineno, line))
                 context = context[-N:]
                 for name in names:
@@ -283,7 +275,7 @@ def make_entity_page(e, print_version):
         f = open('%s/%s_print.html' % (outdir, e.name), 'w') 
     else:
         f = open('%s/%s.html' % (outdir, e.name), 'w') 
-    f.write('<html><body>\n')
+    f.write('<html><head><meta charset="UTF-8"></head><body>\n')
 
     def write_tr(*rows, **kwargs):
         sep = kwargs.get('sep', 'td')
@@ -401,6 +393,6 @@ for e in entities:
     make_entity_page(e, False)
 make_main_index_page()
 
-print 'Finished.'
+print('Finished.')
 
-print 'Now run: sensible-browser %s/index.html' % outdir
+print('Now run: sensible-browser %s/index.html' % outdir)
