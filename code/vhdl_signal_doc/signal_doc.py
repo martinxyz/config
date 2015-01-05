@@ -5,7 +5,7 @@
 Generate HTML documentation from vhdl source.
 """
 import vhdl
-import os, cgi, sys, optparse
+import os, shutil, cgi, sys, optparse
 
 parser = optparse.OptionParser(
     usage = '%prog <filelist1.txt|projectfile1.qsf> [<filelist2.txt|projectfile2.qsf> ...]',
@@ -49,7 +49,9 @@ top = vhdl.Codebase(files)
 for e in top.entities:
     # grab entity description from the top-of-file comment
     sourcefile = e.parent
-    e.doc = ''
+    doc_full = ''
+    doc_short = None
+    parsing_short = False
     for s in sourcefile.content:
         if not isinstance(s, str):
             break
@@ -57,9 +59,26 @@ for e in top.entities:
         if s.startswith('--'):
             s = s[2:]
             if not s.strip(): continue
-            e.doc += s + '\n'
-    e.doc = '<pre>' + e.doc.strip() + '</pre>'
-    #e.doc = e.doc.strip()
+            doc_full += s + '\n'
+            if 'Description' in s and ':' in s:
+                parsing_short = True
+                doc_short = s.split(':', 1)[1]
+            elif parsing_short:
+                if '----' in s or ' : ' in s or '*****' in s or '====' in s:
+                    parsing_short = False
+                else:
+                    doc_short = doc_short + ' ' + s.strip()
+            
+    doc_full = doc_full.strip()
+    if doc_short is None:
+        doc_short = doc_full
+    if len(doc_short) > 800:
+        doc_short = doc_short[:400] + '<a href="#">...</a>'
+
+    doc_short = '<div class="hider" style="width:60%">' + doc_short + '</div>'
+    doc_full = '<pre>' + doc_full + '</pre>'
+    doc_full = '<div class="hider" style="display:none">' + doc_full + '</div>'
+    e.doc = doc_short + doc_full
 
 #
 # collect signal comments
@@ -138,6 +157,10 @@ if True:
                 name = line.replace(':', ' ').split()[1].strip()
                 if not ';' in line: continue
                 value = line.split(':=')[1].split(';')[0].strip()
+                try:
+                    value = int(value)
+                except ValueError:
+                    pass
                 #print 'found constant:', name, value
                 if name in global_constants:
                     if value != global_constants[name]:
@@ -164,8 +187,24 @@ for e in top.entities:
 
 signal_pages = []
 
+html_header = '''
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="jquery.js"></script>
+  <script src="signal_doc.js"></script>
+</head>
+<body>
+'''
+
+html_footer = '''
+</body>
+</html>
+'''
+
 def make_main_index_page():
     f = open('%s/index.html' % outdir, 'w')
+    f.write(html_header)
     f.write('<h3>Entities</h3>\n')
     roots = [e for e in top.entities if not e.parents]
     entities_ordered = []
@@ -186,7 +225,8 @@ def make_main_index_page():
     signal_pages.sort()
     for sig, ent, url in signal_pages:
         f.write('<a href="%s">%s</a> (%s)<br>' % (url, sig, ent))
-    f.write('</html></body>\n')
+    f.write(html_footer)
+    f.close()
 
 def sig2url(signal):
     return signal.entity.name + '__' + signal.name + '.html'
@@ -195,7 +235,8 @@ def make_signal_info_page(signal):
     filename = sig2url(signal)
     signal_pages.append((signal.name, signal.entity.name, filename))
     f = open(outdir + '/' + filename, 'w')
-    f.write('<html><head><meta charset="UTF-8"></head><body><h1>%s::%s</h1>' % (signal.entity.name, signal.name))
+    f.write(html_header)
+    f.write('<h1>%s::%s</h1>' % (signal.entity.name, signal.name))
     f.write('<h3>from</h3>')
 
     def get_orig_sources(sig1):
@@ -275,7 +316,7 @@ def make_entity_page(e, print_version):
         f = open('%s/%s_print.html' % (outdir, e.name), 'w') 
     else:
         f = open('%s/%s.html' % (outdir, e.name), 'w') 
-    f.write('<html><head><meta charset="UTF-8"></head><body>\n')
+    f.write(html_header)
 
     def write_tr(*rows, **kwargs):
         sep = kwargs.get('sep', 'td')
@@ -331,7 +372,17 @@ def make_entity_page(e, print_version):
     if print_version:
         f.write('<h2>%s</h2>\n' % e.name)
     else:
+        f.write('<a href="index.html">index</a>')
+
+        f.write('&nbsp;|&nbsp;')
+
+        f.write('<a class="hider" href="#">full header</a>')
+        f.write('<a class="hider" style="display:none" href="#">short header</a>')
+
+        f.write('&nbsp;|&nbsp;')
+
         f.write('<a href="%s">print version</a>\n' % (e.name + '_print.html'))
+
         f.write('<h1><a name="%s">%s</a></h1>\n' % (e.name, e.name))
 
     if print_version: f.write('<h4>Description</h4>\n')
@@ -386,13 +437,17 @@ def make_entity_page(e, print_version):
 
         f.write('</table><br>\n')
 
-    f.write('</body></html>\n')
+    f.write(html_footer)
+    f.close()
 
 for e in entities:
     make_entity_page(e, True)
     make_entity_page(e, False)
 make_main_index_page()
 
+scriptdir = os.path.dirname(sys.argv[0])
+shutil.copy(os.path.join(scriptdir, 'jquery.js'), outdir)
+shutil.copy(os.path.join(scriptdir, 'signal_doc.js'), outdir)
 print('Finished.')
 
 print('Now run: sensible-browser %s/index.html' % outdir)
