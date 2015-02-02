@@ -46,6 +46,21 @@
   (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
 
 
+;; visual line movement
+;; source: http://stackoverflow.com/questions/20882935/how-to-move-between-visual-lines-and-move-past-newline-in-evil-mode
+(define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+(define-key evil-normal-state-map (kbd "<remap> <evil-end-of-line>") 'evil-end-of-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-end-of-line>") 'evil-end-of-visual-line)
+(define-key evil-normal-state-map (kbd "<remap> <evil-beginning-of-line>") 'evil-beginning-of-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-beginning-of-line>") 'evil-beginning-of-visual-line)
+(evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line)
+; Make horizontal movement cross lines                                    
+(setq-default evil-cross-lines t)
+
+
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
 ;; ??, scheint nicht zu funktionnieren.
