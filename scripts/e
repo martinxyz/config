@@ -19,6 +19,7 @@ if [ $cnt -eq 1 ] ; then
     echo using $dirname
     cd $dirname
     emacs > /dev/null 2>&1 &
+    exit 0
 else
     PS3='Directory: '
     select dirname in $dirs; do
