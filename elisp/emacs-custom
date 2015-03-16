@@ -16,17 +16,14 @@
  '(complex-buffers-menu-p t)
  '(delete-key-deletes-forward t)
  '(desktop-enable t nil (desktop))
- '(desktop-globals-to-save
-   (quote
-    (desktop-missing-file-warning search-ring regexp-search-ring register-alist compile-command compile-history extended-command-history tags-file-name tags-table-list compilation-directory)))
+ '(desktop-globals-to-save (quote (desktop-missing-file-warning search-ring regexp-search-ring register-alist compile-command compile-history extended-command-history tags-file-name tags-table-list compilation-directory)))
  '(desktop-load-locked-desktop t)
- '(desktop-locals-to-save
-   (quote
-    (desktop-locals-to-save truncate-lines case-fold-search case-replace fill-column overwrite-mode change-log-default-name line-number-mode column-number-mode size-indication-mode buffer-file-coding-system indicate-buffer-boundaries indicate-empty-lines show-trailing-whitespace)))
+ '(desktop-locals-to-save (quote (desktop-locals-to-save truncate-lines case-fold-search case-replace fill-column overwrite-mode change-log-default-name line-number-mode column-number-mode size-indication-mode buffer-file-coding-system indicate-buffer-boundaries indicate-empty-lines show-trailing-whitespace)))
  '(desktop-path (quote (".")))
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
  '(evil-repeat-move-cursor nil)
+ '(evil-search-module (quote evil-search))
  '(evil-symbol-word-search t)
  '(font-lock-maximum-decoration t)
  '(font-lock-use-colors nil)
@@ -37,14 +34,10 @@
  '(global-auto-revert-ignore-modes (quote (tags-table-mode)))
  '(global-auto-revert-mode t nil (autorevert))
  '(global-font-lock-mode t nil (font-lock))
- '(ido-decorations
-   (quote
-    (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+ '(ido-decorations (quote (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
  '(ido-enabled (quote both) t (ido))
  '(ido-everywhere t)
- '(ido-ignore-files
-   (quote
-    ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "\\`.svn/" "\\`~")))
+ '(ido-ignore-files (quote ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "\\`.svn/" "\\`~")))
  '(ido-max-directory-size 3000000)
  '(ido-max-prospects 30)
  '(ido-max-window-height 2)
@@ -65,6 +58,7 @@
  '(py-continuation-offset 2)
  '(py-smart-indentation nil)
  '(python-guess-indent nil)
+ '(python-indent-guess-indent-offset nil)
  '(query-user-mail-address nil)
  '(safe-local-variable-values (quote ((py-indent-offset . 4))))
  '(save-abbrevs nil)
@@ -93,26 +87,12 @@
  '(vhdl-clock-name "clk")
  '(vhdl-company-name "Integrated Systems Laboratory, ETH Zurich")
  '(vhdl-compiler "ModelSim")
- '(vhdl-compiler-alist
-   (quote
-    (("Cadence" "cv -file" "" "make -f \\1" "" nil "mkdir \\1" "./" "work/" "Makefile" "cadence"
-      ("duluth: \\*E,[0-9]+
-(\\(.+\\),\\([0-9]+\\)):" 1 2 0)
-      ("" 0)
-      nil)
-     ("ModelSim" "vcom" "" "make
--f \\1" "" "vmake > Makefile" "mkdir \\1" "../modelsim/" "work/" "Makefile" "modelsim"
-("\\(ERROR\\|WARNING\\)[^:]*: \\(.+\\)(\\([0-9]+\\)):" 2 3 0)
-("" 0)
-nil)
-     ("Synopsys" "synopsys vhdlan" "" "make -f \\1" "" nil "mkdir \\1" "../synopsys/" "work/" "Makefile" "synopsys"
-      ("\\*\\*Error: vhdlan,[0-9]+
-\\(.+\\)(\\([0-9]+\\)):" 1 2 0)
-      ("" 0)
-      nil))))
+ '(vhdl-compiler-alist (quote (("Cadence" "cv -file" "" "make -f \\1" "" nil "mkdir \\1" "./" "work/" "Makefile" "cadence" ("duluth: \\*E,[0-9]+
+(\\(.+\\),\\([0-9]+\\)):" 1 2 0) ("" 0) nil) ("ModelSim" "vcom" "" "make
+-f \\1" "" "vmake > Makefile" "mkdir \\1" "../modelsim/" "work/" "Makefile" "modelsim" ("\\(ERROR\\|WARNING\\)[^:]*: \\(.+\\)(\\([0-9]+\\)):" 2 3 0) ("" 0) nil) ("Synopsys" "synopsys vhdlan" "" "make -f \\1" "" nil "mkdir \\1" "../synopsys/" "work/" "Makefile" "synopsys" ("\\*\\*Error: vhdlan,[0-9]+
+\\(.+\\)(\\([0-9]+\\)):" 1 2 0) ("" 0) nil))))
  '(vhdl-end-comment-column 999)
-'(vhdl-file-header
-"--------------------------------------------------------------------
+ '(vhdl-file-header "--------------------------------------------------------------------
 --  _____       ______  _____                                     --
 -- |_   _|     |  ____|/ ____|                                    --
 --   | |  _ __ | |__  | (___    Institute of Embedded Systems     --
@@ -158,17 +138,7 @@ end <filename>;
  '(vhdl-prompt-for-comments nil)
  '(vhdl-reset-name "reset_n")
  '(vhdl-self-insert-comments nil)
-'(vhdl-special-syntax-alist
-(quote
- (("constant" "[A-Z][A-Z0-9_]+" "Gold3" "BurlyWood1")
-  ("signal-clock" "[A-Z][A-Za-z0-9]*xC[A-Za-z0-9]*" "LimeGreen" "Green")
-  ("signal-reset" "[A-Z][A-Za-z0-9]*xR[A-Za-z0-9]*" "Tomato" "Coral")
-  ("signal-enable" "[A-Z][A-Za-z0-9]*xE[A-Za-z0-9]*" "LightSeaGreen" "AquaMarine2")
-  ("signal-control" "[A-Z][A-Za-z0-9]*xS[A-Za-z0-9]*" "DodgerBlue" "LightSkyBlue1")
-  ("signal-data" "[A-Z][A-Za-z0-9]*xD[A-Za-z0-9]*" "Grey50" "Grey80")
-  ("signal-test" "[A-Z][A-Za-z0-9]*xT[A-Za-z0-9]*" "Gold" "Yellow")
-  ("signal-async" "[A-Z][A-Za-z0-9]*xA[A-Za-z0-9]*" "PaleVioletRed" "PaleVioletRed1")
-  ("signal-3state" "[A-Z][A-Za-z0-9]*xZ[A-Za-z0-9]*" "Grey70" "Grey70"))))
+ '(vhdl-special-syntax-alist (quote (("constant" "[A-Z][A-Z0-9_]+" "Gold3" "BurlyWood1") ("signal-clock" "[A-Z][A-Za-z0-9]*xC[A-Za-z0-9]*" "LimeGreen" "Green") ("signal-reset" "[A-Z][A-Za-z0-9]*xR[A-Za-z0-9]*" "Tomato" "Coral") ("signal-enable" "[A-Z][A-Za-z0-9]*xE[A-Za-z0-9]*" "LightSeaGreen" "AquaMarine2") ("signal-control" "[A-Z][A-Za-z0-9]*xS[A-Za-z0-9]*" "DodgerBlue" "LightSkyBlue1") ("signal-data" "[A-Z][A-Za-z0-9]*xD[A-Za-z0-9]*" "Grey50" "Grey80") ("signal-test" "[A-Z][A-Za-z0-9]*xT[A-Za-z0-9]*" "Gold" "Yellow") ("signal-async" "[A-Z][A-Za-z0-9]*xA[A-Za-z0-9]*" "PaleVioletRed" "PaleVioletRed1") ("signal-3state" "[A-Z][A-Za-z0-9]*xZ[A-Za-z0-9]*" "Grey70" "Grey70"))))
  '(vhdl-testbench-name (quote (".*" . "\\&Tb")))
  '(vhdl-underscore-is-part-of-word t)
  '(viper-auto-indent t)
@@ -181,8 +151,10 @@ end <filename>;
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
  '(ido-first-match ((t (:weight bold))))
  '(ido-subdir ((t (:foreground "#729FCF"))))
+ '(lazy-highlight ((t (:background "#003F3F"))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
  '(viper-minibuffer-emacs ((t nil)))
