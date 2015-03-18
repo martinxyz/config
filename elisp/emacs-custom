@@ -152,6 +152,7 @@ end <filename>;
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
+ '(font-lock-comment-face ((t (:foreground "#cb4e39"))))
  '(ido-first-match ((t (:weight bold))))
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(lazy-highlight ((t (:background "#003F3F"))))

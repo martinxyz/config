@@ -948,6 +948,14 @@
 ;(define-key evil-motion-state-map "^" #'evil-first-non-blank-of-visual-line)
 ;(define-key evil-motion-state-map "0" #'evil-beginning-of-visual-line)
 
+; search word at point backwards, but when pressing "n" search forward again
+(defun martin-search-word-at-point()
+ (interactive)
+ (call-interactively 'evil-ex-search-word-backward)
+ (setq evil-ex-search-direction 'forward)
+ )
+(define-key evil-motion-state-map "#" 'martin-search-word-at-point)
+
 ; evil should count underscores as part of a word, like vim does
 ; https://bitbucket.org/lyro/evil/wiki/Home
 (modify-syntax-entry ?_ "w")
