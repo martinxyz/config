@@ -652,30 +652,54 @@
 ; see emacs wiki
 (require 'wgrep)
 
-(defun pager-some-rows-down ()
+; FIXME: visual rows, when in visual mode!
+(defun maxy-some-rows-down ()
   (interactive)
-  (pager-row-down)
-  (pager-row-down)
-  (pager-row-down)
-  (pager-row-down)
-  (back-to-indentation)
+  (evil-next-visual-line)
+  ;(evil-scroll-line-down 1)
+  (evil-next-visual-line)
+  ;(evil-scroll-line-down 1)
+  (evil-next-visual-line)
+  ;(evil-scroll-line-down 1)
+  (evil-next-visual-line)
+  (evil-scroll-line-down 4)
+
+ ; (evil-next-visual-line)
+ ; (evil-next-visual-line)
+ ; (evil-next-visual-line)
+  ;(pager-row-down)
+  ;(pager-row-down)
+  ;(pager-row-down)
+  ;(pager-row-down)
+  ;(evil-scroll-line-to-center nil)
+  ;(back-to-indentation)
   )
-(defun pager-some-rows-up ()
+(defun maxy-some-rows-up ()
   (interactive)
-  (pager-row-up)
-  (pager-row-up)
-  (pager-row-up)
-  (pager-row-up)
-  (back-to-indentation)
+  (evil-previous-visual-line)
+  ;(evil-scroll-line-up 1)
+  (evil-previous-visual-line)
+  ;(evil-scroll-line-up 1)
+  (evil-previous-visual-line)
+  ;(evil-scroll-line-up 1)
+  (evil-previous-visual-line)
+  (evil-scroll-line-up 4)
+  ;(pager-row-up)
+  ;(pager-row-up)
+  ;(pager-row-up)
+  ;(pager-row-up)
+  ;(evil-scroll-line-to-center nil)
+  ;(back-to-indentation)
   )
 
-(global-set-key [next] 	   'pager-page-down)
-(global-set-key [prior]	   'pager-page-up)
+; pager module doesn't work well with visual-line
+;(global-set-key [next] 	   'evil-scroll-down)
+;(global-set-key [prior]	   'evil-scroll-up)
 
 ; scroll text (cursor fixed)
-(global-set-key "\M-k"  'pager-some-rows-up)
-(global-set-key "\M-j"  'pager-some-rows-down)
-(define-key c-mode-base-map "\M-j"  'pager-some-rows-down)
+(global-set-key "\M-k"  'maxy-some-rows-up)
+(global-set-key "\M-j"  'maxy-some-rows-down)
+(define-key c-mode-base-map "\M-j"  'maxy-some-rows-down)
 
 ; speichert liste von zuletzt geoeffneten dateien beim Beenden
 (require 'recentf)
@@ -840,8 +864,8 @@
 ;(load "/usr/share/git-core/emacs/vc-git.el")
 ;(add-to-list 'vc-handled-backends 'GIT)
 
-;(require 'git-blame) ; note: modified version of git-blame.el
-;(define-key evil-normal-state-map "B" 'git-blame-mode)
+(require 'git-blame) ; note: modified version of git-blame.el
+(define-key evil-normal-state-map "B" 'git-blame-mode)
 
 
 ;(add-to-list 'load-path "~/compile/mo-git-blame")
@@ -870,7 +894,7 @@
       (message "No more matches."))))
 
 ;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
-(setq x-select-enable-clipboard t)
+;(setq x-select-enable-clipboard t)
 ;; after mouse selection in X11, you can paste by `yank' in emacs
 (setq x-select-enable-primary t)
 
@@ -910,8 +934,8 @@
 ;(define-key evil-normal-state-map "\C-d" 'pager-page-down)
 (define-key evil-normal-state-map "\C-u" 'evil-scroll-up)
 (define-key evil-normal-state-map "\C-d" 'evil-scroll-down)
-(define-key evil-normal-state-map "[" 'pager-some-rows-down) ; kinesis
-(define-key evil-normal-state-map "]" 'pager-some-rows-up) ; kinesis
+(define-key evil-normal-state-map "[" 'maxy-some-rows-down) ; kinesis
+(define-key evil-normal-state-map "]" 'maxy-some-rows-up) ; kinesis
 (define-key evil-normal-state-map "\C-d" 'evil-scroll-down)
 
 ; from http://dnquark.com/blog/2012/02/emacs-evil-ecumenicalism/
