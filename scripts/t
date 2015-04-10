@@ -86,12 +86,13 @@ def lookup(search):
     def score(a):
         value = 0
         if a[0].lower() == search or a[1].lower() == search:
-            value += 1000
+            value += 10000
         if search in a[0].lower().split() + a[1].lower().split():
             value += 100
         value -= len(a[0]) + len(a[1])
         return value
     results.sort(key=score)
+    results.reverse()
 
     total = len(results)
     results = results[0:maxoutput]
