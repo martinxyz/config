@@ -984,3 +984,7 @@
 ; https://bitbucket.org/lyro/evil/wiki/Home
 (modify-syntax-entry ?_ "w")
 (add-hook 'c-mode-common-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+
+(require 'keyfreq)
+(keyfreq-mode 1)
+(keyfreq-autosave-mode 1)
