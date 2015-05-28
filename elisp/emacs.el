@@ -176,6 +176,13 @@
 (push '(unresolved_reference2 "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
       compilation-error-regexp-alist-alist)
 
+; make compile buffer wrap lines
+; http://stackoverflow.com/questions/1292936/line-wrapping-within-emacs-compilation-buffer
+(defun my-compilation-mode-hook ()
+   (setq truncate-lines nil) ;; automatically becomes buffer local
+   (set (make-local-variable 'truncate-partial-width-windows) nil))
+(add-hook 'compilation-mode-hook 'my-compilation-mode-hook)
+
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
@@ -623,6 +630,7 @@
 (define-key evil-normal-state-map "*" 'pop-tag-mark)
 
 (define-key evil-normal-state-map "\C-W" 'kill-region)
+(define-key evil-insert-state-map "\C-W" 'backward-kill-word)
 (define-key evil-normal-state-map "W" 'copy-region-as-kill)
 (define-key evil-normal-state-map " " 'set-mark-command)
 ;(define-key evil-normal-state-map "F" 'pop-global-mark)
