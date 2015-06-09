@@ -34,17 +34,20 @@ calendar = calendars[0]
 
 show_days = 30
 results = calendar.date_search(
-        datetime.now().date()+timedelta(days=1),
+        datetime.now().date(),#+timedelta(days=1),
         datetime.now().date()+timedelta(days=show_days+1))
 
-content = ''
+ical_results = []
 for event in results:
   events = str(event)  
-
   cal = icalendar.Calendar.from_ical(event.data)
   assert len(cal.subcomponents) == 1
   event = cal.subcomponents[0]
   dt = event['DTSTART'].dt
+  ical_results.append((dt, event))
+ 
+content = ''
+for dt, event in sorted(ical_results):
   # too lazy to figure out locale stuff
   s = 'So Mo Di Mi Do Fr Sa'.split()[int(dt.strftime('%w'))] + ' '
   #s += dt.strftime('%a %d.%m. ')
@@ -67,4 +70,3 @@ if not content:
 # update the file even if there is an error
 with open(fn('content'), 'w') as f:
     f.write(content)
-
