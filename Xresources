@@ -1,27 +1,34 @@
+! to apply changes:
+!
+!   xrdb -merge ~/.Xresources
+!   xrdb ~/.Xresources
+!   or
+!   ~/config/reinstall.sh
+
 !adapted from http://dotfiles.org/~Nobbs/.Xdefaults
 
 urxvt*borderLess:               false
 urxvt*externalBorder:           0
 urxvt*internalBorder:           2
-urxvt*scrollBar:                false
+!urxvt*scrollBar:                false
+urxvt*scrollBar:                true
 urxvt*depth:                    32
 urxvt*background:               rgb:00/00/00
 urxvt*foreground:               #c8c8c8
 urxvt*cursorColor:              #dedede
-!urxvt*cursorColor:              yellow
 urxvt*cursorColor2:             #050505
 urxvt*cursorBlink:              false
 urxvt*inheritPixmap:            false
-urxvt*termName:                 rxvt
+!urxvt*termName:                 rxvt
 urxvt*saveLines:                9999
 urxvt*scrollTtyOutput:          false
 urxvt*scrollTtyKeypress:        true
 urxvt*mouseWheelScrollPage:     false
-urxvt*perl-lib:                 /usr/lib/urxvt/perl/
-urxvt*perl-ext-common:          default,matcher
-urxvt*matcher.button:           1
-urxvt*matcher.pattern.1:        \\bwww\\.[\\w-]+\\.[\\w./?&@#-]*[\\w/-]
-urxvt*urlLauncher:              firefox
+!urxvt*perl-lib:                 /usr/lib/urxvt/perl/
+!urxvt*perl-ext-common:          default,matcher
+!urxvt*matcher.button:           1
+!urxvt*matcher.pattern.1:        \\bwww\\.[\\w-]+\\.[\\w./?&@#-]*[\\w/-]
+!urxvt*urlLauncher:              firefox
 urxvt*underlineColor:           #3465a4
 urxvt*loginShell:               true
 
@@ -52,6 +59,3 @@ urxvt*colorBD: white
 !white
 *color7:         rgb:d3/d7/cf
 *color15:        rgb:ee/ee/ec
-
-
-
