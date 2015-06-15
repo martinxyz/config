@@ -69,4 +69,5 @@ if not content:
 
 # update the file even if there is an error
 with open(fn('content'), 'w') as f:
-    f.write(content)
+    f.write(content.encode('utf-8'))
+

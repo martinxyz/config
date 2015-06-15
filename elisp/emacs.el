@@ -23,6 +23,20 @@
 (require 'evil)
 (evil-mode 1)
 
+;; Add my directories to load-path.
+(setq load-path (append
+                 '("~/config/elisp")
+                 load-path))
+(setq load-path (append
+                 '("~/config/elisp/python-mode-1.0")
+                 load-path))
+
+(require 'ace-jump-mode)
+;(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+;;If you also use viper mode:
+;(define-key viper-vi-global-user-map (kbd "SPC") 'ace-jump-mode)
+(define-key evil-normal-state-map "g" 'ace-jump-mode)
+(define-key evil-normal-state-map "t" 'ace-jump-line-mode)
 
 ; Evil normal emacs commands when in insert state
 (setcdr evil-insert-state-map nil)
@@ -399,14 +413,6 @@
 (setq auto-mode-alist 
       (cons '(".*/Cura.*\\.cpp" . cura-c-mode)
           auto-mode-alist))
-
-;; Add my directories to load-path.
-(setq load-path (append
-                 '("~/config/elisp")
-                 load-path))
-(setq load-path (append
-                 '("~/config/elisp/python-mode-1.0")
-                 load-path))
 
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
