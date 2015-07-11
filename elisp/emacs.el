@@ -200,6 +200,9 @@
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
+(autoload 'markdown-mode "markdown-mode"
+  "Major mode for editing Markdown files" t)
+
 ; ;; This adds additional extensions which indicate files normally
 ;; ;; handled by cc-mode.
 ;; (setq auto-mode-alist
@@ -412,6 +415,22 @@
           auto-mode-alist))
 (setq auto-mode-alist 
       (cons '(".*/Cura.*\\.cpp" . cura-c-mode)
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*\\.md$" . 
+              (lambda ()
+                (markdown-mode)
+                (visual-line-mode)
+                ))
+          auto-mode-alist))
+
+(setq auto-mode-alist 
+      (cons '(".*\\.txt$" . 
+              (lambda ()
+                (markdown-mode)
+                (visual-line-mode)
+                ))
           auto-mode-alist))
 
 ;(eval-after-load "pymacs"
@@ -908,7 +927,7 @@
       (message "No more matches."))))
 
 ;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
-;(setq x-select-enable-clipboard t)
+(setq x-select-enable-clipboard t)
 ;; after mouse selection in X11, you can paste by `yank' in emacs
 (setq x-select-enable-primary t)
 

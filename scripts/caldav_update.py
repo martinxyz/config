@@ -25,7 +25,7 @@ import icalendar
 import datetime
 
 webdav = easywebdav.connect(server, protocol='https', username=user, password=pw)
-with open(fn('calendar.ical'), 'w') as f:
+with open(fn('calendar.ical'), 'wb') as f:
     webdav.download(serverpath, f)
 
 g = open(fn('calendar.ical'))
