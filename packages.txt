@@ -1,0 +1,22 @@
+# packages to install on new systems
+
+sudo apt-get install vim emacs build-essential manpages-dev \
+  atop htop tree git
+
+# desktop
+sudo apt-get install wmctrl redshift rxvt-unicode gnome-do
+sudo apt-get install xfce4
+
+sudo apt-get install python3-matplotlib python3-scipy ipython3 \
+                      python-matplotlib  python-scipy ipython
+
+# dev tools (light)
+sudo apt-get build-dep emacs microcom linux-image
+sudo apt-get install libncurses-dev
+
+# dev tools (heavy)
+sudo apt-get build-dep python3-numpy python-numpy
+
+# microcom: 
+git clone https://github.com/martinxyz/microcom.git # minimalist branch
+
