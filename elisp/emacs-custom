@@ -89,12 +89,11 @@
  '(transient-mark-mode nil)
  '(truncate-lines t)
  '(user-full-name "Martin Renold")
- '(user-mail-address "martinxyz@gmx.ch")
+ '(user-mail-address "martin@log2.ch")
  '(vhdl-actual-port-name (quote ("\\(.*\\)[IO]$" . "\\1")))
  '(vhdl-basic-offset 4)
  '(vhdl-clock-edge-condition (quote function))
  '(vhdl-clock-name "clk")
- '(vhdl-company-name "Integrated Systems Laboratory, ETH Zurich")
  '(vhdl-compiler "ModelSim")
  '(vhdl-compiler-alist
    (quote
@@ -113,51 +112,10 @@ nil)
 \\(.+\\)(\\([0-9]+\\)):" 1 2 0)
       ("" 0)
       nil))))
- '(vhdl-end-comment-column 999)
-'(vhdl-file-header
-"--------------------------------------------------------------------
---  _____       ______  _____                                     --
--- |_   _|     |  ____|/ ____|                                    --
---   | |  _ __ | |__  | (___    Institute of Embedded Systems     --
---   | | | '_ \\|  __|  \\___ \\   Zürcher Hochschule für Angewandte --
---  _| |_| | | | |____ ____) |  Wissenschaften                    --
--- |_____|_| |_|______|_____/   8401 Winterthur, Switzerland      --
---------------------------------------------------------------------
---
--- Project     : HSR
---
--- File Name   : <filename>
--- Description : 
---
---------------------------------------------------------------------
--- Change History
--- Date       |Name    |Modification
---------------|--------|--------------------------------------------
--- <date> | RELD   | file created
---------------------------------------------------------------------
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.math_pack.all;
-use work.globals_pack.all;
-
-entity <filename> is
-
-    port (
-        reset_n : in std_logic;
-        clk     : in std_logic;
-
-        <cursor>
-        );
-
-end <filename>;
-")
  '(vhdl-highlight-case-sensitive t)
  '(vhdl-highlight-signals t)
  '(vhdl-highlight-special-words t)
  '(vhdl-intelligent-tab nil)
- '(vhdl-platform-spec "ModelSim (simulation), Synopsys (synthesis)")
  '(vhdl-prompt-for-comments nil)
  '(vhdl-reset-name "reset_n")
  '(vhdl-self-insert-comments nil)
@@ -172,6 +130,8 @@ end <filename>;
   ("signal-test" "[A-Z][A-Za-z0-9]*xT[A-Za-z0-9]*" "Gold" "Yellow")
   ("signal-async" "[A-Z][A-Za-z0-9]*xA[A-Za-z0-9]*" "PaleVioletRed" "PaleVioletRed1")
   ("signal-3state" "[A-Z][A-Za-z0-9]*xZ[A-Za-z0-9]*" "Grey70" "Grey70"))))
+ '(vhdl-standard (quote (8 nil)))
+ '(vhdl-stutter-mode t)
  '(vhdl-testbench-name (quote (".*" . "\\&Tb")))
  '(vhdl-underscore-is-part-of-word t)
  '(viper-auto-indent t)

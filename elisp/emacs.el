@@ -203,6 +203,10 @@
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (visual-line-mode t)))
+
 ; ;; This adds additional extensions which indicate files normally
 ;; ;; handled by cc-mode.
 ;; (setq auto-mode-alist
@@ -418,20 +422,9 @@
           auto-mode-alist))
 
 (setq auto-mode-alist 
-      (cons '(".*\\.md$" . 
-              (lambda ()
-                (markdown-mode)
-                (visual-line-mode)
-                ))
-          auto-mode-alist))
-
-(setq auto-mode-alist 
       (cons '(".*\\.txt$" . 
-              (lambda ()
-                (markdown-mode)
-                (visual-line-mode)
-                ))
-          auto-mode-alist))
+              (lambda () (markdown-mode)))
+            auto-mode-alist))
 
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
@@ -468,9 +461,13 @@
 
 ;; Turn off mouse interface early in startup to avoid momentary display
 ;; You really don't need these; trust me.
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+;(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;(scroll-bar-mode -1)
+;(set-scroll-bar-mode 't)
+(toggle-horizontal-scroll-bar -1)
+(toggle-scroll-bar -1)
 
 ;; groessere Schrift
 (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
@@ -847,26 +844,8 @@
 ;(setq ibuffer-sorting-mode 'recency)
 ;(setq ibuffer-use-header-line t)
 
-; From the GIMP developer webpage:
-
-;; Merge this into your custom-set-variables section if you already have one
-(custom-set-variables
- ;; Syntax highlighting
- ;'(global-font-lock-mode t nil (font-lock))
- ;'(show-paren-mode t nil (paren))
- ;; User name to be put in the ChangeLog file by M-x add-change-log-entry
- '(user-full-name "Martin Renold")
- '(user-mail-address "martinxyz@gmx.ch")
- )
-
-;; use UTF-8 by default
-;(prefer-coding-system 'mule-utf-8)
-
 (global-set-key "\M-l" 'dabbrev-expand) ; windows-tastaturen haben den / nicht in reichweite
 (global-set-key "ł" 'dabbrev-expand) ; kinesis AltGr-l
-
-;(load-library "ispell")
-;(setq ispell-program-name "aspell")
 
 ;(load "remem.el")
 
@@ -884,9 +863,6 @@
 ;(resize-minibuffer-mode 1)            ;; minibuffer gets resized if it becomes too big
 (setq scroll-step 1) ; maybe this did interfer with "pager"?
 (setq scroll-conservatively 1) ; maybe this did interfer with "pager"?
-
-; http://github.com/mattharrison/emacs-starter-kit
-(require 'starter-kit-defuns)
 
 (put 'downcase-region 'disabled nil)
 
@@ -927,9 +903,9 @@
       (message "No more matches."))))
 
 ;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
-(setq x-select-enable-clipboard t)
+;(setq select-enable-clipboard t)
 ;; after mouse selection in X11, you can paste by `yank' in emacs
-(setq x-select-enable-primary t)
+(setq select-enable-primary t)
 
 (require 'package)
 (add-to-list 'package-archives
