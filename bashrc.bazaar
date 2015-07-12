@@ -16,7 +16,7 @@ export PS1='\u \w$(__git_ps1 " \[\033[33m\]%s\[\033[00m\]")`[ -r /home/martin/.n
 
 umask 022
 
-export EMAIL="Martin Renold <martinxyz@gmx.ch>"
+export EMAIL="Martin Renold <martin@log2.ch>"
 
 #mesg y
 
