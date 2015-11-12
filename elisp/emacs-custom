@@ -91,6 +91,7 @@
  '(user-full-name "Martin Renold")
  '(user-mail-address "martin@log2.ch")
  '(vhdl-actual-port-name (quote ("\\(.*\\)[IO]$" . "\\1")))
+ '(vhdl-array-index-record-field-in-sensitivity-list nil)
  '(vhdl-basic-offset 4)
  '(vhdl-clock-edge-condition (quote function))
  '(vhdl-clock-name "clk")

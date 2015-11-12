@@ -1,5 +1,0 @@
-#!/bin/sh
-
-find -name '*.cpp' -or -name '*.hpp' -or -name '*.c' -or -name '*.h' -or -name '*.py' -or -name '*.d' -or -name '*.cc' -or -name '*.hh' -or -name '*.cxx' -or -name '*.hxx' | grep -v '#' | grep -v .svn \
-| xargs grep -ir --color=always "$@" | less
-

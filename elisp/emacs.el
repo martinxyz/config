@@ -142,8 +142,8 @@
 ;;setq compile-command '("gmake"))
 ;;setq compile-command '("gmake" . 4))
 
-;; Compilierfenster entfernen bei Erfolg
-;; Quelle: http://www.bloomington.in.us/~brutt/emacs-c-dev.html
+;; get rid of compilation window on success
+;; source: http://www.bloomington.in.us/~brutt/emacs-c-dev.html [dead link]
 (setq compilation-finish-function
       (lambda (buf str)
         (if (string-match "exited abnormally" str)
@@ -157,38 +157,33 @@
 
 (require 'compile)
 ; questa / vsim style errors
-(add-to-list 'compilation-error-regexp-alist 'vsim)
+;(add-to-list 'compilation-error-regexp-alist 'vsim)
 ; # ** Error: ../../source/core/queue_fifo.vhd(22): (vcom-1195) Cannot find expanded name "work.ram".
-(push '(vsim "^..\\(ERROR\\|WARNING\\|\\*\\* Error\\|\\*\\* Warning\\)[^:]*: \\(\\[[0-9]+\\] \\)?\\(.+\\)(\\([0-9]+\\)):" 3 4)
-      compilation-error-regexp-alist-alist)
-(add-to-list 'compilation-error-regexp-alist 'vsim2)
+;(push '(vsim "^..\\(ERROR\\|WARNING\\|\\*\\* Error\\|\\*\\* Warning\\)[^:]*: \\(\\[[0-9]+\\] \\)?\\(.+\\)(\\([0-9]+\\)):" 3 4)
+;      compilation-error-regexp-alist-alist)
+;(add-to-list 'compilation-error-regexp-alist 'vsim2)
 ; # Error in macro ./queue_fifo.do line 22
-(push '(vsim2 "^..Error in macro \\([^ ]+\\) line \\([0-9]+\\)" 1 2)
-      compilation-error-regexp-alist-alist)
+;(push '(vsim2 "^..Error in macro \\([^ ]+\\) line \\([0-9]+\\)" 1 2)
+;      compilation-error-regexp-alist-alist)
 
 ; Error: Symbolic name "_clk3" is used but not defined File: /opt/altera9.1/quartus/libraries/megafunctions/altpll.tdf Line: 1376
-(add-to-list 'compilation-error-regexp-alist 'quartus1)
+;(add-to-list 'compilation-error-regexp-alist 'quartus1)
 ; # Error in macro ./queue_fifo.do line 22
 ;(push '(quartus1 "^Error.*File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
 ;      compilation-error-regexp-alist-alist)
-(push '(quartus1 "File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
-      compilation-error-regexp-alist-alist)
+;(push '(quartus1 "File: \\([^ ]+\\) Line: \\([0-9]+\\)" 1 2)
+;      compilation-error-regexp-alist-alist)
 
 ; fix from https://bugs.launchpad.net/ubuntu/+source/emacs23/+bug/814468
-(add-to-list 'compilation-error-regexp-alist 'gcc_include_fix)
-(push '(gcc_include_fix "^\\(?:In file included\\|                \\) from \
-+\\([^:]+\\):\\([0-9]+\\)\\(?::[0-9]+\\)?[:,]$" 1 2)
-      compilation-error-regexp-alist-alist)
-
-; own fix
-;(add-to-list 'compilation-error-regexp-alist 'unresolved_reference)
-;(push '(unresolved_reference "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+;(add-to-list 'compilation-error-regexp-alist 'gcc_include_fix)
+;(push '(gcc_include_fix "^\\(?:In file included\\|                \\) from \
+;+\\([^:]+\\):\\([0-9]+\\)\\(?::[0-9]+\\)?[:,]$" 1 2)
 ;      compilation-error-regexp-alist-alist)
 
 ; own fix
-(add-to-list 'compilation-error-regexp-alist 'unresolved_reference2 t)
-(push '(unresolved_reference2 "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
-      compilation-error-regexp-alist-alist)
+;(add-to-list 'compilation-error-regexp-alist 'unresolved_reference2 t)
+;(push '(unresolved_reference2 "\\(^obj[^:]+[:]\\)\\([^0-9][^:]+\\)[:]\\([0-9]+\\)[:] first defined here" 2 3)
+;      compilation-error-regexp-alist-alist)
 
 ; make compile buffer wrap lines
 ; http://stackoverflow.com/questions/1292936/line-wrapping-within-emacs-compilation-buffer
@@ -630,12 +625,17 @@
       (progn
         (find-tag nil t)
         (ring-remove find-tag-marker-ring 0))
-    (tags-loop-continue)))
+
+    (swbuff-start-switching)
+    (tags-loop-continue)
+    (swbuff-end-switching)))
 
 (defun my-start-tag-grep ()
   (interactive)
   (setq last-tags-jump-was-find-tag nil)
-  (call-interactively 'tags-search (thing-at-point 'symbol)))
+  (swbuff-start-switching)
+  (call-interactively 'tags-search (thing-at-point 'symbol))
+  (swbuff-end-switching))
 
 
 
@@ -664,6 +664,9 @@
 ;;(define-key evil-normal-state-map "ä" 'viper-bol-and-skip-white)
 (define-key evil-normal-state-map "v" 'ido-find-file)
 (define-key evil-normal-state-map "V" 'ido-switch-buffer)
+(define-key evil-normal-state-map (kbd "SPC") 'evil-visual-line)
+(define-key evil-visual-state-map (kbd "SPC") 'evil-next-line)
+(define-key evil-visual-state-map (kbd "SPC") 'evil-next-line)
 ;
 (define-key evil-normal-state-map "H" 'point-grep)
 
@@ -954,6 +957,13 @@
    (call-interactively (key-binding (this-command-keys)))))
 ; use tab for indentation, not for evil-jump-forward
 (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+
+(defun my-indent-region()
+  (interactive)
+  ;(call-interactively indent-region)
+  (indent-region (mark) (point))
+  )
+(define-key evil-visual-state-map (kbd "TAB") 'my-indent-region)
 
 ;(fill-keymap evil-normal-state-map
 ;            "SPC" 'evil-ace-jump-char-mode

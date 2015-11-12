@@ -39,7 +39,7 @@ if [ "$PS1" ]; then
     alias en="export LC_MESSAGES=C"
 fi
 
-export HISTIGNORE='*#[Rr][Mm]:?:halt'
+export HISTIGNORE='*#[Rr][Mm]:?:halt:poweroff'
 export HISTCONTROL="ignoredups"
 export HISTFILESIZE=160000
 export HISTSIZE=160000
