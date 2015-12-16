@@ -26,6 +26,9 @@
  '(desktop-path (quote (".")))
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
+ '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
+ '(electric-pair-mode t)
+ '(electric-pair-skip-self (quote electric-pair-default-skip-self))
  '(evil-repeat-move-cursor nil)
  '(evil-search-module (quote evil-search))
  '(evil-symbol-word-search t)
@@ -61,6 +64,9 @@
  '(mouse-yank-at-point t)
  '(octave-auto-indent nil)
  '(pabbrev-idle-timer-verbose nil)
+ '(package-selected-packages
+   (quote
+    (ace-jump-mode avy markdown-mode evil-org evil yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
@@ -88,6 +94,7 @@
  '(toolbar-visible-p nil)
  '(transient-mark-mode nil)
  '(truncate-lines t)
+ '(undo-tree-enable-undo-in-region nil)
  '(user-full-name "Martin Renold")
  '(user-mail-address "martin@log2.ch")
  '(vhdl-actual-port-name (quote ("\\(.*\\)[IO]$" . "\\1")))
@@ -146,6 +153,10 @@ nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ace-jump-face-foreground ((t (:foreground "white smoke" :underline nil))))
+ '(avy-lead-face ((t (:foreground "orange"))))
+ '(avy-lead-face-0 ((t (:foreground "yellow"))))
+ '(avy-lead-face-1 ((t (:foreground "orange"))))
+ '(avy-lead-face-2 ((t (:foreground "orange"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
  '(font-lock-comment-face ((t (:foreground "#cb4e39"))))
  '(ido-first-match ((t (:weight bold))))

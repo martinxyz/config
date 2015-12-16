@@ -6,6 +6,11 @@
 (setq custom-file "~/config/elisp/emacs-custom")
 (load "~/config/elisp/emacs-custom" t t)
 
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
 ; scheint auch ohne zu gehen, aber so ist es gleich von Anfang an geladen
 (require 'cc-mode)
 
@@ -14,13 +19,15 @@
 ; some nice ideas there, but nothing wrong with ido, imo
 ;(require 'icicles)
 
+; evil is installed from melpa now
 ; undo-tree is required for evil's redo to work (and is also nice on its own)
-(add-to-list 'load-path "~/config/elisp/evil/lib")
-(require 'undo-tree)
-(global-undo-tree-mode)
+;(add-to-list 'load-path "~/config/elisp/evil/lib")
+;(require 'undo-tree)
+;(global-undo-tree-mode)
+;
+;(add-to-list 'load-path "~/config/elisp/evil")
 
-(add-to-list 'load-path "~/config/elisp/evil")
-(require 'evil)
+;(require 'evil)
 (evil-mode 1)
 
 ;; Add my directories to load-path.
@@ -31,12 +38,23 @@
                  '("~/config/elisp/python-mode-1.0")
                  load-path))
 
-(require 'ace-jump-mode)
+(require 'evil-surround)
+(global-evil-surround-mode 1)
+
+(require 'ace-jump-mode) ; from melpa
+(require 'avy) ; from melpa
+;(setq ace-jump-word-mode-use-query-char nil)
+(setq ace-jump-word-mode-use-query-char 't)
 ;(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 ;;If you also use viper mode:
 ;(define-key viper-vi-global-user-map (kbd "SPC") 'ace-jump-mode)
 (define-key evil-normal-state-map "g" 'ace-jump-mode)
-(define-key evil-normal-state-map "t" 'ace-jump-line-mode)
+;(define-key evil-normal-state-map "t" 'ace-jump-line-mode)
+;(define-key evil-normal-state-map "t" 'ace-jump-word-mode)
+(setq ace-jump-mode-move-keys (append "jkluiomhznp,fds.arvecwxqytbg" nil))
+;(define-key evil-normal-state-map "t" 'avy-goto-line)
+(define-key evil-normal-state-map "t" 'avy-goto-word-1)
+
 
 ; Evil normal emacs commands when in insert state
 (setcdr evil-insert-state-map nil)
@@ -195,6 +213,7 @@
 ;; passende Klammer anzeigen wenn man eine schliesst
 (show-paren-mode t)
 
+; from melpa now
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 
@@ -910,10 +929,6 @@
 ;; after mouse selection in X11, you can paste by `yank' in emacs
 (setq select-enable-primary t)
 
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
 
 ; http://www.emacswiki.org/emacs/pabbrev.el
 (require 'pabbrev)
@@ -957,6 +972,12 @@
    (call-interactively (key-binding (this-command-keys)))))
 ; use tab for indentation, not for evil-jump-forward
 (define-key evil-normal-state-map (kbd "TAB") 'evil-undefine)
+
+; clash of TAB key (pabbrev vs yasnippet vs python-mode)
+(require 'yasnippet) ; installed with M-x list-packages
+(define-key yas-keymap (kbd "ħ")   'yas-next-field-or-maybe-expand)
+(define-key yas-keymap (kbd "TAB")   'pabbrev-expand-maybe)
+(define-key yas-keymap [(tab)]       'pabbrev-expand-maybe)
 
 (defun my-indent-region()
   (interactive)
