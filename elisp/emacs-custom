@@ -66,7 +66,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (ace-jump-mode avy markdown-mode evil-org evil yasnippet ido-ubiquitous flycheck)))
+    (helm-swoop helm ace-jump-mode avy markdown-mode evil-org evil yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)

@@ -1028,3 +1028,11 @@
 (require 'keyfreq)
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
+
+(require 'helm) ; melpa: helm and helm-swoop
+(global-set-key (kbd "M-x") 'helm-M-x)
+; try those:
+; - helm-for-files  - too much clutter (size, type, path... ido-find-file is better, shows path only if needed)
+; - helm-semantic-or-imenu   - jump to local function/variable/method/class
+; - helm-multi-swoop-all
+; (or just use M-x occur)
