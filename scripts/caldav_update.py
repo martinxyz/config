@@ -59,7 +59,8 @@ for dt, event in sorted(events, key=lambda x: x[0]):
         s += hour + ' '
     s += event['SUMMARY']
     for name, value in list(event.items()):
-        if name in 'SUMMARY TRANSP UID'.split():
+        #print(repr((name, value)))
+        if name in 'SUMMARY TRANSP UID CLASS STATUS'.split():
             continue
         if isinstance(value, str):
             s += ', ' + value

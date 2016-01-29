@@ -1,0 +1,22 @@
+#!/bin/bash
+# Colorize the background of urxvt terminals when running ssh
+# to prevent typing into the wrong window.
+#
+# To colorize per-host, put this into .ssh/config
+#
+# Host foo
+# PermitLocalCommand yes
+# LocalCommand [ -t 1 ] && echo -e "\e]49;#700000\a" # strong red
+#
+# See also: https://github.com/jeromenerf/perhostcolor
+
+if [ -t 1 ] ; then
+    # running in terminal
+    echo -n -e "\e]49;#000040\a" # non-penetrant blue
+    /usr/bin/ssh "$@"
+    echo -n -e "\e]49;#000000\a" # black
+else
+    # do not disturb scripts (like git ssh)
+    /usr/bin/ssh "$@"
+fi
+
