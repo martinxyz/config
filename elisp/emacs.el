@@ -986,6 +986,17 @@
   )
 (define-key evil-visual-state-map (kbd "TAB") 'my-indent-region)
 
+; return key in insert mode should indent, too
+(define-key global-map (kbd "RET") 'newline-and-indent)
+
+; type ';' in normal state to add semicolon (useful if brackets were auto-closed)
+(define-key evil-normal-state-map ";" 'my-add-semicolon)
+(defun my-add-semicolon()
+  (interactive)
+  (save-excursion
+    (end-of-line)
+    (insert ";")))
+
 ;(fill-keymap evil-normal-state-map
 ;            "SPC" 'evil-ace-jump-char-mode
 ;             "Y" (kbd "y$")
