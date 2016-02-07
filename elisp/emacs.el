@@ -56,27 +56,29 @@
 (define-key evil-normal-state-map "t" 'avy-goto-word-1)
 
 
+;; The commented stuff below seems to do more harm than good.
 ; Evil normal emacs commands when in insert state
-(setcdr evil-insert-state-map nil)
-;(define-key evil-insert-state-map "\C-k" 'evil-insert-digraph)
-;(define-key evil-insert-state-map "\C-o" 'evil-execute-in-normal-state)
-;(define-key evil-insert-state-map "\C-r" 'evil-paste-from-register)
-;(define-key evil-insert-state-map "\C-y" 'evil-copy-from-above)
-;(define-key evil-insert-state-map "\C-e" 'evil-copy-from-below)
-;(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
-;(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
-;(define-key evil-insert-state-map "\C-x\C-n" 'evil-complete-next-line)
-;(define-key evil-insert-state-map "\C-x\C-p" 'evil-complete-previous-line)
-;(define-key evil-insert-state-map "\C-t" 'evil-shift-right-line)
-;(define-key evil-insert-state-map "\C-d" 'evil-shift-left-line)
-(define-key evil-insert-state-map [remap delete-backward-char] 'evil-delete-backward-char-and-join)
-;(define-key evil-insert-state-map [delete] 'delete-char)
-(define-key evil-insert-state-map [remap newline] 'evil-ret)
-(define-key evil-insert-state-map [remap newline-and-indent] 'evil-ret-and-indent)
-(define-key evil-insert-state-map [escape] 'evil-normal-state)
-(define-key evil-insert-state-map
-  (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
-
+;(setcdr evil-insert-state-map nil)
+;;(define-key evil-insert-state-map "\C-k" 'evil-insert-digraph)
+;;(define-key evil-insert-state-map "\C-o" 'evil-execute-in-normal-state)
+;;(define-key evil-insert-state-map "\C-r" 'evil-paste-from-register)
+;;(define-key evil-insert-state-map "\C-y" 'evil-copy-from-above)
+;;(define-key evil-insert-state-map "\C-e" 'evil-copy-from-below)
+;;(define-key evil-insert-state-map "\C-n" 'evil-complete-next)
+;;(define-key evil-insert-state-map "\C-p" 'evil-complete-previous)
+;;(define-key evil-insert-state-map "\C-x\C-n" 'evil-complete-next-line)
+;;(define-key evil-insert-state-map "\C-x\C-p" 'evil-complete-previous-line)
+;;(define-key evil-insert-state-map "\C-t" 'evil-shift-right-line)
+;;(define-key evil-insert-state-map "\C-d" 'evil-shift-left-line)
+;;(define-key evil-insert-state-map [delete] 'delete-char)
+;(define-key evil-insert-state-map [remap delete-backward-char] 'evil-delete-backward-char-and-join)
+;(define-key evil-insert-state-map [escape] 'evil-normal-state)
+;(define-key evil-insert-state-map
+;  (read-kbd-macro evil-toggle-key) 'evil-emacs-state)
+;(define-key evil-insert-state-map [remap newline] 'evil-ret)
+;(define-key evil-insert-state-map [remap newline-and-indent] 'evil-ret-and-indent)
+; return key in insert mode should indent, too
+;(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; visual line movement
 ;; source: http://stackoverflow.com/questions/20882935/how-to-move-between-visual-lines-and-move-past-newline-in-evil-mode
@@ -210,7 +212,7 @@
    (set (make-local-variable 'truncate-partial-width-windows) nil))
 (add-hook 'compilation-mode-hook 'my-compilation-mode-hook)
 
-;; passende Klammer anzeigen wenn man eine schliesst
+; show matching brackets
 (show-paren-mode t)
 
 ; from melpa now
@@ -220,19 +222,6 @@
 (add-hook 'markdown-mode-hook
           (lambda ()
             (visual-line-mode t)))
-
-; ;; This adds additional extensions which indicate files normally
-;; ;; handled by cc-mode.
-;; (setq auto-mode-alist
-;;       (append '(("\\.C$"  . c++-mode)
-;; 		("\\.cc$" . c++-mode)
-;; 		("\\.hh$" . c++-mode)
-;; 		("\\.c$"  . c-mode)
-;; 		("\\.h$"  . c-mode)
-;; 		("\\.html\\.in$" . html-mode))
-;; 	      auto-mode-alist))
-
-;; Programmierstil. 
 
 (defun linux-c-mode ()
        "C mode with adjusted defaults for use with the Linux kernel."
@@ -249,9 +238,6 @@
        ;; Note: figure those out with C-c C-o (o=offset)
        (c-set-offset 'substatement-open 0)
        (setq tab-width 8))
-
-;(setq-default c-electric-flag nil)
-(setq-default c-brace-newlines nil)
 
 (defun wesnoth-c-mode ()
   "Wesnoth cpp coding style"
@@ -340,105 +326,37 @@
         indent-tabs-mode t)
   (c-set-offset 'substatement-open 0)
   )
-;; TODO: Im c-mode beim Laden einer Datei 
-;; den fremden Stil erkennen und automatisch einstellen.
-(setq auto-mode-alist 
-      (cons '(".*/linux.*/.*\\.[ch]$" . linux-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/git/.*\\.[ch]$" . linux-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/wesnoth.*\\.cpp$" . wesnoth-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/ieee1588v2.*\\.[ch]$" . ines-notab-c-mode)
-            auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/prp.*\\.[ch]$" . ines-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/coldfire.*\\.[ch]$" . ines-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/hsr.*\\.[ch]$" . ines-notab-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/h.pp.*\\.[ch]$" . ines-notab-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/gtk+.*/.*\\.[ch]$" . gtk-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*\\.mas$" . python-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*\\.java$" . java-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*SConstruct$" . python-mode)
-          auto-mode-alist))
 
-(setq auto-mode-alist 
-      (cons '(".*\\.do$" . tcl-mode)
-          auto-mode-alist))
+(require 'google-c-style)
+(defun google-cpp-mode ()
+  (interactive)
+  (google-set-c-style))
 
-(setq auto-mode-alist 
-      (cons '(".*\\.m$" . octave-mode)
-          auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+(add-to-list 'auto-mode-alist '(".*/linux.*/.*\\.[ch]$" . linux-c-mode))
+(add-to-list 'auto-mode-alist '(".*/git/.*\\.[ch]$" . linux-c-mode))
+(add-to-list 'auto-mode-alist '(".*/wesnoth.*\\.cpp$" . wesnoth-c-mode))
+(add-to-list 'auto-mode-alist '(".*/wesnoth.*\\.hpp$" . wesnoth-c-mode))
+(add-to-list 'auto-mode-alist '(".*/gimp.*/.*\\.[ch]$" . gimp-c-mode))
+(add-to-list 'auto-mode-alist '(".*/gtk+.*/.*\\.[ch]$" . gtk-c-mode))
+(add-to-list 'auto-mode-alist '(".*\\.mas$" . python-mode))
+(add-to-list 'auto-mode-alist '(".*\\.java$" . java-mode))
+(add-to-list 'auto-mode-alist '(".*SConstruct$" . python-mode))
+(add-to-list 'auto-mode-alist '(".*\\.do$" . tcl-mode))
+(add-to-list 'auto-mode-alist '(".*\\.m$" . octave-mode))
+(add-to-list 'auto-mode-alist '(".*\\.d$" . c-mode))
+(add-to-list 'auto-mode-alist '(".*\\.vhd$" . ines-vhdl-mode))
+(add-to-list 'auto-mode-alist '(".*\\.do$" . sh-mode))
+(add-to-list 'auto-mode-alist '(".*\\.pde$" . c-mode))
+(add-to-list 'auto-mode-alist '(".*\\.ino$" . c-mode))
+(add-to-list 'auto-mode-alist '(".*wireshark.*\\.[ch]$" . wireshark-c-mode))
+(add-to-list 'auto-mode-alist '(".*/Cura.*\\.py$" . cura-py-mode))
+(add-to-list 'auto-mode-alist '(".*/Cura.*\\.h$" . cura-c-mode))
+(add-to-list 'auto-mode-alist '(".*/Cura.*\\.cpp" . cura-c-mode))
+(add-to-list 'auto-mode-alist '(".*\\.txt$" . markdown-mode))
 
-(setq auto-mode-alist 
-      (cons '(".*\\.d$" . c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*\\.vhd$" . ines-vhdl-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*\\.do$" . sh-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*\\.pde$" . c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*\\.ino$" . c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*wireshark.*\\.[ch]$" . wireshark-c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*/linux_ts.*/.*\\.[ch]$" . ines-notab-c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*/ptp2_.*\\.[ch]$" . ines-notab-c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*/Cura.*\\.py$" . cura-py-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/Cura.*\\.h$" . cura-c-mode)
-          auto-mode-alist))
-(setq auto-mode-alist 
-      (cons '(".*/Cura.*\\.cpp" . cura-c-mode)
-          auto-mode-alist))
-
-(setq auto-mode-alist 
-      (cons '(".*\\.txt$" . 
-              (lambda () (markdown-mode)))
-            auto-mode-alist))
+;;(setq-default c-electric-flag nil)
+;(setq-default c-brace-newlines nil)
 
 ;(eval-after-load "pymacs"
 ;  '(add-to-list 'pymacs-load-path "~/config/elisp"))
@@ -986,8 +904,6 @@
   )
 (define-key evil-visual-state-map (kbd "TAB") 'my-indent-region)
 
-; return key in insert mode should indent, too
-(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ; type ';' in normal state to add semicolon (useful if brackets were auto-closed)
 (define-key evil-normal-state-map ";" 'my-add-semicolon)
@@ -1047,3 +963,5 @@
 ; - helm-semantic-or-imenu   - jump to local function/variable/method/class
 ; - helm-multi-swoop-all
 ; (or just use M-x occur)
+
+(define-key global-map (kbd "C-z") nil) ; don't ever do "suspend frame"
