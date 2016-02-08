@@ -330,6 +330,7 @@
 (require 'google-c-style)
 (defun google-cpp-mode ()
   (interactive)
+  (c++-mode)
   (google-set-c-style))
 
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
