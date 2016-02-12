@@ -15,6 +15,7 @@
  '(compilation-window-height 21)
  '(complex-buffers-menu-p t)
  '(delete-key-deletes-forward t)
+ '(delete-trailing-lines nil)
  '(desktop-enable t nil (desktop))
  '(desktop-globals-to-save
    (quote
@@ -93,6 +94,7 @@
  '(tool-bar-mode nil nil (tool-bar))
  '(toolbar-captioned-p nil)
  '(toolbar-visible-p nil)
+ '(tramp-mode nil)
  '(transient-mark-mode nil)
  '(truncate-lines t)
  '(undo-tree-enable-undo-in-region nil)

@@ -91,15 +91,15 @@
 (define-key evil-normal-state-map (kbd "<remap> <evil-beginning-of-line>") 'evil-beginning-of-visual-line)
 (define-key evil-motion-state-map (kbd "<remap> <evil-beginning-of-line>") 'evil-beginning-of-visual-line)
 (evil-redirect-digit-argument evil-motion-state-map "0" 'evil-beginning-of-visual-line)
-; Make horizontal movement cross lines                                    
+; Make horizontal movement cross lines
 (setq-default evil-cross-lines t)
 
 
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
 ;; ??, scheint nicht zu funktionnieren.
-;(global-set-key [(f2)] (lambda () (interactive) 
-;                         (let ((word-at-point (current-word))) 
+;(global-set-key [(f2)] (lambda () (interactive)
+;                         (let ((word-at-point (current-word)))
 ;                                 (Info-query "libc")
 ;                                 (Info-index word-at-point))))
 
@@ -364,7 +364,7 @@
 ;(pymacs-load "pymacstest" "pytest-")
 ;;(message (pytest-foo))
 
-; Color-themes package. 
+; Color-themes package.
 ; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?ColorTheme
 (require 'color-theme)
 ;(color-theme-sitaramv-solaris)
@@ -424,7 +424,7 @@
 ;;; 'regadhoc-register-char-list is list of your "favorite" register's char.
 
 (add-hook 'c-mode-common-hook
-  (lambda () 
+  (lambda ()
     ; keine automatischen newlines wenn man ; drueckt
 ; <old version>
 ;   ;(c-toggle-auto-newline-state -1)
@@ -442,7 +442,7 @@
 
 ; Tabs fuer eclipse java zeugs
 (add-hook 'java-mode-hook
-  (lambda () 
+  (lambda ()
     (setq indent-tabs-mode t)))
 
 ; Ich glaube das ist damit mal ein file.c.bz2 direkt editieren kann
@@ -501,7 +501,7 @@
 ;; (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
 ;; (defun ido-sort-mtime ()
 ;;   (setq ido-temp-list
-;;         (sort ido-temp-list 
+;;         (sort ido-temp-list
 ;;               (lambda (a b)
 ;;                 (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
 ;;                       (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
@@ -518,7 +518,7 @@
 (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
 (defun ido-sort-mtime ()
   (setq ido-temp-list
-        (sort ido-temp-list 
+        (sort ido-temp-list
               (lambda (a b)
                 (time-less-p
                  (sixth (file-attributes (concat ido-current-directory b)))
@@ -964,5 +964,11 @@
 ; - helm-semantic-or-imenu   - jump to local function/variable/method/class
 ; - helm-multi-swoop-all
 ; (or just use M-x occur)
+
+(autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
+(add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
+
+(add-hook 'c-mode-hook
+          (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
 
 (define-key global-map (kbd "C-z") nil) ; don't ever do "suspend frame"

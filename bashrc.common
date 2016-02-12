@@ -78,8 +78,8 @@ complete -o bashdefault -o default -o nospace -F _git i
 
 # messy chdir history
 
-mkdir -p /home/martin/.chdir
-export PROMPT_COMMAND='(( echo -n "$SECONDS " ; pwd ) >> /home/martin/.chdir/bash_$$.cwd ) 2>/dev/null'
+mkdir -p $HOME/.chdir
+export PROMPT_COMMAND='(( echo -n "$SECONDS " ; pwd ) >> $HOME/.chdir/bash_$$.cwd ) 2>/dev/null'
 
 # from http://stackoverflow.com/questions/5138110/emacs-create-new-file-with-ido-enabled
 #source ~/scripts/bash-ido
