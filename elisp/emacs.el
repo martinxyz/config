@@ -972,3 +972,66 @@
           (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
 
 (define-key global-map (kbd "C-z") nil) ; don't ever do "suspend frame"
+
+
+;; Evil indent after paste
+;; Almost (not quite) working. Source: http://comments.gmane.org/gmane.emacs.vim-emulation/2005
+(defun get-common-indent-in-region (start end)
+  (setq end (copy-marker end))
+  (unwind-protect
+      (let (indentation)
+        (save-excursion
+          (goto-char start)
+          (or (bolp) (forward-line 1))
+          (while (< (point) end)
+            (skip-chars-forward " \t")
+            (setq indentation
+                  (cons (current-column) indentation))
+            (forward-line 1)))
+        (apply #'min indentation))
+    (move-marker end nil)))
+(defun my-evil-adjust-indent-after-paste ()
+  (interactive)
+  (unless (memq last-command
+                '(evil-paste-after
+                  evil-paste-before))
+    (error "Previous command was not a line-wise evil-paste: %s" last-command))
+  (let* ((start (evil-get-marker ?\[))
+         (end (evil-get-marker ?\]))
+         (common (get-common-indent-in-region start end))
+         (this
+          (save-excursion
+            (cond
+             ((eq last-command 'evil-paste-after)
+              (goto-char end)
+              (forward-line 1))
+             (t
+              (goto-char start)
+              (forward-line -1)))
+            (skip-chars-forward " \t")
+            (current-column))))
+    (indent-rigidly start end (- this common))))
+(evil-define-command evil-paste-after-adjusting-indent
+  (count &optional register yank-handler)
+  "Like `evil-paste-before' but adjusts the indent to the current line."
+  :suppress-operator t
+  (interactive "P<x>")
+  (evil-paste-after count register yank-handler)
+  ;(my-evil-adjust-indent-after-paste 'before))
+  (my-evil-adjust-indent-after-paste))
+;(define-key evil-normal-state-map "p" 'evil-paste-after-adjusting-indent)
+
+; indented yank (working; from https://www.emacswiki.org/emacs/AutoIndentation)
+(dolist (command '(yank yank-pop))
+   (eval `(defadvice ,command (after indent-region activate)
+            (and (not current-prefix-arg)
+                 (member major-mode '(emacs-lisp-mode lisp-mode
+                                                      clojure-mode    scheme-mode
+                                                      haskell-mode    ruby-mode
+                                                      rspec-mode      python-mode
+                                                      c-mode          c++-mode
+                                                      objc-mode       latex-mode
+                                                      plain-tex-mode))
+                 (let ((mark-even-if-inactive transient-mark-mode))
+                   (indent-region (region-beginning) (region-end) nil))))))
+(define-key evil-normal-state-map "P" 'yank)
