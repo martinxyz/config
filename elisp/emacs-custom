@@ -58,6 +58,7 @@
  '(indent 2 t)
  '(inhibit-local-menu-bar-menus t)
  '(line-number-mode t)
+ '(menu-bar-mode nil)
  '(mouse-avoidance-animation-delay 0)
  '(mouse-avoidance-mode (quote none) nil (avoid))
  '(mouse-avoidance-nudge-dist 40)
