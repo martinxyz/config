@@ -1,22 +1,52 @@
-#!/bin/bash
-# This is a replacement for the status display of "git branch". 
-# I found git's alphabetic sort very useless. This sorts the output by
-# usage (recently modified branches last) and only shows the 10 most
-# recent ones.
-#
-# (See also the 'brr' script for remote branches and stashes.)
+#!/usr/bin/env python
+"""Hack to get a more useful (IMHO) "git branch" style summary.
 
-if test $# -ne 0 ; then
-    git branch "$@"
-    exit $?
-fi
+Output is sorted by usage (recently modified branches last) and
+limited in lines (I like to let old test branches lying around).
+"""
 
-export GIT_PAGER= 
-git log --branches --not --tags\
-    --simplify-by-decoration\
-    -10 --reverse --decorate --oneline\
-    --format=%d \
-|sed -e 's/[()]/ /g'\
-|sed -e 's/  HEAD, /* /' \
-|sed -e 's/^\(.\).*, /\1 /'
+import os, sys, subprocess
 
+if len(sys.argv) > 1:
+    subprocess.call(['git', 'branch'] + sys.argv[1:])
+    sys.exit(0)
+
+cmd = '''
+git log --branches --not --tags
+        --simplify-by-decoration
+        -10 --reverse --decorate --oneline
+        --color=always
+'''
+
+gray = False
+if gray:
+    cmd += ' --format=%D'
+
+os.environ['GIT_PAGER'] = ''
+output = subprocess.check_output(cmd.split())
+for line in output.split('\n'):
+    if not line.strip():
+        continue
+    if gray:
+        s = ''
+        if 'HEAD' in line:
+            s += '* '
+            line = line.replace('HEAD -> ', '')
+            line = line.replace('HEAD, ', '')
+        else:
+            s += '  '
+        s += line.strip()
+    else:
+        s = ''
+        if '(' not in line or ')' not in line:
+            continue
+        if 'HEAD' in line:
+            s += '* '
+        else:
+            s += '  '
+        part = line.split('(', 1)[1].split(')', 1)[0]
+        parts = part.split(' ')
+        parts = [ss.replace(',', '') for ss in parts if 'HEAD' not in ss and '->' not in ss]
+        parts.sort(key=lambda x: x.count('/'))
+        s += ', '.join(parts)
+    print s
