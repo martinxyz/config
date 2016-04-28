@@ -333,6 +333,11 @@
   (c++-mode)
   (google-set-c-style))
 
+(defun javascript-tabconfig ()
+  (interactive)
+  (javascript-mode)
+  (setq tab-width 4))
+
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".*/linux.*/.*\\.[ch]$" . linux-c-mode))
 (add-to-list 'auto-mode-alist '(".*/git/.*\\.[ch]$" . linux-c-mode))
@@ -355,6 +360,7 @@
 (add-to-list 'auto-mode-alist '(".*/Cura.*\\.h$" . cura-c-mode))
 (add-to-list 'auto-mode-alist '(".*/Cura.*\\.cpp" . cura-c-mode))
 (add-to-list 'auto-mode-alist '(".*\\.txt$" . markdown-mode))
+(add-to-list 'auto-mode-alist '(".*\\.js$" . javascript-tabconfig))
 
 ;;(setq-default c-electric-flag nil)
 ;(setq-default c-brace-newlines nil)
