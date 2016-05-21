@@ -894,12 +894,12 @@ The suggestion should start with PREFIX, and be entered at point."
             (save-excursion
               (pabbrev-save-buffer-modified-p
                (insert
-                "[" expansion "]" )
+                "" expansion "" )
                ;; store everything. Most importantly the pabbrev-marker!
                (setq pabbrev-marker (cons end (point)))
-               (let ((point-1 (- (point) 1)))
+               (let ((point-0 (- (point) 0)))
                  (pabbrev-set-overlay
-                  (- point-1 (length expansion)) point-1
+                  (- point-0 (length expansion)) point-0
                   (length suggestions)))))
           (pabbrev-set-overlay (point) (point)
                                (length suggestions))
@@ -907,10 +907,9 @@ The suggestion should start with PREFIX, and be entered at point."
           (overlay-put pabbrev-overlay
                        'after-string
                        (concat
-                        (propertize "[" 'cursor 1)
                         (propertize expansion
-                                    'face (overlay-get pabbrev-overlay 'face))
-                        "]")))))))
+                                    'face (overlay-get pabbrev-overlay 'face)
+                                    'cursor 1))))))))
 
 (defvar pabbrev-last-expansion-suggestions nil
   "Cached alternative suggestions from the last expansion.")
