@@ -959,9 +959,9 @@
 (modify-syntax-entry ?_ "w")
 (add-hook 'c-mode-common-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 
-(require 'keyfreq)
-(keyfreq-mode 1)
-(keyfreq-autosave-mode 1)
+;#(require 'keyfreq)
+;(keyfreq-mode 1)
+;(keyfreq-autosave-mode 1)
 
 (require 'helm) ; melpa: helm and helm-swoop
 (global-set-key (kbd "M-x") 'helm-M-x)
