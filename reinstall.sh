@@ -16,7 +16,7 @@ symlink config/elisp/viper.el .viper
 mkdir -p .config/matplotlib
 symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
-for i in vimrc gvimrc vim cvsrc Xresources inputrc fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload; do
+for i in vimrc gvimrc vim cvsrc Xresources fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload; do
   test -r config/$i || echo config/$i does not exist
   symlink config/$i .$i
 done
@@ -39,6 +39,7 @@ fi
 perl -p -i -e 's/bash_completion /bash_completion_disabled /g' ~/.bashrc
 
 test -h .Xdefaults && rm .Xdefaults # replaced by Xresources
+test -h .inputrc && rm .inputrc # use system-wide file
 
 echo 
 
