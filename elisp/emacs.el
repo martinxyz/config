@@ -2,14 +2,15 @@
 ;; Aus verschiedenen Quellen zusammenkopiert,
 ;; neuere Dinge am Schluss.
 
+
 ;; wohin die "customize"-Einstellungen gespeichert werden
 (setq custom-file "~/config/elisp/emacs-custom")
 (load "~/config/elisp/emacs-custom" t t)
-
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
+;(require 'seq)
 
 ; scheint auch ohne zu gehen, aber so ist es gleich von Anfang an geladen
 (require 'cc-mode)
@@ -405,7 +406,7 @@
 ;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 ;(scroll-bar-mode -1)
 ;(set-scroll-bar-mode 't)
-(toggle-horizontal-scroll-bar -1)
+;(toggle-horizontal-scroll-bar -1)
 (toggle-scroll-bar -1)
 
 ;; groessere Schrift
@@ -1041,3 +1042,23 @@
                  (let ((mark-even-if-inactive transient-mark-mode))
                    (indent-region (region-beginning) (region-end) nil))))))
 (define-key evil-normal-state-map "P" 'yank)
+
+(require 'flycheck)
+;(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; disable jshint since we prefer eslint checking
+;(setq-default flycheck-disabled-checkers
+;  (append flycheck-disabled-checkers
+;    '(javascript-jshint)))
+
+;;; use eslint with web-mode for jsx files
+;(flycheck-add-mode 'javascript-eslint 'web-mode)
+
+;;; customize flycheck temp file prefix
+;(setq-default flycheck-temp-prefix ".flycheck")
+
+;;; disable json-jsonlist checking for json files
+;(setq-default flycheck-disabled-checkers
+;  (append flycheck-disabled-checkers
+;    '(json-jsonlist)))
+
