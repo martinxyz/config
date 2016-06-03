@@ -23,7 +23,12 @@ if gray:
     cmd += ' --format=%D'
 
 os.environ['GIT_PAGER'] = ''
-output = subprocess.check_output(cmd.split())
+
+try:
+    output = subprocess.check_output(cmd.split())
+except subprocess.CalledProcessError:
+    sys.exit(1)
+
 for line in output.split('\n'):
     if not line.strip():
         continue
@@ -49,4 +54,5 @@ for line in output.split('\n'):
         parts = [ss.replace(',', '') for ss in parts if 'HEAD' not in ss and '->' not in ss]
         parts.sort(key=lambda x: x.count('/'))
         s += ', '.join(parts)
-    print s
+    print s + '\x1b[0m'
+
