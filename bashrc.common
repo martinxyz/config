@@ -37,6 +37,11 @@ if [ "$PS1" ]; then
     shopt -s checkwinsize
 
     alias en="export LC_MESSAGES=C"
+
+    # bash/readline configuration (inputrc)
+    bind 'set completion-ignore-case on'
+    bind 'set show-all-if-ambiguous on'
+    bind 'set mark-symlinked-directories on'
 fi
 
 export HISTIGNORE='*#[Rr][Mm]:?:halt:poweroff'
@@ -57,12 +62,6 @@ export SCONSFLAGS="-Q -u"
 
 #export LESS='-R --chop-long-lines'
 export LESS='-R'
-
-# bash/readline configuration (inputrc)
-bind 'set completion-ignore-case on'
-bind 'set show-all-if-ambiguous on'
-bind 'set mark-symlinked-directories on'
-
 
 # Use bash-completion, if available
 # Too slow!
