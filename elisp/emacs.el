@@ -2,6 +2,21 @@
 ;; Aus verschiedenen Quellen zusammenkopiert,
 ;; neuere Dinge am Schluss.
 
+; latest evil version with fix for undo bug
+(add-to-list 'load-path "~/compile/evil")
+(add-to-list 'load-path "~/compile/evil/lib")
+(require 'undo-tree)
+(require 'evil)
+(evil-mode 1)
+; evil is installed from melpa now
+; undo-tree is required for evil's redo to work (and is also nice on its own)
+;(add-to-list 'load-path "~/config/elisp/evil/lib")
+;(require 'undo-tree)
+;(global-undo-tree-mode)
+;(add-to-list 'load-path "~/config/elisp/evil")
+;(require 'evil)
+;(evil-mode 1)
+
 
 ;; wohin die "customize"-Einstellungen gespeichert werden
 (setq custom-file "~/config/elisp/emacs-custom")
@@ -15,21 +30,13 @@
 ; scheint auch ohne zu gehen, aber so ist es gleich von Anfang an geladen
 (require 'cc-mode)
 
+; make sure we use python-mode from melpa (bugfix about slow font-lock-mode)
+(require 'python-mode)
+
 (set-cursor-color "yellow")
 
 ; some nice ideas there, but nothing wrong with ido, imo
 ;(require 'icicles)
-
-; evil is installed from melpa now
-; undo-tree is required for evil's redo to work (and is also nice on its own)
-;(add-to-list 'load-path "~/config/elisp/evil/lib")
-;(require 'undo-tree)
-;(global-undo-tree-mode)
-;
-;(add-to-list 'load-path "~/config/elisp/evil")
-
-;(require 'evil)
-(evil-mode 1)
 
 ;; Add my directories to load-path.
 (setq load-path (append
@@ -39,6 +46,7 @@
                  '("~/config/elisp/python-mode-1.0")
                  load-path))
 
+; (related: smartparen, autopairs, electric pair mode)
 (require 'evil-surround)
 (global-evil-surround-mode 1)
 
@@ -1062,3 +1070,6 @@
 ;  (append flycheck-disabled-checkers
 ;    '(json-jsonlist)))
 
+
+; using evil to search, might as well save with this
+(global-set-key "\C-s" 'save-buffer)

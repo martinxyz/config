@@ -27,9 +27,7 @@
  '(desktop-path (quote (".")))
  '(desktop-save (quote if-exists))
  '(dragdrop-drop-at-point t)
- '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
  '(electric-pair-mode t)
- '(electric-pair-skip-self (quote electric-pair-default-skip-self))
  '(evil-repeat-move-cursor nil)
  '(evil-search-module (quote evil-search))
  '(evil-symbol-word-search t)
@@ -69,7 +67,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
+    (evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
