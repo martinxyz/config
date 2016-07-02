@@ -562,6 +562,10 @@
 ;  (comment-dwim nil)
 ;  (viper-insert nil))
 
+(global-set-key (kbd "C-;") 'comment-dwim)
+(define-key evil-normal-state-map ";" 'comment-dwim)
+(define-key evil-visual-state-map ";" 'comment-dwim)
+
 (defun my-jump-to-tag ()
   (interactive)
   (setq last-tags-jump-was-find-tag t)
@@ -599,7 +603,7 @@
 (define-key evil-normal-state-map "," 'my-start-tag-grep)
 (global-set-key "\M-," 'my-continue-tag-search)
 (define-key evil-normal-state-map "}" 'my-continue-tag-search)
-(global-set-key (kbd "C-.") 'my-jump-to-tag)
+;(global-set-key (kbd "\C-.") 'my-jump-to-tag)
 ;(define-key evil-normal-state-map ":" 'my-jump-to-tag)
 
 (define-key evil-normal-state-map "*" 'pop-tag-mark)
@@ -983,8 +987,12 @@
 (autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
 (add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
 
-(add-hook 'c-mode-hook
-          (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
+; Procudes too much commit noise when editing code with broken whitespace...
+; (add-hook 'c-mode-hook
+;           (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
+;
+; Better solution: ws-butler package from melpa. (enabled globally through M-x customize)
+
 
 (define-key global-map (kbd "C-z") nil) ; don't ever do "suspend frame"
 
@@ -1072,4 +1080,7 @@
 
 
 ; using evil to search, might as well save with this
-(global-set-key "\C-s" 'save-buffer)
+; (global-set-key "\C-s" 'save-buffer) ; this hurts searching inside M-x customize etc.
+(define-key evil-normal-state-map "\C-s" 'save-buffer)
+(define-key evil-visual-state-map "\C-s" 'save-buffer)
+(define-key evil-insert-state-map "\C-s" 'save-buffer)

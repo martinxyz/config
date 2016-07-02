@@ -9,6 +9,7 @@
  '(c-strict-syntax-p nil)
  '(case-fold-search t)
  '(column-number-mode nil)
+ '(comment-empty-lines t)
  '(compilation-ask-about-save nil)
  '(compilation-context-lines 0)
  '(compilation-scroll-output t)
@@ -67,7 +68,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
+    (ws-butler evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
@@ -148,6 +149,7 @@ nil)
  '(viper-replace-overlay-cursor-color "yellow")
  '(viper-syntax-preference (quote extended))
  '(whitespace-style (quote (face trailing tabs empty tab-mark)))
+ '(ws-butler-global-mode t)
  '(xslt-process-java-program "java-1.4.1_02")
  '(xslt-process-pdf-viewer (quote (acroread))))
 (custom-set-faces
