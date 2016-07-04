@@ -47,10 +47,6 @@
     (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
  '(ido-enabled (quote both) t (ido))
  '(ido-everywhere t)
- '(ido-ignore-extensions nil)
- '(ido-ignore-files
-   (quote
-    ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "\\`.svn/" "\\`~")))
  '(ido-max-directory-size 3000000)
  '(ido-max-prospects 30)
  '(ido-max-window-height 2)

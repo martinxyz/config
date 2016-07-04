@@ -1,3 +1,6 @@
 syntax: glob
 *~
 *#
+TAGS
+.emacs.desktop*
+

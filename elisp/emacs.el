@@ -545,9 +545,10 @@
 
 (setq ido-enable-flex-matching t)
 ; ignore some build products (they are often more recent than whatever I want to select)
-(setq ido-ignore-files '("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./"
-                         "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"
-                         "\\.elf\\'" "\\.hex\\'"  "\\.dblite\\'" ))
+; (setq ido-ignore-files '("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./"
+;                          "\\.o\\'" "\\.os\\'" "\\.so\\'" "\\.pyc\\'"
+;                          "\\.elf\\'" "\\.hex\\'"  "\\.dblite\\'" ))
+;; ido-ignore-extensions should hopefully replace all of the above
 
 ;(define-key evil-normal-state-map "t" 'martin-kill-whole-line)
 
@@ -992,6 +993,7 @@
 ;           (lambda () (add-to-list 'write-file-functions 'delete-trailing-whitespace)))
 ;
 ; Better solution: ws-butler package from melpa. (enabled globally through M-x customize)
+(require 'ws-butler)
 
 
 (define-key global-map (kbd "C-z") nil) ; don't ever do "suspend frame"
@@ -1084,3 +1086,13 @@
 (define-key evil-normal-state-map "\C-s" 'save-buffer)
 (define-key evil-visual-state-map "\C-s" 'save-buffer)
 (define-key evil-insert-state-map "\C-s" 'save-buffer)
+
+
+(defun my-ido-find-tag ()
+  "Find a tag using ido"
+  (interactive)
+  (tags-completion-table)
+  (let (tag-names)
+    (find-tag (ido-completing-read "Tag: " tags-completion-table))))
+
+(define-key evil-normal-state-map "\C-t" 'my-ido-find-tag)
