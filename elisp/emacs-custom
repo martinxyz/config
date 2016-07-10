@@ -64,7 +64,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (ws-butler evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
+    (web-mode evil-matchit ws-butler evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
@@ -144,6 +144,8 @@ nil)
  '(viper-auto-indent t)
  '(viper-replace-overlay-cursor-color "yellow")
  '(viper-syntax-preference (quote extended))
+ '(web-mode-enable-auto-expanding t)
+ '(web-mode-enable-current-element-highlight t)
  '(whitespace-style (quote (face trailing tabs empty tab-mark)))
  '(ws-butler-global-mode t)
  '(xslt-process-java-program "java-1.4.1_02")

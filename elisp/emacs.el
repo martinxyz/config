@@ -51,18 +51,16 @@
 (global-evil-surround-mode 1)
 
 (require 'ace-jump-mode) ; from melpa
-(require 'avy) ; from melpa
 ;(setq ace-jump-word-mode-use-query-char nil)
 (setq ace-jump-word-mode-use-query-char 't)
-;(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-;;If you also use viper mode:
-;(define-key viper-vi-global-user-map (kbd "SPC") 'ace-jump-mode)
 (define-key evil-normal-state-map "g" 'ace-jump-mode)
 ;(define-key evil-normal-state-map "t" 'ace-jump-line-mode)
 ;(define-key evil-normal-state-map "t" 'ace-jump-word-mode)
 (setq ace-jump-mode-move-keys (append "jkluiomhznp,fds.arvecwxqytbg" nil))
+
+;(require 'avy) ; from melpa
 ;(define-key evil-normal-state-map "t" 'avy-goto-line)
-(define-key evil-normal-state-map "t" 'avy-goto-word-1)
+;(define-key evil-normal-state-map "t" 'avy-goto-word-1)
 
 
 ;; The commented stuff below seems to do more harm than good.
@@ -103,6 +101,10 @@
 ; Make horizontal movement cross lines
 (setq-default evil-cross-lines t)
 
+;; evil visual line mode: can only select whole lines, not visual lines
+; does not work...
+;(define-key evil-visual-state-map "j" 'evil-next-line)
+;(define-key evil-visual-state-map "k" 'evil-previous-line)
 
 ;; F1 zeigt die Manpage zum Wort unter dem cursor (alle SDL Funkionen haben z.B. eine Manpage)
 (global-set-key [(f1)] (lambda () (interactive) (manual-entry (current-word))))
@@ -223,6 +225,16 @@
 
 ; show matching brackets
 (show-paren-mode t)
+
+; use % for jumping to matching html tags, if/else, etc.
+(require 'evil-matchit)
+;(defun evilmi-customize-keybinding ()
+;  (evil-define-key 'normal evil-matchit-mode-map
+;    "%" 'evilmi-jump-items))
+(global-evil-matchit-mode 1)
+
+;(define-key evil-normal-state-map "t" 'evilmi-jump-items)
+(define-key evil-normal-state-map "t" 'web-mode-navigate)
 
 ; from melpa now
 (autoload 'markdown-mode "markdown-mode"
@@ -1061,6 +1073,17 @@
                    (indent-region (region-beginning) (region-end) nil))))))
 (define-key evil-normal-state-map "P" 'yank)
 
+
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
 (require 'flycheck)
 ;(add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -1087,12 +1110,13 @@
 (define-key evil-visual-state-map "\C-s" 'save-buffer)
 (define-key evil-insert-state-map "\C-s" 'save-buffer)
 
-
 (defun my-ido-find-tag ()
   "Find a tag using ido"
   (interactive)
   (tags-completion-table)
   (let (tag-names)
+    ; (find-tag (ido-completing-read "Tag: " tags-completion-table nil nil "foobar"))))
     (find-tag (ido-completing-read "Tag: " tags-completion-table))))
 
 (define-key evil-normal-state-map "\C-t" 'my-ido-find-tag)
+(define-key evil-normal-state-map (kbd "C-.") 'my-ido-find-tag)
