@@ -140,9 +140,10 @@
 (global-set-key  [f10]  'kill-compilation)
 ;(global-set-key  [f12]  'add-change-log-entry-other-window)
 
-(define-key evil-normal-state-map "\C-e" 'bigterm-in-current-directory)
 ;(global-set-key  "\C-e" 'bigterm-in-current-directory)
-(global-set-key  [F12] 'bigterm-in-current-directory)
+(define-key evil-normal-state-map "\C-e" 'bigterm-in-current-directory)
+(define-key evil-visual-state-map "\C-e" 'bigterm-in-current-directory)
+(define-key evil-insert-state-map "\C-e" 'bigterm-in-current-directory)
 
 (defun bigterm-in-current-directory ()
   "start a terminal in the current directory"
