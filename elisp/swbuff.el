@@ -234,9 +234,7 @@ buffer if any wrap on the display due to their length."
   "Adjust window height to fit its buffer contents.
 If optional TEXT-HEIGHT is non-nil adjust window height to this
 value."
-  (setq text-height (max swbuff-window-min-text-height
-                         (or text-height
-                             (swbuff-window-lines))))
+  (setq text-height 3)
   (if (fboundp 'set-window-text-height)
       (set-window-text-height nil text-height)
     (let ((height (window-height))

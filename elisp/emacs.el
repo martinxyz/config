@@ -509,8 +509,16 @@
 
 ; ido = iswitchb fork + same functionality for finding files
 (require 'ido)
+(require 'flx-ido)
 (ido-mode t)
 (setq ido-enable-flex-matching t)
+
+;(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
 
 ; not really working anyway
 ;; (add-hook 'ido-define-mode-map-hook 'ido-my-keys)
@@ -580,6 +588,7 @@
 (define-key evil-normal-state-map ";" 'comment-dwim)
 (define-key evil-visual-state-map ";" 'comment-dwim)
 
+
 (defun my-jump-to-tag ()
   (interactive)
   (setq last-tags-jump-was-find-tag t)
@@ -608,9 +617,21 @@
   (call-interactively 'tags-search (thing-at-point 'symbol))
   (swbuff-end-switching))
 
+(require 'etags)
+(defun my-ido-find-tag ()
+  "Find a tag using ido"
+  (interactive)
+  (let ((default (find-tag--default)))
+    (save-excursion
+      (visit-tags-table-buffer))
+    (tags-completion-table)
+    (find-tag (ido-completing-read "Tag: " tags-completion-table
+                                   nil nil default)))
+  )
 
 
-
+(define-key evil-normal-state-map "\C-t" 'my-ido-find-tag)
+(define-key evil-normal-state-map (kbd "C-.") 'my-ido-find-tag)
 
 (global-set-key "\M-." 'my-jump-to-tag)
 (define-key evil-normal-state-map "\M-." 'my-jump-to-tag)
@@ -1110,14 +1131,3 @@
 (define-key evil-normal-state-map "\C-s" 'save-buffer)
 (define-key evil-visual-state-map "\C-s" 'save-buffer)
 (define-key evil-insert-state-map "\C-s" 'save-buffer)
-
-(defun my-ido-find-tag ()
-  "Find a tag using ido"
-  (interactive)
-  (tags-completion-table)
-  (let (tag-names)
-    ; (find-tag (ido-completing-read "Tag: " tags-completion-table nil nil "foobar"))))
-    (find-tag (ido-completing-read "Tag: " tags-completion-table))))
-
-(define-key evil-normal-state-map "\C-t" 'my-ido-find-tag)
-(define-key evil-normal-state-map (kbd "C-.") 'my-ido-find-tag)

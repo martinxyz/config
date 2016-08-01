@@ -64,7 +64,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (web-mode evil-matchit ws-butler evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
+    (flx-ido web-mode evil-matchit ws-butler evil-surround python-mode auto-complete helm-swoop helm ace-jump-mode avy markdown-mode yasnippet ido-ubiquitous flycheck)))
  '(paren-mode (quote paren) nil (paren))
  '(ps-paper-type (quote a4))
  '(ps-print-color-p nil)
@@ -164,6 +164,7 @@ nil)
  '(avy-lead-face-1 ((t (:foreground "orange"))))
  '(avy-lead-face-2 ((t (:foreground "orange"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
+ '(flx-highlight-face ((t (:inherit font-lock-variable-name-face :weight bold))))
  '(flycheck-error ((t (:underline (:color "#af1010" :style wave)))))
  '(flycheck-fringe-error ((t (:foreground "#E05555"))))
  '(flycheck-fringe-info ((t (:foreground "#404040"))))
