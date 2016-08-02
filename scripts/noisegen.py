@@ -16,7 +16,7 @@ fs = 44100
 frame_duration = float(N)/fs
 
 outp = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK)
-outp.setchannels(1)
+outp.setchannels(2)
 outp.setrate(fs)
 outp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 outp.setperiodsize(N)

@@ -41,6 +41,9 @@ perl -p -i -e 's/bash_completion /bash_completion_disabled /g' ~/.bashrc
 test -h .Xdefaults && rm .Xdefaults # replaced by Xresources
 test -h .inputrc && rm .inputrc # use system-wide file
 
+mkdir -p .config/git
+ln -s ../../config/gitignore .config/git/ignore
+
 echo 
 echo "Done. Maybe need to change email in ~/.gitconfig"
 

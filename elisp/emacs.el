@@ -355,9 +355,10 @@
   (c++-mode)
   (google-set-c-style))
 
-(defun javascript-tabconfig ()
+(defun javascript-config ()
   (interactive)
   (javascript-mode)
+  (electric-indent-mode)
   (setq tab-width 4))
 
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
@@ -382,7 +383,7 @@
 (add-to-list 'auto-mode-alist '(".*/Cura.*\\.h$" . cura-c-mode))
 (add-to-list 'auto-mode-alist '(".*/Cura.*\\.cpp" . cura-c-mode))
 (add-to-list 'auto-mode-alist '(".*\\.txt$" . markdown-mode))
-(add-to-list 'auto-mode-alist '(".*\\.js$" . javascript-tabconfig))
+(add-to-list 'auto-mode-alist '(".*\\.js$" . javascript-config))
 
 ;;(setq-default c-electric-flag nil)
 ;(setq-default c-brace-newlines nil)
@@ -593,6 +594,10 @@
   (interactive)
   (setq last-tags-jump-was-find-tag t)
   (call-interactively 'find-tag))
+
+(define-key evil-normal-state-map (kbd "C-.") 'my-jump-to-tag)
+(define-key evil-visual-state-map (kbd "C-.") 'my-jump-to-tag)
+(define-key evil-insert-state-map (kbd "C-.") 'my-jump-to-tag)
 
 ; Problem:
 ; M-x tags-search since emacs24 visits every buffer where there is NO match,
@@ -1097,6 +1102,16 @@
 
 
 (require 'web-mode)
+
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+    (setq web-mode-markup-indent-offset 4)
+    (setq web-mode-css-indent-offset 4)
+    (setq web-mode-code-indent-offset 4)
+    (setq web-mode-indent-style 4)
+)
+
+(add-hook 'web-mode-hook  'my-web-mode-hook)
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
@@ -1107,7 +1122,7 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 (require 'flycheck)
-;(add-hook 'after-init-hook #'global-flycheck-mode)
+; (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;; disable jshint since we prefer eslint checking
 ;(setq-default flycheck-disabled-checkers
@@ -1125,9 +1140,9 @@
 ;  (append flycheck-disabled-checkers
 ;    '(json-jsonlist)))
 
-
 ; using evil to search, might as well save with this
 ; (global-set-key "\C-s" 'save-buffer) ; this hurts searching inside M-x customize etc.
 (define-key evil-normal-state-map "\C-s" 'save-buffer)
 (define-key evil-visual-state-map "\C-s" 'save-buffer)
 (define-key evil-insert-state-map "\C-s" 'save-buffer)
+
