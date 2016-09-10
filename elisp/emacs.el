@@ -361,6 +361,31 @@
   (electric-indent-mode)
   (setq tab-width 4))
 
+(require 'web-mode)
+(defun my-web-mode ()
+  (interactive)
+  (web-mode)
+  (setq web-mode-markup-indent-offset 4)
+  (setq web-mode-css-indent-offset 4)
+  (setq web-mode-code-indent-offset 4)
+  (setq web-mode-indent-style 4))
+(defun my-web-mode-2spc ()
+  (interactive)
+  (my-web-mode)
+  (setq web-mode-markup-indent-offset 2)
+  ; (setq web-mode-auto-close-style 2)
+)
+
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . my-web-mode))
+(add-to-list 'auto-mode-alist '(".*/frontend/.*\\.html?\\'" . my-web-mode-2spc))
+
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".*/linux.*/.*\\.[ch]$" . linux-c-mode))
 (add-to-list 'auto-mode-alist '(".*/git/.*\\.[ch]$" . linux-c-mode))
@@ -1100,26 +1125,6 @@
                    (indent-region (region-beginning) (region-end) nil))))))
 (define-key evil-normal-state-map "P" 'yank)
 
-
-(require 'web-mode)
-
-(defun my-web-mode-hook ()
-  "Hooks for Web mode."
-    (setq web-mode-markup-indent-offset 4)
-    (setq web-mode-css-indent-offset 4)
-    (setq web-mode-code-indent-offset 4)
-    (setq web-mode-indent-style 4)
-)
-
-(add-hook 'web-mode-hook  'my-web-mode-hook)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 (require 'flycheck)
 ; (add-hook 'after-init-hook #'global-flycheck-mode)
