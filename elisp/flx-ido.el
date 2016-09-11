@@ -272,7 +272,7 @@ Our implementation always uses flex and doesn't care about substring matches."
            (original-items (ad-get-arg 0)))
       (flx-ido-debug "query: %s" query)
       (flx-ido-debug "id-set-matches-1 sees %s items" (length original-items))
-      (setq ad-return-value (nreverse (flx-ido-match query original-items))))
+      (setq ad-return-value (reverse (flx-ido-match query original-items))))
     (flx-ido-debug "id-set-matches-1 returning %s items starting with %s " (length ad-return-value) (car ad-return-value))))
 
 (defadvice ido-kill-buffer-at-head (before flx-ido-reset activate)
