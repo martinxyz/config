@@ -11,12 +11,15 @@ function symlink {
 
 #set -x
 cd $HOME
-symlink config/elisp/emacs.el .emacs
-symlink config/elisp/viper.el .viper
+
+#symlink config/elisp/emacs.el .emacs
+test -h .emacs && rm .emacs # switched to spacemacs
+test -h .viper && rm .viper
+
 mkdir -p .config/matplotlib
 symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
-for i in vimrc gvimrc vim cvsrc Xresources fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload; do
+for i in vimrc gvimrc vim cvsrc Xresources fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload spacemacs.d; do
   test -r config/$i || echo config/$i does not exist
   symlink config/$i .$i
 done
@@ -42,9 +45,10 @@ test -h .Xdefaults && rm .Xdefaults # replaced by Xresources
 test -h .inputrc && rm .inputrc # use system-wide file
 
 mkdir -p .config/git
-ln -s ../../config/gitignore .config/git/ignore
+symlink ../../config/gitignore .config/git/ignore
 
 echo 
-echo "Done. Maybe need to change email in ~/.gitconfig"
-
+echo "Done."
+echo -n "Check .gitconfig email: "
+grep email\ = ~/.gitconfig | sed -e 's/.*=.//'
 
