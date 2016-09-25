@@ -47,6 +47,9 @@
     (" " " " "  " "  ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
  '(ido-enabled (quote both) t (ido))
  '(ido-everywhere t)
+ '(ido-ignore-files
+   (quote
+    ("\\`CVS/" "\\`#" "\\`.#" "\\`\\.\\./" "\\`\\./" "__pycache__")))
  '(ido-max-directory-size 3000000)
  '(ido-max-prospects 30)
  '(ido-max-window-height 2)
