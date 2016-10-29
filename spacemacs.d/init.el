@@ -65,7 +65,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(swbuff)
+   dotspacemacs-additional-packages '(swbuff cycbuf)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -156,7 +156,8 @@ values."
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
-   ;; The leader key
+   ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
+;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
@@ -311,6 +312,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; Do I need this?
   ;; Fix indentation with < and > via https://www.youtube.com/watch?v=HKF41ivkBb0
   ;(setq-default evil-shift-round nil)
+  (push (expand-file-name "~/config/spacemacs.d/patched") load-path)
 
   (message "end of user-init")
   )
@@ -326,10 +328,17 @@ you should place your code here."
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
   (define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
-  (define-key evil-normal-state-map "M" 'evil-record-macro)
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)
+  (spacemacs/set-leader-keys "Ω" 'evil-record-macro) ; Shift-@
+
+  (define-key evil-normal-state-map "t" 'evil-visual-line)
+  (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
+  (define-key evil-normal-state-map "T" 'cycbuf-switch-to-next-buffer)
+  ;(define-key evil-normal-state-map "M" 'evil-record-macro)
+  (define-key evil-normal-state-map "M" 'delete-other-windows)
+
 
   ; from https://github.com/syl20bnr/spacemacs/issues/6097
   ; use this with dotspacemacs-smooth-scrolling nil
@@ -383,6 +392,10 @@ you should place your code here."
     (evil-scroll-line-up 4)
     )
 
+  ; completion
+  (global-set-key "\M-l" 'dabbrev-expand)
+  (global-set-key "ł" 'dabbrev-expand) ; kinesis AltGr-l
+
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 	   'evil-scroll-down)
   ;(global-set-key [prior]	   'evil-scroll-up)
@@ -406,6 +419,8 @@ you should place your code here."
 
   ;(spacemacs/set-leader-keys "d" 'helm-mini)
   ;(spacemacs/set-leader-keys "os" 'ag-project)
+
+  ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
   ;; show the filepath in the frame title
   ;; http://emacsredux.com/blog/2013/04/07/display-visited-files-path-in-the-frame-title/
@@ -439,6 +454,13 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(counsel-find-file-ignore-regexp "\\(?:\\`[#.]\\)\\|\\(?:[#~]\\'\\)")
+ '(cycbuf-dont-show-regexp (quote ("^ " "^\\*cycbuf\\*$" "^\\*.*\\*$" "TAGS")))
+ '(cycbuf-max-window-height 10)
+ '(cycbuf-maximal-buffer-name-column 30)
+ '(cycbuf-maximal-file-name-column 30)
+ '(cycbuf-minimal-buffer-name-column 10)
+ '(cycbuf-minimal-file-name-column 10)
  '(evil-want-Y-yank-to-eol nil)
  '(ivy-sort-functions-alist
    (quote
@@ -450,7 +472,7 @@ you should place your code here."
      (t . string-lessp))))
  '(package-selected-packages
    (quote
-    (swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
@@ -460,4 +482,7 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cycbuf-current-face ((t (:background "dim gray" :weight bold))))
+ '(cycbuf-header-face ((t (:foreground "yellow" :weight bold))))
+ '(cycbuf-uniquify-face ((t (:foreground "dodger blue"))))
  '(swbuff-current-buffer-face ((t (:background "#37474F" :foreground "yellow" :weight bold)))))
