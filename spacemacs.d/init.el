@@ -56,6 +56,8 @@ values."
      colors
      ; (colors :variables colors-enable-nyan-cat-progress-bar t) ; no, no, no.
 
+     gtags ; does not seem to do any good (because not using helm, maybe)
+     c-c++ ; huh, this only adds "disaster" mode and not much else?
      python
      html
      javascript
@@ -331,13 +333,34 @@ you should place your code here."
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)
-  (spacemacs/set-leader-keys "Ω" 'evil-record-macro) ; Shift-@
+  (define-key evil-normal-state-map "Ω" 'evil-record-macro) ; Shift-@
 
-  (define-key evil-normal-state-map "t" 'evil-visual-line)
+  ; keys I don't use: "#+| (AltGr-h,n,z,o,p)~ ←
+  ; HD:
+
+  ;(define-key evil-normal-state-map "t" 'evil-visual-line)
+  (define-key evil-normal-state-map "t" 'avy-goto-word-or-subword-1)
   (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
+  (define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
+
+  ;(define-key evil-normal-state-map "v" 'ido-find-file)
+  ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
+
   (define-key evil-normal-state-map "T" 'cycbuf-switch-to-next-buffer)
   ;(define-key evil-normal-state-map "M" 'evil-record-macro)
   (define-key evil-normal-state-map "M" 'delete-other-windows)
+  (define-key evil-normal-state-map "K" 'kill-this-buffer)
+  ;(define-key evil-normal-state-map "K" 'bury-buffer)
+  ;;(define-key evil-normal-state-map "D" 'kill-this-buffer)
+  (define-key evil-normal-state-map "W" 'copy-region-as-kill)
+
+  ; old stuff from old config
+  ;(global-set-key "\M-." 'my-jump-to-tag)
+  ;(define-key evil-normal-state-map "\M-." 'my-jump-to-tag)
+  ;(define-key evil-normal-state-map "," 'my-start-tag-grep)
+  ;(global-set-key "\M-," 'my-continue-tag-search)
+  ;(define-key evil-normal-state-map "}" 'my-continue-tag-search)
+  ;(define-key evil-normal-state-map "*" 'pop-tag-mark) -- * is bound to something useful now
 
 
   ; from https://github.com/syl20bnr/spacemacs/issues/6097
@@ -363,6 +386,17 @@ you should place your code here."
   ;; Uralte Gewohnheiten aus Borland-Produkten
   (global-set-key  [f4]  'next-error)
   (global-set-key  [(shift f4)]  'previous-error)
+
+  (defun last-error () ; useful when coding python (go to end of traceback)
+    (interactive)
+    (with-current-buffer next-error-last-buffer
+      (setq compilation-current-error (point-max)))
+    (previous-error))
+  (global-set-key  [f5]  'last-error)
+  (global-set-key  [f8]  'compile)
+  (global-set-key  [f9]  'recompile)
+  ;(global-set-key  [f9]  (lambda () (interactive) (desktop-save-in-desktop-dir) (run-at-time 0.1 nil 'recompile)))
+  (global-set-key  [f10]  'kill-compilation)
 
   ; Ctrl-S is "save file", not swiper-search
   (define-key evil-normal-state-map "\C-s" 'save-buffer)
@@ -443,6 +477,8 @@ you should place your code here."
             ;;no errors, make the compilation window go away in 0.5 seconds
             (run-at-time 0.5 nil 'delete-windows-on buf)
             (message "Compilation done."))))
+
+  (global-hl-line-mode -1) ; Disable current line highlight
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -472,7 +508,7 @@ you should place your code here."
      (t . string-lessp))))
  '(package-selected-packages
    (quote
-    (cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")

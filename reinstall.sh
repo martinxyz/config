@@ -47,8 +47,15 @@ test -h .inputrc && rm .inputrc # use system-wide file
 mkdir -p .config/git
 symlink ../../config/gitignore .config/git/ignore
 
+if ! grep -q -s spacemacs .emacs.d/.git/config ; then
+    echo
+    echo "Spacemacs:"
+    [ -r .emacs.d ] && echo "  move ~/.emacs.d out ouf the way"
+    echo "  git clone --branch develop https://github.com/syl20bnr/spacemacs ~/.emacs.d"
+fi
+
 echo 
 echo "Done."
-echo -n "Check .gitconfig email: "
+echo -n ".gitconfig email: "
 grep email\ = ~/.gitconfig | sed -e 's/.*=.//'
 
