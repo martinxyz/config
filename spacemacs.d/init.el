@@ -140,9 +140,14 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(material
-                         spacemacs-dark
-                         spacemacs-light)
+   dotspacemacs-themes '(
+                         sanityinc-tomorrow-night ; great
+                         material  ; nice, high-contrast, a bit too colorful
+                         ; moe-dark  ; search hilights are too strong
+                         sanityinc-tomorrow-day ; nice
+                         spacemacs-dark ; just for reference
+                         ; spacemacs-light
+                         )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -159,7 +164,7 @@ values."
                                :width normal
                                :powerline-scale 1.1)
    ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
-;; The leader key
+   ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
