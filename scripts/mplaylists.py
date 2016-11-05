@@ -3,12 +3,16 @@
 Music playlist server controlling mplayer as backend.
 See playlist-example.py to find out how to use it.
 """
-mplayer_path = '/usr/bin/mplayer'
+mpv_path = '/usr/bin/mpv'
+mpv_socket = '/home/martin/.cache/mplaylists-mpvsocket'
+# echo '{ "command": ["get_property", "playback-time"] }' | socat - ~/.cache/mplaylists-mpvsocket
+
 # playlog = None
 playlog_path = '/home/martin/sich/playlog'
 playlog = open(playlog_path, 'a')
 
-import os, sys, random, re, time
+
+import os, sys, random, re, time, socket
 stdout = sys.stdout
 
 ### Helper functions, they all return a list of filenames
@@ -329,6 +333,7 @@ class Mplayer(protocol.ProcessProtocol):
     stopped = False
     def __init__(self):
         self.paused = False
+
     def connectionMade(self):
         #print "Mplayer process started."
         pass
@@ -349,10 +354,22 @@ class Mplayer(protocol.ProcessProtocol):
                 play(NextSong(f=stdout, userrequest=False))
     def stop(self):
         if self.paused: self.pause()
-        self.transport.write('q\n')
+        #self.transport.write('q\n')
+        try:
+            ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            ds.connect(mpv_socket)
+            ds.send('{ "command": ["quit"] }\n')
+        except socket.error:
+            pass
     def pause(self):
-        self.transport.write('p\n')
-        self.paused = not self.paused
+        #self.transport.write('p\n')
+        try:
+            ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            ds.connect(mpv_socket)
+            ds.send('{ "command": ["keypress", "p"] }\n')
+            self.paused = not self.paused
+        except socket.error:
+            pass
 
 class Mplayer_stopped:
     paused = False
@@ -368,7 +385,8 @@ def play(song):
     if song.startswith('-'): return
     mplayer = Mplayer()
     # ?? why does 'wc' work without full path, but not 'mplayer'?
-    reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
+    # reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
+    reactor.spawnProcess(mplayer, mpv_path, [mpv_path, "-really-quiet", "--input-ipc-server=" + mpv_socket, "-vo", "null", song], None)
 
 def RandomPoolSong():
     return random.choice(User_pool)
