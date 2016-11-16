@@ -464,6 +464,9 @@ you should place your code here."
   ;(spacemacs/set-leader-keys "d" 'helm-mini)
   ;(spacemacs/set-leader-keys "os" 'ag-project)
 
+  ; was: spacemacs/search-project-auto
+  (spacemacs/set-leader-keys "/" 'counsel-git-grep)
+
   ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
   ;; show the filepath in the frame title
