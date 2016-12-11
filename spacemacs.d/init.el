@@ -42,7 +42,6 @@ values."
      git
      markdown
      org
-     
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -52,7 +51,6 @@ values."
                       syntax-checking-enable-tooltips nil
                       )
      version-control
-     
      colors
      ; (colors :variables colors-enable-nyan-cat-progress-bar t) ; no, no, no.
 
@@ -67,7 +65,7 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(swbuff cycbuf)
+   dotspacemacs-additional-packages '(swbuff cycbuf dtrt-indent)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -127,8 +125,7 @@ values."
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'.
-   ;; Example for 5 recent files and 7 projects: '((recents . 5) (projects . 7))
+   ;; `recents' `bookmarks' `projects' `agenda' `todos'."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 5)
@@ -239,6 +236,12 @@ values."
    ;; right; if there is insufficient space it displays it at the bottom.
    ;; (default 'bottom)
    dotspacemacs-which-key-position 'bottom
+   ;; Control where `switch-to-buffer' displays the buffer. If nil,
+   ;; `switch-to-buffer' displays the buffer in the current window even if
+   ;; another same-purpose window is available. If non nil, `switch-to-buffer'
+   ;; displays the buffer in a same-purpose window even if the buffer can be
+   ;; displayed in the current window. (default nil)
+   dotspacemacs-switch-to-buffer-prefers-purpose nil
    ;; If non nil a progress bar is displayed when spacemacs is loading. This
    ;; may increase the boot time on some systems and emacs builds, set it to
    ;; nil to boost the loading time. (default t)
@@ -293,9 +296,9 @@ values."
    ;; (default nil)
    dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
-   ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
-   ;; (default '("ag" "pt" "ack" "grep"))
-   dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
+   ;; (default '("rg" "ag" "pt" "ack" "grep"))
+   dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
    ;; The default package repository used if no explicit repository has been
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
@@ -320,7 +323,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; Fix indentation with < and > via https://www.youtube.com/watch?v=HKF41ivkBb0
   ;(setq-default evil-shift-round nil)
   (push (expand-file-name "~/config/spacemacs.d/patched") load-path)
-
   (message "end of user-init")
   )
 
@@ -347,7 +349,8 @@ you should place your code here."
   ;(define-key evil-normal-state-map "t" 'evil-visual-line)
   (define-key evil-normal-state-map "t" 'avy-goto-word-or-subword-1)
   (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
-  (define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
+  ;(define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
+  (define-key evil-visual-state-map (kbd "<backspace>") 'evil-visual-char)
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
@@ -507,12 +510,33 @@ you should place your code here."
     (delete 'company-files spacemacs-default-company-backends)
     )
 
-  ;(with-eval-after-load 'company
-  ;  (add-to-list 'company-backends 'company-elm))
-  )
+  ; (with-eval-after-load 'company
+  ; (add-to-list 'company-backends 'company-elm))
 
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
+  (add-to-list 'custom-theme-load-path (expand-file-name "~/config/spacemacs.d"))
+
+  ; from http://blog.binchen.org/posts/easy-indentation-setup-in-emacs-for-web-development.html
+  ;(defun my-setup-indent (n)
+  ;  ;; java/c/c++
+  ;  (setq-local c-basic-offset n)
+  ;  ;; web development
+  ;  (setq-local coffee-tab-width n) ; coffeescript
+  ;  (setq-local javascript-indent-level n) ; javascript-mode
+  ;  (setq-local js-indent-level n) ; js-mode
+  ;  (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+  ;  (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  ;  (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
+  ;  (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
+  ;  (setq-local css-indent-offset n) ; css-mode
+  ;  )
+
+  ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
+  (add-hook 'prog-mode-hook #'(lambda ()
+                                (dtrt-indent-mode)
+                                (dtrt-indent-adapt)))
+  ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
+)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -522,7 +546,6 @@ you should place your code here."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
- '(counsel-find-file-ignore-regexp "\\(?:\\`[#.]\\)\\|\\(?:[#~]\\'\\)")
  '(cycbuf-dont-show-regexp (quote ("^ " "^\\*cycbuf\\*$" "^\\*.*\\*$" "TAGS")))
  '(cycbuf-max-window-height 10)
  '(cycbuf-maximal-buffer-name-column 30)
@@ -531,6 +554,7 @@ you should place your code here."
  '(cycbuf-minimal-file-name-column 10)
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f" t)
+ '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
  '(ivy-sort-functions-alist
    (quote
@@ -543,7 +567,7 @@ you should place your code here."
  '(mouse-yank-at-point t)
  '(package-selected-packages
    (quote
-    (pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
@@ -569,13 +593,50 @@ you should place your code here."
      (320 . "#ff9800")
      (340 . "#fff59d")
      (360 . "#8bc34a"))))
- '(vc-annotate-very-old-color nil))
+ '(vc-annotate-very-old-color nil)
+ '(whitespace-style
+   (quote
+    (face tabs space-before-tab::tab space-before-tab tab-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ac-completion-face ((t (:foreground "darkgray"))))
+ '(ace-jump-face-foreground ((t (:foreground "white smoke" :underline nil))))
+ '(avy-lead-face ((t (:foreground "orange"))))
+ '(avy-lead-face-0 ((t (:foreground "yellow"))))
+ '(avy-lead-face-1 ((t (:foreground "orange"))))
+ '(avy-lead-face-2 ((t (:foreground "orange"))))
  '(cycbuf-current-face ((t (:background "dim gray" :weight bold))))
  '(cycbuf-header-face ((t (:foreground "yellow" :weight bold))))
  '(cycbuf-uniquify-face ((t (:foreground "dodger blue"))))
- '(swbuff-current-buffer-face ((t (:background "#37474F" :foreground "yellow" :weight bold)))))
+ '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
+ '(flx-highlight-face ((t (:inherit font-lock-variable-name-face :weight bold))))
+ '(flycheck-error ((t (:underline (:color "#af1010" :style wave)))))
+ '(flycheck-fringe-error ((t (:foreground "#E05555"))))
+ '(flycheck-fringe-info ((t (:foreground "#404040"))))
+ '(flycheck-fringe-warning ((t (:foreground "#784600"))))
+ '(flycheck-info ((t (:underline (:color "#505050" :style wave)))))
+ '(flycheck-warning ((t (:underline (:color "#9f5c00" :style wave)))))
+ '(ido-first-match ((t (:weight bold))))
+ '(ido-subdir ((t (:foreground "#729FCF"))))
+ '(isearch ((t (:background "#7F7F33"))))
+ '(lazy-highlight ((t (:background "#003F3F"))))
+ '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
+ '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
+ '(region ((t (:background "#1D4570"))))
+ '(smerge-base ((t (:background "#21210c"))))
+ '(smerge-lower ((t (:background "#142114"))))
+ '(smerge-markers ((t (:foreground "gray60"))))
+ '(smerge-refined-added ((t (:inherit smerge-refined-change :background "#105210"))))
+ '(smerge-refined-removed ((t (:inherit smerge-refined-change :background "#521010"))))
+ '(smerge-upper ((t (:background "#211414"))))
+ '(swbuff-current-buffer-face ((t (:background "#37474F" :foreground "yellow" :weight bold))))
+ '(viper-minibuffer-emacs ((t nil)))
+ '(viper-minibuffer-insert ((t nil)))
+ '(whitespace-big-indent ((t (:background "OrangeRed4"))))
+ '(whitespace-empty ((t (:background "#503030"))))
+ '(whitespace-space ((t (:background "grey10" :foreground "gray20"))))
+ '(whitespace-tab ((t (:foreground "grey25"))))
+ '(whitespace-trailing ((t (:background "#382A2A")))))
