@@ -655,7 +655,7 @@ you should place your code here."
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil :weight bold))))
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
- '(lazy-highlight ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil))))
+ '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
  '(region ((t (:background "#1D4570"))))
