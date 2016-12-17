@@ -341,6 +341,22 @@ you should place your code here."
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)
+  (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
+  (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
+  ; concerning gtags: http://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub
+  ; "use universal ctags (aka exuberant ctags) as a backend for gnu global, e.g. vor vhdl"
+  ; TODO: learn using eldoc
+  ; old C/C++ habit
+  (define-key evil-normal-state-map (kbd "C-.") 'ggtags-find-definition)
+  (define-key evil-visual-state-map (kbd "C-.") 'ggtags-find-definition)
+  (define-key evil-insert-state-map (kbd "C-.") 'ggtags-find-definition)
+  (define-key evil-normal-state-map (kbd "M-.") 'ggtags-find-definition)
+  (define-key evil-visual-state-map (kbd "M-.") 'ggtags-find-definition)
+  (define-key evil-insert-state-map (kbd "M-.") 'ggtags-find-definition)
+  ;(global-set-key "\M-." 'my-jump-to-tag)
+  ;(define-key evil-normal-state-map "\M-." 'my-jump-to-tag);
+
+  ;(spacemacs/set-leader-keys "og" 'ggtags-find-tag)
   (define-key evil-normal-state-map "Ω" 'evil-record-macro) ; Shift-@
 
   ; keys I don't use: "#+| (AltGr-h,n,z,o,p)~ ←
@@ -351,6 +367,12 @@ you should place your code here."
   (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
   ;(define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
   (define-key evil-visual-state-map (kbd "<backspace>") 'evil-visual-char)
+  ;(define-key evil-visual-line-map (kbd "v") 'er/expand-region)
+  ;(define-key evil-normal-state-map (kbd "v") 'er/expand-region)
+
+  (with-eval-after-load 'evil-iedit-state
+    (define-key evil-iedit-state-map (kbd "p") 'iedit-prev-occurrence)
+    )
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
@@ -444,8 +466,8 @@ you should place your code here."
   (global-set-key "ł" 'dabbrev-expand) ; kinesis AltGr-l
 
   ; pager module doesn't work well with visual-line
-  ;(global-set-key [next] 	   'evil-scroll-down)
-  ;(global-set-key [prior]	   'evil-scroll-up)
+  ;(global-set-key [next] 'evil-scroll-down)
+  ;(global-set-key [prior] 'evil-scroll-up)
   ; scroll text (cursor fixed)
   (global-set-key "\M-k"  'maxy-some-rows-up)
   (global-set-key "\M-j"  'maxy-some-rows-down)
@@ -465,6 +487,9 @@ you should place your code here."
       (insert ";")))
 
   (setq-default spacemacs-show-trailing-whitespace nil)
+
+  ; navigate snake_case as whole word
+  (add-hook 'c-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 
   ;(spacemacs/set-leader-keys "d" 'helm-mini)
   ;(spacemacs/set-leader-keys "os" 'ag-project)
@@ -513,7 +538,7 @@ you should place your code here."
   ; (with-eval-after-load 'company
   ; (add-to-list 'company-backends 'company-elm))
 
-  (add-to-list 'custom-theme-load-path (expand-file-name "~/config/spacemacs.d"))
+  ; (add-to-list 'custom-theme-load-path (expand-file-name "~/config/spacemacs.d"))
 
   ; from http://blog.binchen.org/posts/easy-indentation-setup-in-emacs-for-web-development.html
   ;(defun my-setup-indent (n)
@@ -604,6 +629,12 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(ac-completion-face ((t (:foreground "darkgray"))))
  '(ace-jump-face-foreground ((t (:foreground "white smoke" :underline nil))))
+ '(ahs-definition-face ((t (:background "#3b3735"))))
+ '(ahs-edit-mode-face ((t (:background "#3b3735" :foreground "Coral3"))))
+ '(ahs-face ((t (:background "#3b3735"))))
+ '(ahs-plugin-bod-face ((t (:background "#3b3735" :foreground "DodgerBlue"))))
+ '(ahs-plugin-defalt-face ((t (:background "#3b3735" :foreground "Orange1"))))
+ '(ahs-plugin-whole-buffer-face ((t (:background "#3b3735" :foreground "GreenYellow"))))
  '(avy-lead-face ((t (:foreground "orange"))))
  '(avy-lead-face-0 ((t (:foreground "yellow"))))
  '(avy-lead-face-1 ((t (:foreground "orange"))))
@@ -619,10 +650,12 @@ you should place your code here."
  '(flycheck-fringe-warning ((t (:foreground "#784600"))))
  '(flycheck-info ((t (:underline (:color "#505050" :style wave)))))
  '(flycheck-warning ((t (:underline (:color "#9f5c00" :style wave)))))
+ '(ggtags-highlight ((t nil)))
  '(ido-first-match ((t (:weight bold))))
  '(ido-subdir ((t (:foreground "#729FCF"))))
- '(isearch ((t (:background "#7F7F33"))))
- '(lazy-highlight ((t (:background "#003F3F"))))
+ '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil :weight bold))))
+ '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
+ '(lazy-highlight ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
  '(region ((t (:background "#1D4570"))))
