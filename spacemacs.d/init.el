@@ -397,8 +397,9 @@ you should place your code here."
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
-  (define-key evil-normal-state-map "v" 'counsel-find-file)
-  (define-key evil-normal-state-map "V" 'ivy-switch-buffer)
+
+  ; (define-key evil-normal-state-map "V" 'ivy-switch-buffer) ; maybe reuse for something else (SPC b b good enough)
+  (define-key evil-normal-state-map "v" 'counsel-projectile)
 
   ; from https://github.com/syl20bnr/spacemacs/issues/6097
   ; use this with dotspacemacs-smooth-scrolling nil
