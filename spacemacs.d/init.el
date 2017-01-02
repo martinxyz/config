@@ -565,6 +565,17 @@ you should place your code here."
                                 (dtrt-indent-mode)
                                 (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
+
+  (defun my-web-mode-indent2 ()
+    (interactive)
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    )
+  ;(add-hook 'web-mode-hook  'my-web-mode-indent2)
+
+  ; watch out for trouble on large files, maybe?
+  (spacemacs/toggle-automatic-symbol-highlight-on)
 )
 
 (custom-set-variables
@@ -639,7 +650,7 @@ you should place your code here."
  '(ahs-face ((t (:background "#3b3735"))))
  '(ahs-plugin-bod-face ((t (:background "#3b3735" :foreground "DodgerBlue"))))
  '(ahs-plugin-defalt-face ((t (:background "#3b3735" :foreground "Orange1"))))
- '(ahs-plugin-whole-buffer-face ((t (:background "#3b3735" :foreground "GreenYellow"))))
+ '(ahs-plugin-whole-buffer-face ((t (:background "#3b3735"))))
  '(avy-lead-face ((t (:foreground "orange"))))
  '(avy-lead-face-0 ((t (:foreground "yellow"))))
  '(avy-lead-face-1 ((t (:foreground "orange"))))
