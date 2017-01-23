@@ -335,6 +335,8 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
+  ; may help performance, see bottom of https://github.com/syl20bnr/spacemacs/issues/4207
+  (setq shell-file-name "/bin/sh")
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
@@ -398,8 +400,13 @@ you should place your code here."
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
 
-  ; (define-key evil-normal-state-map "V" 'ivy-switch-buffer) ; maybe reuse for something else (SPC b b good enough)
-  (define-key evil-normal-state-map "v" 'counsel-projectile)
+  (define-key evil-normal-state-map "V" 'counsel-projectile) ; great but slow (two seconds)
+  ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
+  ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only
+  ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
+  ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
+  ;(define-key evil-normal-state-map "v" 'counsel-projectile) ; great but slow (two seconds) (minor usability issue: shows large folder with non-git files before git files)
+  (define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
 
   ; from https://github.com/syl20bnr/spacemacs/issues/6097
   ; use this with dotspacemacs-smooth-scrolling nil
@@ -616,10 +623,16 @@ This function is called at the very end of Spacemacs initialization."
  '(package-selected-packages
    (quote
     (unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+ '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
+ '(projectile-globally-ignored-directories
+   (quote
+    (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
+ '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
  '(swbuff-window-min-text-height 2)
+ '(tramp-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -695,6 +708,7 @@ This function is called at the very end of Spacemacs initialization."
  '(whitespace-big-indent ((t (:background "OrangeRed4"))))
  '(whitespace-empty ((t (:background "#503030"))))
  '(whitespace-space ((t (:background "grey10" :foreground "gray20"))))
+ '(whitespace-space-before-tab ((t (:background "nil" :foreground "#666"))))
  '(whitespace-tab ((t (:foreground "grey25"))))
  '(whitespace-trailing ((t (:background "#382A2A")))))
 )
