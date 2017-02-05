@@ -369,7 +369,7 @@ you should place your code here."
   (define-key evil-normal-state-map "t" 'avy-goto-word-or-subword-1)
   (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
   ;(define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
-  (define-key evil-visual-state-map (kbd "<backspace>") 'evil-visual-char)
+  (define-key evil-visual-state-map (kbd "<backspace>") 'evil-visual-line)
   ;(define-key evil-visual-line-map (kbd "v") 'er/expand-region)
   ;(define-key evil-normal-state-map (kbd "v") 'er/expand-region)
   ; use SPC v instead
