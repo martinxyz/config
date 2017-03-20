@@ -42,6 +42,9 @@ if [ "$PS1" ]; then
     bind 'set completion-ignore-case on'
     bind 'set show-all-if-ambiguous on'
     bind 'set mark-symlinked-directories on'
+
+    # suspend terminal (Ctrl-s) is an anti-feature
+    stty -ixon
 fi
 
 export HISTIGNORE='*#[Rr][Mm]:?:halt:poweroff'

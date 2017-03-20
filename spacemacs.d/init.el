@@ -66,7 +66,13 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(swbuff cycbuf dtrt-indent)
+   dotspacemacs-additional-packages '(swbuff
+                                      cycbuf
+                                      dtrt-indent
+                                      devdocs
+                                      ;(pabbrev :location (recipe :fetcher file
+                                      ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -320,10 +326,19 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
+  ; when I press " inside a string I don't want it to get escaped
+  (setq sp-autoescape-string-quote nil)
+  (setq sp-escape-quotes-after-insert nil)
+  (setq sp-escape-wrapped-region nil)
+
   ;; Do I need this?
   ;; Fix indentation with < and > via https://www.youtube.com/watch?v=HKF41ivkBb0
   ;(setq-default evil-shift-round nil)
   (push (expand-file-name "~/config/spacemacs.d/patched") load-path)
+
+  (setq-default dotspacemacs-configuration-layers
+                '((c-c++ :variables c-c++-enable-clang-support t)))
+
   (message "end of user-init")
   )
 
@@ -337,6 +352,8 @@ you should place your code here."
 
   ; may help performance, see bottom of https://github.com/syl20bnr/spacemacs/issues/4207
   (setq shell-file-name "/bin/sh")
+
+  (require 'pabbrev)
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
@@ -582,7 +599,29 @@ you should place your code here."
   ;(add-hook 'web-mode-hook  'my-web-mode-indent2)
 
   ; watch out for trouble on large files, maybe?
-  (spacemacs/toggle-automatic-symbol-highlight-on)
+  ; nope, trouble is not large files, but it's too distracting
+  ;(spacemacs/toggle-automatic-symbol-highlight-on)
+
+  ;; ; when I press " inside a string I don't want it to get escaped
+  ;; (setq sp-autoescape-string-quote nil)
+  (setq sp-autoescape-string-quote nil)
+  (setq sp-escape-quotes-after-insert nil)
+  (setq sp-escape-wrapped-region nil)
+
+  ;; ; sp-escape-wrapped-region
+  ;; ; If non-nil, escape special chars inside the just wrapped region.
+  ;; (setq sp-escape-wrapped-region nil)
+
+  ;; ; sp-escape-quotes-after-insert
+  ;; ; If non-nil, escape string quotes if typed inside string.
+  ;; (setq sp-escape-quotes-after-insert nil)
+
+  ;; (load-theme 'sanityinc-tomorrow-night)
+  ;; (defun my-after-startup-function ()
+  ;;   (message "loading sanityinc theme again")
+  ;;   ; (spacemacs/load-theme 'sanityinc-tomorrow-night))
+  ;;   (spacemacs/load-theme 'sanityinc-tomorrow-night))
+  ;; (run-with-idle-timer 10 nil 'my-after-startup-function)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -601,6 +640,9 @@ This function is called at the very end of Spacemacs initialization."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(custom-safe-themes
+   (quote
+    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
  '(cycbuf-dont-show-regexp (quote ("^ " "^\\*cycbuf\\*$" "^\\*.*\\*$" "TAGS")))
  '(cycbuf-max-window-height 10)
  '(cycbuf-maximal-buffer-name-column 30)
@@ -609,6 +651,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-minimal-file-name-column 10)
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f" t)
+ '(global-pabbrev-mode t)
  '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
  '(ivy-sort-functions-alist
@@ -619,19 +662,25 @@ This function is called at the very end of Spacemacs initialization."
      (Man-goto-section)
      (org-refile)
      (t . string-lessp))))
+ '(js2-strict-missing-semi-warning nil)
+ '(js2-strict-trailing-comma-warning nil)
  '(mouse-yank-at-point t)
+ '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote
     (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
+ '(sp-escape-quotes-after-insert nil)
+ '(sp-escape-wrapped-region nil)
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
  '(swbuff-window-min-text-height 2)
+ '(tab-width 4)
  '(tramp-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
@@ -692,6 +741,7 @@ This function is called at the very end of Spacemacs initialization."
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil :weight bold))))
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
  '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
+ '(match ((t (:background "#1d1f21" :foreground "#ADD9FF" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
  '(region ((t (:background "#1D4570"))))
@@ -709,6 +759,6 @@ This function is called at the very end of Spacemacs initialization."
  '(whitespace-empty ((t (:background "#503030"))))
  '(whitespace-space ((t (:background "grey10" :foreground "gray20"))))
  '(whitespace-space-before-tab ((t (:background "nil" :foreground "#666"))))
- '(whitespace-tab ((t (:foreground "grey25"))))
+ '(whitespace-tab ((t (:background "nil" :foreground "grey25"))))
  '(whitespace-trailing ((t (:background "#382A2A")))))
 )
