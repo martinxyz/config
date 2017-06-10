@@ -395,6 +395,15 @@ you should place your code here."
     (define-key evil-iedit-state-map (kbd "p") 'iedit-prev-occurrence)
     )
 
+  ; (wishlist: also ignore __pycache__ and GTAGS etc.)
+  ; (wishlist2: I shouldn't have to configure this.)
+  (setq counsel-find-file-ignore-regexp
+        (concat
+         ;; File names beginning with # or .
+         "\\(?:\\`[#.]\\)"
+         ;; File names ending with # or ~
+         "\\|\\(?:\\`.+?[#~]\\'\\)"))
+
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
 
@@ -424,6 +433,19 @@ you should place your code here."
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
   ;(define-key evil-normal-state-map "v" 'counsel-projectile) ; great but slow (two seconds) (minor usability issue: shows large folder with non-git files before git files)
   (define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
+
+  (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)
+  ;(define-key evil-normal-state-map "V" 'helm-mini)
+  (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
+
+  ;; ;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+  ;; ;(define-key helm-map (kbd "ł") 'helm-execute-persistent-action) ; make TAB work in terminal
+  ;; (define-key helm-map (kbd "ħ")  'helm-next-source)
+  ;; (define-key helm-map (kbd "[")  'helm-next-line)
+  ;; (define-key helm-map (kbd "]")  'helm-previous-line)
+  ;; (define-key helm-read-file-map (kbd "ħ")  'helm-find-files-up-one-level)
+  ;; (define-key helm-find-files-map (kbd "ħ")  'helm-find-files-up-one-level)
+
 
   ; from https://github.com/syl20bnr/spacemacs/issues/6097
   ; use this with dotspacemacs-smooth-scrolling nil
@@ -523,7 +545,7 @@ you should place your code here."
   ;(spacemacs/set-leader-keys "os" 'ag-project)
 
   ; was: spacemacs/search-project-auto
-  (spacemacs/set-leader-keys "/" 'counsel-git-grep)
+  ;(spacemacs/set-leader-keys "/" 'counsel-git-grep)
 
   (define-key spacemacs-web-mode-map "," 'spacemacs/web-mode-transient-state/body)
   ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
@@ -540,15 +562,15 @@ you should place your code here."
 
   ;; get rid of compilation window on success
   ;; source: http://www.bloomington.in.us/~brutt/emacs-c-dev.html [dead link]
-  (setq compilation-finish-function
-        (lambda (buf str)
-          (if (string-match "exited abnormally" str)
-              ;;there were errors
-              ;(message "compilation errors, press C-x ` to visit")
-              (message "ERRORs while compiling.")
-            ;;no errors, make the compilation window go away in 0.5 seconds
-            (run-at-time 0.5 nil 'delete-windows-on buf)
-            (message "Compilation done."))))
+  ;; (setq compilation-finish-function
+  ;;       (lambda (buf str)
+  ;;         (if (string-match "exited abnormally" str)
+  ;;             ;;there were errors
+  ;;             ;(message "compilation errors, press C-x ` to visit")
+  ;;             (message "ERRORs while compiling.")
+  ;;           ;;no errors, make the compilation window go away in 0.5 seconds
+  ;;           (run-at-time 0.5 nil 'delete-windows-on buf)
+  ;;           (message "Compilation done."))))
 
   (global-hl-line-mode -1) ; Disable current line highlight
 
@@ -649,6 +671,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-maximal-file-name-column 30)
  '(cycbuf-minimal-buffer-name-column 10)
  '(cycbuf-minimal-file-name-column 10)
+ '(delete-trailing-lines nil)
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f" t)
  '(global-pabbrev-mode t)
@@ -668,7 +691,7 @@ This function is called at the very end of Spacemacs initialization."
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern company-anaconda color-identifiers-mode coffee-mode anaconda-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (symon string-inflection realgud test-simple loc-changes load-relative password-generator evil-org evil-lion editorconfig company-anaconda anaconda-mode browse-at-remote helm-R helm-ad restclient-helm helm-purpose helm-gtags devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern color-identifiers-mode coffee-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote

@@ -19,7 +19,7 @@ test -h .viper && rm .viper
 mkdir -p .config/matplotlib
 symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
-for i in vimrc gvimrc vim cvsrc Xresources fluxbox gitconfig gitignore wmii-3.5 pylintrc wcalc_preload spacemacs.d; do
+for i in vimrc gvimrc vim cvsrc Xresources fluxbox gitconfig gitignore ignore wmii-3.5 pylintrc wcalc_preload spacemacs.d; do
   test -r config/$i || echo config/$i does not exist
   symlink config/$i .$i
 done
