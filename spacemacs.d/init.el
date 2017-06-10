@@ -407,6 +407,14 @@ you should place your code here."
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
 
+  ; similar to https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
+  (defun compare-files-by-date (f1 f2)
+    "Compare files f1 and f2 according to file modification date."
+    (let ((default-directory ivy--directory))
+      (time-less-p
+       (nth 5 (file-attributes f2))
+       (nth 5 (file-attributes f1)))))
+
   (define-key evil-normal-state-map "T" 'cycbuf-switch-to-next-buffer)
   ;(define-key evil-normal-state-map "M" 'evil-record-macro)
   (define-key evil-normal-state-map "M" 'delete-other-windows)
@@ -425,16 +433,14 @@ you should place your code here."
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
-
-  (define-key evil-normal-state-map "V" 'counsel-projectile) ; great but slow (two seconds)
+  (define-key evil-normal-state-map "V" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
-  ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
-  ;(define-key evil-normal-state-map "v" 'counsel-projectile) ; great but slow (two seconds) (minor usability issue: shows large folder with non-git files before git files)
-  (define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
-
-  (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)
+  ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
+  (define-key evil-normal-state-map "v" 'counsel-find-file) ; great (now that it's sorted by mtime again)
+  ; (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)
+  ; (define-key evil-normal-state-map "v" 'projectile-find-file)
   ;(define-key evil-normal-state-map "V" 'helm-mini)
   (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
 
@@ -677,9 +683,10 @@ This function is called at the very end of Spacemacs initialization."
  '(global-pabbrev-mode t)
  '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
+ '(ivy-extra-directories nil)
  '(ivy-sort-functions-alist
    (quote
-    ((read-file-name-internal . ivy--sort-files-by-date)
+    ((read-file-name-internal . compare-files-by-date)
      (internal-complete-buffer)
      (counsel-git-grep-function)
      (Man-goto-section)
@@ -692,6 +699,7 @@ This function is called at the very end of Spacemacs initialization."
  '(package-selected-packages
    (quote
     (symon string-inflection realgud test-simple loc-changes load-relative password-generator evil-org evil-lion editorconfig company-anaconda anaconda-mode browse-at-remote helm-R helm-ad restclient-helm helm-purpose helm-gtags devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern color-identifiers-mode coffee-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+ '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote
