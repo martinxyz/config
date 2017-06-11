@@ -444,6 +444,36 @@ you should place your code here."
   ;(define-key evil-normal-state-map "V" 'helm-mini)
   (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
 
+  ; experimental: use rg to get the list of project files (faster)
+  ; based on https://github.com/kaushalmodi/.emacs.d/blob/master/general.el#L102
+  ; and https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-projectile.el#L79
+  (defconst maxy/rg-arguments
+    `(; "--no-ignore-vcs"
+      "--line-number"
+      "--smart-case"
+      ; "--follow"                 ;Follow symlinks
+      "--max-columns" "150"      ;Emacs doesn't handle long line lengths very well
+      "--ignore-file" ,(concat "/home/" (getenv "USER") "/.ignore")))
+  (defun maxy/advice-projectile-use-rg ()
+    (mapconcat 'identity
+               ; used unaliased version of `rg': \rg
+               (append '("\\rg") maxy/rg-arguments '("--null" "--files")) " "))
+  (if (executable-find "rg")
+      (advice-add 'projectile-get-ext-command :override #'maxy/advice-projectile-use-rg))
+  ;; Make the file list creation faster by NOT calling `projectile-get-sub-projects-files'
+  (defun maxy/advice-projectile-no-sub-project-files ()
+    "Directly call `projectile-get-ext-command'. No need to try to get a list of sub-project files if the vcs is git."
+    (projectile-files-via-ext-command (projectile-get-ext-command)))
+  (advice-add 'projectile-get-repo-files :override
+              #'maxy/advice-projectile-no-sub-project-files)
+  ;; Do not visit the current project's tags table if `ggtags-mode' is loaded.
+  ;; Doing so prevents the unnecessary call to `visit-tags-table' function
+  ;; and the subsequent `find-file' call for the `TAGS' file."
+  (defun maxy/advice-projectile-dont-visit-tags-table () nil)
+  (when (fboundp 'ggtags-mode)
+    (advice-add 'projectile-visit-project-tags-table :override
+                #'maxy/advice-projectile-dont-visit-tags-table))
+
   ;; ;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
   ;; ;(define-key helm-map (kbd "ł") 'helm-execute-persistent-action) ; make TAB work in terminal
   ;; (define-key helm-map (kbd "ħ")  'helm-next-source)
@@ -699,7 +729,7 @@ This function is called at the very end of Spacemacs initialization."
  '(package-selected-packages
    (quote
     (symon string-inflection realgud test-simple loc-changes load-relative password-generator evil-org evil-lion editorconfig company-anaconda anaconda-mode browse-at-remote helm-R helm-ad restclient-helm helm-purpose helm-gtags devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern color-identifiers-mode coffee-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
- '(projectile-enable-caching t)
+ '(projectile-enable-caching nil)
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote
