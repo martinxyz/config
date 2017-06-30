@@ -30,8 +30,10 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(rust
      (auto-completion :variables
+                      auto-completion-tab-key-behavior nil
+                      auto-completion-enable-sort-by-usage t
                       ;auto-completion-enable-help-tooltip nil
                       ;auto-completion-enable-snippets-in-popup nil
                       ;;auto-completion-private-snippets-directory "~/.spacemacs.d/snippets")
@@ -376,6 +378,21 @@ you should place your code here."
   ;(global-set-key "\M-." 'my-jump-to-tag)
   ;(define-key evil-normal-state-map "\M-." 'my-jump-to-tag);
 
+  (defun maxy-show-manpage ()
+    (interactive)
+    (manual-entry (current-word)))
+  (spacemacs/set-leader-keys "hm" 'maxy-show-manpage)
+  (spacemacs/set-leader-keys "hh" 'devdocs-search)
+  (global-set-key [f1] 'maxy-show-manpage)
+  (global-set-key [f2] 'devdocs-search)
+
+  ; from devdocs.el
+  (defun maxy-devdocs-do-search (pattern)
+    (let ((arg (format "--app=%s/#q=%s" devdocs-url (url-hexify-string pattern))))
+      (start-process "chromium devdocs" nil "chromium" "--password-store=basic" arg)
+     ))
+  (advice-add 'devdocs-do-search :override #'maxy-devdocs-do-search)
+
   ;(spacemacs/set-leader-keys "og" 'ggtags-find-tag)
   (define-key evil-normal-state-map "Ω" 'evil-record-macro) ; Shift-@
 
@@ -409,11 +426,9 @@ you should place your code here."
 
   ; similar to https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
   (defun compare-files-by-date (f1 f2)
-    "Compare files f1 and f2 according to file modification date."
-    (let ((default-directory ivy--directory))
-      (time-less-p
-       (nth 5 (file-attributes f2))
-       (nth 5 (file-attributes f1)))))
+    (time-less-p
+     (nth 5 (file-attributes f2))
+     (nth 5 (file-attributes f1))))
 
   (define-key evil-normal-state-map "T" 'cycbuf-switch-to-next-buffer)
   ;(define-key evil-normal-state-map "M" 'evil-record-macro)
@@ -437,9 +452,10 @@ you should place your code here."
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
+  ; (define-key evil-normal-state-map "v" 'counsel-projectile)
   ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
-  (define-key evil-normal-state-map "v" 'counsel-find-file) ; great (now that it's sorted by mtime again)
-  ; (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)
+  ;; (define-key evil-normal-state-map "v" 'counsel-find-file) ; great (now that it's sorted by mtime again)
+  (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
   ; (define-key evil-normal-state-map "v" 'projectile-find-file)
   ;(define-key evil-normal-state-map "V" 'helm-mini)
   (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
@@ -525,6 +541,12 @@ you should place your code here."
 
   ; Ctrl-F is swiper-search, not evil-scroll-page-down
   (define-key evil-normal-state-map "\C-f" 'swiper-search)
+
+  ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
+  (define-key evil-visual-state-map "J"
+    (concat ":m '>+1" (kbd "RET") "gv=gv"))
+  (define-key evil-visual-state-map "K"
+    (concat ":m '<-2" (kbd "RET") "gv=gv"))
 
   (defun maxy-some-rows-down ()
     (interactive)
@@ -728,7 +750,7 @@ This function is called at the very end of Spacemacs initialization."
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
    (quote
-    (symon string-inflection realgud test-simple loc-changes load-relative password-generator evil-org evil-lion editorconfig company-anaconda anaconda-mode browse-at-remote helm-R helm-ad restclient-helm helm-purpose helm-gtags devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern color-identifiers-mode coffee-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (toml-mode racer flycheck-rust seq cargo rust-mode symon string-inflection realgud test-simple loc-changes load-relative password-generator evil-org evil-lion editorconfig company-anaconda anaconda-mode browse-at-remote helm-R helm-ad restclient-helm helm-purpose helm-gtags devdocs winum fuzzy unfill ob-restclient ob-http company-restclient restclient know-your-http-well dtrt-indent pcache company-quickhelp color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow ggtags disaster company-c-headers cmake-mode clang-format powerline spinner ivy-purpose window-purpose imenu-list hydra parent-mode hide-comnt flx evil goto-chg highlight diminish pkg-info epl bind-map bind-key packed avy popup package-build cycbuf swbuff helm-pydoc helm-gitignore helm-css-scss helm-company helm-c-yasnippet anzu iedit smartparens undo-tree helm helm-core projectile async f dash s material-theme pug-mode yapfify web-mode web-beautify tagedit slim-mode scss-mode sass-mode rainbow-mode rainbow-identifiers pyvenv pytest pyenv-mode py-isort pip-requirements mwim livid-mode skewer-mode simple-httpd live-py-mode less-css-mode json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc jade-mode hy-mode haml-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter emmet-mode diff-hl cython-mode company-web web-completion-data company-tern dash-functional tern color-identifiers-mode coffee-mode pythonic smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete wgrep smex ivy-hydra counsel-projectile counsel swiper ivy ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(projectile-enable-caching nil)
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
@@ -785,6 +807,8 @@ This function is called at the very end of Spacemacs initialization."
  '(avy-lead-face-0 ((t (:foreground "yellow"))))
  '(avy-lead-face-1 ((t (:foreground "orange"))))
  '(avy-lead-face-2 ((t (:foreground "orange"))))
+ '(company-tooltip-common ((t (:inherit company-tooltip :underline nil :weight bold))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :underline nil :weight bold))))
  '(cycbuf-current-face ((t (:background "dim gray" :weight bold))))
  '(cycbuf-header-face ((t (:foreground "yellow" :weight bold))))
  '(cycbuf-uniquify-face ((t (:foreground "dodger blue"))))
@@ -801,7 +825,7 @@ This function is called at the very end of Spacemacs initialization."
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil :weight bold))))
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
- '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
+ '(lazy-highlight ((t (:background "nil" :foreground "#3b3735"))))
  '(match ((t (:background "#1d1f21" :foreground "#ADD9FF" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
