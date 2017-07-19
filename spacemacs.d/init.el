@@ -571,6 +571,8 @@ you should place your code here."
   ; completion
   (global-set-key "\M-l" 'dabbrev-expand)
   (global-set-key "ł" 'dabbrev-expand) ; kinesis AltGr-l
+  ; hack-around to fix tab-completion in html/css/web modes (may want to preserve emmet-expand for later, it looks useful...)
+  (advice-add 'spacemacs/emmet-expand :override #'dabbrev-expand)
 
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
@@ -825,7 +827,7 @@ This function is called at the very end of Spacemacs initialization."
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil :weight bold))))
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
- '(lazy-highlight ((t (:background "nil" :foreground "#3b3735"))))
+ '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
  '(match ((t (:background "#1d1f21" :foreground "#ADD9FF" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
