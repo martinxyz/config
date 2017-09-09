@@ -393,6 +393,8 @@ you should place your code here."
      ))
   (advice-add 'devdocs-do-search :override #'maxy-devdocs-do-search)
 
+  (spacemacs/set-leader-keys "op" 'js2r-log-this)  ; a bit easier than SPC m r l t
+
   ;(spacemacs/set-leader-keys "og" 'ggtags-find-tag)
   (define-key evil-normal-state-map "Ω" 'evil-record-macro) ; Shift-@
 
