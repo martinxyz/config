@@ -72,6 +72,7 @@ values."
                                       cycbuf
                                       dtrt-indent
                                       devdocs
+                                      editorconfig
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       )
@@ -470,7 +471,7 @@ you should place your code here."
       "--line-number"
       "--smart-case"
       ; "--follow"                 ;Follow symlinks
-      "--max-columns" "150"      ;Emacs doesn't handle long line lengths very well
+      "--max-columns" "350"      ;Emacs doesn't handle long line lengths very well
       "--ignore-file" ,(concat "/home/" (getenv "USER") "/.ignore")))
   (defun maxy/advice-projectile-use-rg ()
     (mapconcat 'identity
@@ -674,13 +675,15 @@ you should place your code here."
                                 (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
 
-  (defun my-web-mode-indent2 ()
-    (interactive)
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    )
+  ;; (defun my-web-mode-indent2 ()
+  ;;   (interactive)
+  ;;   (setq web-mode-markup-indent-offset 2)
+  ;;   (setq web-mode-code-indent-offset 2)
+  ;;   (setq web-mode-css-indent-offset 2)
+  ;;   )
   ;(add-hook 'web-mode-hook  'my-web-mode-indent2)
+
+  (editorconfig-mode 1)
 
   ; watch out for trouble on large files, maybe?
   ; nope, trouble is not large files, but it's too distracting
@@ -761,6 +764,14 @@ This function is called at the very end of Spacemacs initialization."
    (quote
     (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
+ '(safe-local-variable-values
+   (quote
+    ((eval progn
+           (add-to-list
+            (quote exec-path)
+            (concat
+             (locate-dominating-file default-directory ".dir-locals.el")
+             "node_modules/.bin/"))))))
  '(sp-escape-quotes-after-insert nil)
  '(sp-escape-wrapped-region nil)
  '(swbuff-clear-delay 20)
