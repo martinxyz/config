@@ -695,6 +695,14 @@ you should place your code here."
   (setq sp-escape-quotes-after-insert nil)
   (setq sp-escape-wrapped-region nil)
 
+  ; some javascript stuff picked from https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-javascript.el
+  (setq-default js2-strict-trailing-comma-warning nil ; it's encouraged to use trailing comma in ES6
+                js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
+                js2-skip-preprocessor-directives t
+                js2-strict-inconsistent-return-warning nil) ; return <=> return null
+  (setq auto-mode-alist (cons '("\\.json$" . js-mode) auto-mode-alist))
+
+
   ;; ; sp-escape-wrapped-region
   ;; ; If non-nil, escape special chars inside the just wrapped region.
   ;; (setq sp-escape-wrapped-region nil)
