@@ -577,6 +577,15 @@ you should place your code here."
   ; hack-around to fix tab-completion in html/css/web modes (may want to preserve emmet-expand for later, it looks useful...)
   (advice-add 'spacemacs/emmet-expand :override #'dabbrev-expand)
 
+  ; https://github.com/syl20bnr/spacemacs/tree/master/layers/%2Bcompletion/auto-completion#auto-complete
+  ; I want to confirm the pabbrev-expand suggestion with TAB, always.
+  ; The autocomplete suggestion can still be confirmed with RET.
+  ; (TODO: if there is only a single auto-complete, the displayed suggestion clashes with dabbrev-expand)
+  (setq-default dotspacemacs-configuration-layers
+                '((auto-completion :variables
+                                   auto-completion-tab-key-behavior nil)))
+
+
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
   ;(global-set-key [prior] 'evil-scroll-up)
@@ -700,8 +709,6 @@ you should place your code here."
                 js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
                 js2-skip-preprocessor-directives t
                 js2-strict-inconsistent-return-warning nil) ; return <=> return null
-  (setq auto-mode-alist (cons '("\\.json$" . js-mode) auto-mode-alist))
-
 
   ;; ; sp-escape-wrapped-region
   ;; ; If non-nil, escape special chars inside the just wrapped region.
