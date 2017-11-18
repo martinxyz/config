@@ -2,18 +2,16 @@
 import evdev
 import asyncio
 from evdev import ecodes
-import alsaaudio
 import socket
+import subprocess
 
 fn = '/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd'
 device = evdev.InputDevice(fn)
 device.grab()  # prevent X11 from getting the events, too
 
-mixer = alsaaudio.Mixer()
-print('volume', mixer.getvolume())
-
 mplaylist = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 mplaylist.connect(('localhost', 28443))
+
 
 async def print_events():
     async for event in device.async_read_loop():
@@ -21,15 +19,9 @@ async def print_events():
             continue
         if event.value == 1 or event.value == 2:
             if event.code == ecodes.KEY_KPMINUS:
-                v = mixer.getvolume()[0]
-                v -= 1
-                if v < 0: v = 0
-                mixer.setvolume(v)
+                subprocess.call(['amixer', 'sset', 'Master', '1%-'])
             if event.code == ecodes.KEY_KPPLUS:
-                v = mixer.getvolume()[0]
-                v += 1
-                if v > 100: v = 100
-                mixer.setvolume(v)
+                subprocess.call(['amixer', 'sset', 'Master', '1%+'])
         if event.value == 2:  # repeated
             continue
         if event.value == 1:  # pressed
@@ -49,4 +41,3 @@ async def print_events():
 loop = asyncio.get_event_loop()
 asyncio.ensure_future(print_events())
 loop.run_forever()
-
