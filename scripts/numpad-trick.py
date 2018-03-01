@@ -21,9 +21,9 @@ def volume_keys(keyset):
     if plus and minus:
         return
     elif plus:
-        subprocess.call(['amixer', 'sset', 'Master', '1%+'])
+        subprocess.call(['amixer', '-q', 'sset', 'Master', '1%+'])
     elif minus:
-        subprocess.call(['amixer', 'sset', 'Master', '1%-'])
+        subprocess.call(['amixer', '-q', 'sset', 'Master', '1%-'])
 
 
 async def handle_active_keys():

@@ -2,7 +2,6 @@ bower_components
 node_modules
 *.min.js
 *.min.css
-build
 *.mine
 *.theirs
 *.orig
