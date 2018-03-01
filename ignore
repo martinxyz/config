@@ -8,4 +8,8 @@ node_modules
 *.bak
 *.deleted
 *.old
+dist
+*-dist
+*.diff
+TAGS
 
