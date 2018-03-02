@@ -434,7 +434,7 @@ you should place your code here."
   (require 'pabbrev)
   (require 'swbuff)
 
-  (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS"))
+  (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS" "magit[-:]"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
   (define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
@@ -791,6 +791,12 @@ you should place your code here."
   ;;   ; (spacemacs/load-theme 'sanityinc-tomorrow-night))
   ;;   (spacemacs/load-theme 'sanityinc-tomorrow-night))
   ;; (run-with-idle-timer 10 nil 'my-after-startup-function)
+
+  ; collapse "untracked files" section by default
+  (defun local-magit-initially-hide-untracked (section)
+    (if (eq (magit-section-type section) 'untracked) 'hide))
+  (add-hook 'magit-section-set-visibility-hook
+            'local-magit-initially-hide-untracked)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -832,9 +838,10 @@ This function is called at the very end of Spacemacs initialization."
      (counsel-git-grep-function)
      (Man-goto-section)
      (org-refile)
-     (t . string-lessp))))
+     (t))))
  '(js2-strict-missing-semi-warning nil)
  '(js2-strict-trailing-comma-warning nil)
+ '(magit-save-repository-buffers (quote dontask))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
