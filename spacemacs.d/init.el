@@ -724,6 +724,8 @@ you should place your code here."
   ;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
   ;(setq select-enable-clipboard t)
   (setq select-enable-primary t)
+  ; fix pasting over visual selection, see https://github.com/syl20bnr/spacemacs/issues/4685#issuecomment-278076373
+  (fset 'evil-visual-update-x-selection 'ignore)
 
   ;(delete 'company-dabbrev company-backends)
   ;(delete 'company-files company-backends) ; way too slow in $HOMe
