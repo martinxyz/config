@@ -1,4 +1,4 @@
 #!/bin/sh
 
-ipython --pylab $@
+ipython3 --pylab $@
 

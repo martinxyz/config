@@ -1,6 +1,10 @@
 #!/bin/sh
 # apt-get install rxvt-unicode
 # apt-get install rxvt-unicode-256color
+
+# un-do spacemacs pager setting (if called from emacs)
+unset PAGER
+
 #urxvt -si -sw -cr yellow --print-pipe echo -sl 9999 +sb -fn -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -fb -misc-fixed-medium-r-normal-*-20-*-*-*-c-100-*-1 -e bash "$@"
 #urxvtc \
 urxvt \

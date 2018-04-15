@@ -31,18 +31,18 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layers
    '(typescript
      rust
-     (auto-completion :variables
-                      auto-completion-enable-sort-by-usage t
-                      ;auto-completion-enable-help-tooltip nil
-                      ;auto-completion-enable-snippets-in-popup nil
-                      ;;auto-completion-private-snippets-directory "~/.spacemacs.d/snippets")
+     ;; (auto-completion :variables
+     ;;                  auto-completion-enable-sort-by-usage t
+     ;;                  ;auto-completion-enable-help-tooltip nil
+     ;;                  ;auto-completion-enable-snippets-in-popup nil
+     ;;                  ;;auto-completion-private-snippets-directory "~/.spacemacs.d/snippets")
 
-                      ;; ; https://github.com/syl20bnr/spacemacs/tree/master/layers/%2Bcompletion/auto-completion#auto-complete
-                      ;; ; I want to confirm the pabbrev-expand suggestion with TAB, always.
-                      ;; ; The autocomplete suggestion can still be confirmed with RET.
-                      ;; ; (TODO: if there is only a single auto-complete, the displayed suggestion clashes with dabbrev-expand)
-                      auto-completion-tab-key-behavior nil
-                      )
+     ;;                  ;; ; https://github.com/syl20bnr/spacemacs/tree/master/layers/%2Bcompletion/auto-completion#auto-complete
+     ;;                  ;; ; I want to confirm the pabbrev-expand suggestion with TAB, always.
+     ;;                  ;; ; The autocomplete suggestion can still be confirmed with RET.
+     ;;                  ;; ; (TODO: if there is only a single auto-complete, the displayed suggestion clashes with dabbrev-expand)
+     ;;                  auto-completion-tab-key-behavior nil
+     ;;                  )
      ivy
      better-defaults
      emacs-lisp
@@ -527,14 +527,14 @@ you should place your code here."
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
-  (define-key evil-normal-state-map "V" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
+  (define-key evil-normal-state-map "v" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
   ; (define-key evil-normal-state-map "v" 'counsel-projectile)
   ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
   ;; (define-key evil-normal-state-map "v" 'counsel-find-file) ; great (now that it's sorted by mtime again)
-  (define-key evil-normal-state-map "v" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
+  (define-key evil-normal-state-map "V" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
   ; (define-key evil-normal-state-map "v" 'projectile-find-file)
   ;(define-key evil-normal-state-map "V" 'helm-mini)
   (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
@@ -650,8 +650,16 @@ you should place your code here."
   ; completion
   (global-set-key "\M-l" 'dabbrev-expand)
   (global-set-key "ł" 'dabbrev-expand) ; kinesis AltGr-l
-  ; hack-around to fix tab-completion in html/css/web modes (may want to preserve emmet-expand for later, it looks useful...)
-  (advice-add 'spacemacs/emmet-expand :override #'dabbrev-expand)
+  ; Undo html layer emmet-mode configuration: dabbrev-expand is already showing autocompletions for me, often more accurate than emmet-mode. When I press tab I want those completions, just like in every other buffer.
+  (remove-hook 'css-mode-hook 'emmet-mode)
+  (remove-hook 'html-mode-hook 'emmet-mode)
+  (remove-hook 'sass-mode-hook 'emmet-mode)
+  (remove-hook 'scss-mode-hook 'emmet-mode)
+  (remove-hook 'web-mode-hook 'emmet-mode)
+  ; this was not quite working:
+  ;; (advice-add 'spacemacs/emmet-expand :override #'dabbrev-expand)
+  ;; (advice-add 'spacemacs/emmet-expand :override #'pabbrev-expand-maybe)
+  ;; (advice-add 'emmet-expand :override #'pabbrev-expand-maybe)  ; TAB key in html-mode
 
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
@@ -720,10 +728,10 @@ you should place your code here."
   ;(delete 'company-dabbrev company-backends)
   ;(delete 'company-files company-backends) ; way too slow in $HOMe
 
-  (with-eval-after-load 'core-auto-completion
-    ; way too when showing $HOME
-    (delete 'company-files spacemacs-default-company-backends)
-    )
+  ;; (with-eval-after-load 'core-auto-completion
+  ;;   ; way too when showing $HOME
+  ;;   (delete 'company-files spacemacs-default-company-backends)
+  ;;   )
 
   ; (with-eval-after-load 'company
   ; (add-to-list 'company-backends 'company-elm))
@@ -825,6 +833,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-minimal-buffer-name-column 10)
  '(cycbuf-minimal-file-name-column 10)
  '(delete-trailing-lines nil)
+ '(evil-repeat-move-cursor nil)
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f" t)
  '(global-pabbrev-mode t)
@@ -854,6 +863,7 @@ This function is called at the very end of Spacemacs initialization."
    (quote
     (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
+ '(py-shell-name "python3")
  '(safe-local-variable-values
    (quote
     ((eval progn
