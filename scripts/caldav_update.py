@@ -63,6 +63,8 @@ for dt, event in sorted(events, key=lambda x: x[0]):
         if name in 'SUMMARY TRANSP UID CLASS STATUS'.split():
             continue
         if isinstance(value, str):
+            if 'Ein Service von fcal.ch. NUR zum inter' in value:
+                continue
             s += ', ' + value
     if len(s) > 79:
         s = s[:79-3] + '...'

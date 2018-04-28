@@ -807,6 +807,10 @@ you should place your code here."
     (if (eq (magit-section-type section) 'untracked) 'hide))
   (add-hook 'magit-section-set-visibility-hook
             'local-magit-initially-hide-untracked)
+
+  ;; support .vue files
+  (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -836,8 +840,23 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-minimal-file-name-column 10)
  '(delete-trailing-lines nil)
  '(evil-repeat-move-cursor nil)
+ '(evil-surround-pairs-alist
+   (quote
+    ((40 "(" . ")")
+     (91 "[" . "]")
+     (123 "{" . "}")
+     (41 "(" . ")")
+     (93 "[" . "]")
+     (125 "{" . "}")
+     (35 "#{" . "}")
+     (98 "(" . ")")
+     (66 "{" . "}")
+     (62 "<" . ">")
+     (116 . evil-surround-read-tag)
+     (60 . evil-surround-read-tag)
+     (102 . evil-surround-function))))
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#37474f" t)
+ '(fci-rule-color "#37474f")
  '(global-pabbrev-mode t)
  '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
