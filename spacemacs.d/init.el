@@ -808,6 +808,8 @@ you should place your code here."
   (add-hook 'magit-section-set-visibility-hook
             'local-magit-initially-hide-untracked)
 
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+
   ;; support .vue files
   (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
   (flycheck-add-mode 'javascript-eslint 'web-mode)
