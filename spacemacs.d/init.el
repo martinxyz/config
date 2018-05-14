@@ -760,6 +760,12 @@ you should place your code here."
                                 (dtrt-indent-mode)
                                 (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
+  ; (but .editorconfig works, I think?)
+  (defun my-web-mode-hook ()
+    ; for .vue files. Do not indent script inside tag (rule from eslint-plugin-vue).
+    (setq web-mode-script-padding 0)
+    )
+  (add-hook 'web-mode-hook  'my-web-mode-hook)
 
   ;; (defun my-web-mode-indent2 ()
   ;;   (interactive)
@@ -858,7 +864,11 @@ This function is called at the very end of Spacemacs initialization."
      (60 . evil-surround-read-tag)
      (102 . evil-surround-function))))
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#37474f")
+ '(fci-rule-color "#37474f" t)
+ '(flycheck-json-python-json-executable "python3")
+ '(flycheck-python-flake8-executable "python3")
+ '(flycheck-python-pycompile-executable "python3")
+ '(flycheck-python-pylint-executable "python3")
  '(global-pabbrev-mode t)
  '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
