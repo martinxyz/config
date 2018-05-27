@@ -405,11 +405,6 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
-  ; when I press " inside a string I don't want it to get escaped
-  (setq sp-autoescape-string-quote nil)
-  (setq sp-escape-quotes-after-insert nil)
-  (setq sp-escape-wrapped-region nil)
-
   ;; Do I need this?
   ;; Fix indentation with < and > via https://www.youtube.com/watch?v=HKF41ivkBb0
   ;(setq-default evil-shift-round nil)
@@ -661,6 +656,11 @@ you should place your code here."
   ;; (advice-add 'spacemacs/emmet-expand :override #'pabbrev-expand-maybe)
   ;; (advice-add 'emmet-expand :override #'pabbrev-expand-maybe)  ; TAB key in html-mode
 
+  ; org-mode should not override tab in insert-mode
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "<tab>") 'pabbrev-expand-maybe))
+
+
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
   ;(global-set-key [prior] 'evil-scroll-up)
@@ -767,39 +767,34 @@ you should place your code here."
     )
   (add-hook 'web-mode-hook  'my-web-mode-hook)
 
-  ;; (defun my-web-mode-indent2 ()
-  ;;   (interactive)
-  ;;   (setq web-mode-markup-indent-offset 2)
-  ;;   (setq web-mode-code-indent-offset 2)
-  ;;   (setq web-mode-css-indent-offset 2)
-  ;;   )
-  ;(add-hook 'web-mode-hook  'my-web-mode-indent2)
-
   (editorconfig-mode 1)
+
+  ;; support .vue files
+  (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+
+  ;; use the current project's eslint binary
+  ;; source: https://emacs.stackexchange.com/a/21207/12292
+  (defun my/use-eslint-from-node-modules ()
+    (let* ((root (locate-dominating-file
+                  (or (buffer-file-name) default-directory)
+                  "node_modules"))
+           (eslint (and root
+                        (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                          root))))
+      (when (and eslint (file-executable-p eslint))
+        (setq-local flycheck-javascript-eslint-executable eslint))))
+  (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
   ; watch out for trouble on large files, maybe?
   ; nope, trouble is not large files, but it's too distracting
   ;(spacemacs/toggle-automatic-symbol-highlight-on)
-
-  ;; ; when I press " inside a string I don't want it to get escaped
-  ;; (setq sp-autoescape-string-quote nil)
-  (setq sp-autoescape-string-quote nil)
-  (setq sp-escape-quotes-after-insert nil)
-  (setq sp-escape-wrapped-region nil)
 
   ; some javascript stuff picked from https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-javascript.el
   (setq-default js2-strict-trailing-comma-warning nil ; it's encouraged to use trailing comma in ES6
                 js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
                 js2-skip-preprocessor-directives t
                 js2-strict-inconsistent-return-warning nil) ; return <=> return null
-
-  ;; ; sp-escape-wrapped-region
-  ;; ; If non-nil, escape special chars inside the just wrapped region.
-  ;; (setq sp-escape-wrapped-region nil)
-
-  ;; ; sp-escape-quotes-after-insert
-  ;; ; If non-nil, escape string quotes if typed inside string.
-  ;; (setq sp-escape-quotes-after-insert nil)
 
   ;; (load-theme 'sanityinc-tomorrow-night)
   ;; (defun my-after-startup-function ()
@@ -815,10 +810,6 @@ you should place your code here."
             'local-magit-initially-hide-untracked)
 
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-
-  ;; support .vue files
-  (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
