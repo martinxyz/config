@@ -59,7 +59,8 @@ export VISUAL=vim
 export CVS_EDITOR=vim
 export CVS_RSH=ssh
 export RSYNC_RSH=ssh
-export SHELL=bash
+# export SHELL=bash
+export SHELL=/bin/bash
 
 export SCONSFLAGS="-Q -u"
 
