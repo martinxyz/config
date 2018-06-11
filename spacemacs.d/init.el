@@ -828,6 +828,7 @@ This function is called at the very end of Spacemacs initialization."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(compilation-ask-about-save nil)
  '(custom-safe-themes
    (quote
     ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
@@ -873,7 +874,7 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil)
+ '(js2-strict-trailing-comma-warning nil t)
  '(magit-save-repository-buffers (quote dontask))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)

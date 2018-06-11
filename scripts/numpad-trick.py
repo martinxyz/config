@@ -67,6 +67,8 @@ async def listen_to_numpad():
         print(evdev.categorize(event))
 
 
+print('numpad-trick.py: starting asyncio loop')
 loop = asyncio.get_event_loop()
 asyncio.ensure_future(listen_to_numpad())
 loop.run_forever()
+
