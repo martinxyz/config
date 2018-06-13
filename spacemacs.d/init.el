@@ -31,6 +31,7 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layers
    '(typescript
      rust
+     ;; not using the auto-completion layer because it rebinds <tab> in too many places, clashing with dabbrev-expand, and generally produces too much noise
      ;; (auto-completion :variables
      ;;                  auto-completion-enable-sort-by-usage t
      ;;                  ;auto-completion-enable-help-tooltip nil
@@ -83,6 +84,8 @@ This function should only modify configuration layer settings."
                                       dtrt-indent
                                       devdocs
                                       editorconfig
+                                      yasnippet-snippets
+                                      auto-yasnippet
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       )
@@ -660,6 +663,12 @@ you should place your code here."
   (with-eval-after-load 'org
     (define-key org-mode-map (kbd "<tab>") 'pabbrev-expand-maybe))
 
+  (require 'yasnippet)
+  (yas-global-mode 1)
+  (define-key yas-minor-mode-map (kbd "C-<return>") 'yas-expand)
+  (define-key yas-keymap (kbd "<tab>") 'pabbrev-expand-maybe)
+  (define-key yas-keymap (kbd "C-<return>") 'yas-next-field)
+  (define-key yas-keymap (kbd "<return>") 'yas-next-field)
 
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
