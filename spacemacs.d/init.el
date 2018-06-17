@@ -665,6 +665,9 @@ you should place your code here."
 
   (require 'yasnippet)
   (yas-global-mode 1)
+  (define-key yas-minor-mode-map [(tab)]        nil)
+  (define-key yas-minor-mode-map (kbd "TAB")    nil)
+  (define-key yas-minor-mode-map (kbd "<tab>")  nil)
   (define-key yas-minor-mode-map (kbd "C-<return>") 'yas-expand)
   (define-key yas-keymap (kbd "<tab>") 'pabbrev-expand-maybe)
   (define-key yas-keymap (kbd "C-<return>") 'yas-next-field)
@@ -819,6 +822,9 @@ you should place your code here."
             'local-magit-initially-hide-untracked)
 
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
+
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
