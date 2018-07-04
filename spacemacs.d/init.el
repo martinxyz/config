@@ -86,8 +86,10 @@ This function should only modify configuration layer settings."
                                       editorconfig
                                       yasnippet-snippets
                                       auto-yasnippet
+                                      company ; for company-clang-arguments
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
+                                      cmake-ide
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -413,6 +415,11 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;(setq-default evil-shift-round nil)
   (message "setting patched directory in user-init")
   (push (expand-file-name "~/config/spacemacs.d/patched") load-path)
+
+  (add-hook 'after-init-hook 'global-company-mode)
+  ; hack: this would be defined in the autocomplete layer, which I'm not using, but other spacemacs packages keep calling this when company is installed.
+  ; (company-clang-arguments works either way; just get to rid of the startup errors)
+  (defmacro spacemacs|add-company-backends (&rest props))
 
   (message "end of user-init")
   )
@@ -825,6 +832,13 @@ you should place your code here."
   (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
   (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 
+  ; treat the underscores (snake_case) as part of the word
+  (with-eval-after-load 'evil
+    (defalias #'forward-evil-word #'forward-evil-symbol))
+
+  ;; (require 'rtags) ;; optional, must have rtags installed
+  (cmake-ide-setup)
+  ;; (rtags-enable-standard-keybindings)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
