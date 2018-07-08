@@ -1,0 +1,4 @@
+# key: p
+# name: print (debug)
+# --
+console.log('$0');

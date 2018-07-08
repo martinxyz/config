@@ -1,0 +1,4 @@
+# key: p
+# name: print (debug)
+# --
+std::cout << "$0\n";

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print variable
+# key: pv
+# --
+console.log('$1:', $1);
