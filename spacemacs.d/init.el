@@ -62,7 +62,7 @@ This function should only modify configuration layer settings."
      colors
      ; (colors :variables colors-enable-nyan-cat-progress-bar t) ; no, no, no.
 
-     gtags ; does not seem to do any good (because not using helm, maybe)
+     ;; gtags ; does not seem to do any good (because not using helm, maybe)
 
      (c-c++ :variables ; huh, this layer only adds "disaster" mode and not much else?
             c-c++-enable-clang-support t
@@ -632,6 +632,9 @@ you should place your code here."
   (define-key evil-visual-state-map "K"
     (concat ":m '<-2" (kbd "RET") "gv=gv"))
 
+  (define-key evil-visual-state-map (kbd "<tab>")
+    'indent-region)
+
   (defun maxy-some-rows-down ()
     (interactive)
     (evil-next-visual-line)
@@ -679,6 +682,10 @@ you should place your code here."
   (define-key yas-keymap (kbd "<tab>") 'pabbrev-expand-maybe)
   (define-key yas-keymap (kbd "C-<return>") 'yas-next-field)
   (define-key yas-keymap (kbd "<return>") 'yas-next-field)
+
+  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)  ; C-c p a
+  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)  ; C-c p a
+  (spacemacs/set-leader-keys "ph" 'projectile-find-other-file)  ; there is already test/impl: SPC p a
 
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
@@ -836,7 +843,14 @@ you should place your code here."
   (with-eval-after-load 'evil
     (defalias #'forward-evil-word #'forward-evil-symbol))
 
-  ;; (require 'rtags) ;; optional, must have rtags installed
+  ;; https://www.emacswiki.org/emacs/IndentingC
+  (c-add-style "double-class-indent"
+               '("k&r"
+                 (c-basic-offset . 4)
+                 (c-offsets-alist
+                  (inclass . ++)
+                  (access-label . -))))
+  (setq c-default-style "double-class-indent")
   (cmake-ide-setup)
   ;; (rtags-enable-standard-keybindings)
 )
@@ -903,7 +917,7 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil t)
+ '(js2-strict-trailing-comma-warning nil)
  '(magit-save-repository-buffers (quote dontask))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
