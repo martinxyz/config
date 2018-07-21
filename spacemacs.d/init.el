@@ -62,7 +62,7 @@ This function should only modify configuration layer settings."
      colors
      ; (colors :variables colors-enable-nyan-cat-progress-bar t) ; no, no, no.
 
-     ;; gtags ; does not seem to do any good (because not using helm, maybe)
+     gtags ; does not seem to do any good (because not using helm, maybe)
 
      (c-c++ :variables ; huh, this layer only adds "disaster" mode and not much else?
             c-c++-enable-clang-support t
@@ -70,6 +70,8 @@ This function should only modify configuration layer settings."
      python
      html
      javascript
+     c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
+
      ;react
      ;restclient
      )
@@ -445,20 +447,6 @@ you should place your code here."
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)
-  (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
-  (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
-  ; concerning gtags: http://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub
-  ; "use universal ctags (aka exuberant ctags) as a backend for gnu global, e.g. vor vhdl"
-  ; TODO: learn using eldoc
-  ; old C/C++ habit
-  (define-key evil-normal-state-map (kbd "C-.") 'ggtags-find-definition)
-  (define-key evil-visual-state-map (kbd "C-.") 'ggtags-find-definition)
-  (define-key evil-insert-state-map (kbd "C-.") 'ggtags-find-definition)
-  (define-key evil-normal-state-map (kbd "M-.") 'ggtags-find-definition)
-  (define-key evil-visual-state-map (kbd "M-.") 'ggtags-find-definition)
-  (define-key evil-insert-state-map (kbd "M-.") 'ggtags-find-definition)
-  ;(global-set-key "\M-." 'my-jump-to-tag)
-  ;(define-key evil-normal-state-map "\M-." 'my-jump-to-tag);
 
   (defun maxy-show-manpage ()
     (interactive)
@@ -615,8 +603,12 @@ you should place your code here."
   (global-set-key  [f5]  'last-error)
   (global-set-key  [f8]  'compile)
   (global-set-key  [f9]  'recompile)
+  (global-set-key  (kbd "C-b")  'recompile)
   ;(global-set-key  [f9]  (lambda () (interactive) (desktop-save-in-desktop-dir) (run-at-time 0.1 nil 'recompile)))
   (global-set-key  [f10]  'kill-compilation)
+  (define-key evil-normal-state-map "\C-b" 'recompile)
+  (define-key evil-visual-state-map "\C-b" 'recompile)
+  (define-key evil-insert-state-map "\C-b" 'recompile)
 
   ; Ctrl-S is "save file", not swiper-search
   (define-key evil-normal-state-map "\C-s" 'save-buffer)
@@ -627,6 +619,7 @@ you should place your code here."
   (define-key evil-normal-state-map "\C-f" 'swiper-search)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
+  ; TODO: there is dotspacemacs-visual-line-move-text -- just enable that instead?
   (define-key evil-visual-state-map "J"
     (concat ":m '>+1" (kbd "RET") "gv=gv"))
   (define-key evil-visual-state-map "K"
@@ -851,8 +844,51 @@ you should place your code here."
                   (inclass . ++)
                   (access-label . -))))
   (setq c-default-style "double-class-indent")
+
+  ;; requires: https://github.com/Andersbakken/rtags
+  (require 'rtags)
   (cmake-ide-setup)
-  ;; (rtags-enable-standard-keybindings)
+
+  ;; (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
+  ;; (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
+  (define-key evil-normal-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+  (define-key evil-visual-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+  (define-key evil-insert-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+  (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
+  (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
+  (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
+
+  (define-key c-mode-base-map (kbd "M-<left>")
+    (function rtags-location-stack-back))
+  (define-key c-mode-base-map (kbd "M-<right>")
+    (function rtags-location-stack-forward))
+
+  ;; rtags and eldoc, source:
+  ;; https://github.com/Andersbakken/rtags/issues/987
+  (defun fontify-string (str mode)
+    "Return STR fontified according to MODE."
+    (with-temp-buffer
+      (insert str)
+      (delay-mode-hooks (funcall mode))
+      (font-lock-default-function mode)
+      (font-lock-default-fontify-region
+       (point-min) (point-max) nil)
+      (buffer-string)))
+  (defun rtags-eldoc-function ()
+    (let ((summary (rtags-get-summary-text)))
+      (and summary
+           (fontify-string
+            (replace-regexp-in-string
+             "{[^}]*$" ""
+             (mapconcat
+              (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
+              (split-string summary "\r?\n")
+              " "))
+            major-mode))))
+  (defun rtags-eldoc-mode ()
+    (interactive)
+    (setq-local eldoc-documentation-function #'rtags-eldoc-function)
+    (eldoc-mode 1))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -899,7 +935,7 @@ This function is called at the very end of Spacemacs initialization."
      (60 . evil-surround-read-tag)
      (102 . evil-surround-function))))
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#37474f" t)
+ '(fci-rule-color "#37474f")
  '(flycheck-json-python-json-executable "python3")
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pycompile-executable "python3")
@@ -917,7 +953,7 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil)
+ '(js2-strict-trailing-comma-warning nil t)
  '(magit-save-repository-buffers (quote dontask))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
@@ -1016,6 +1052,8 @@ This function is called at the very end of Spacemacs initialization."
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))
  '(region ((t (:background "#1D4570"))))
+ '(rtags-errline ((t (:background "#321212" :underline (:color "red" :style wave)))))
+ '(rtags-fixitline ((t (:background "#303012" :underline (:color "brown" :style wave)))))
  '(show-paren-match ((t (:background "#443947" :foreground "#fff"))))
  '(smerge-base ((t (:background "#21210c"))))
  '(smerge-lower ((t (:background "#142114"))))
