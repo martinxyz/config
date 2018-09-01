@@ -1,0 +1,3 @@
+#!/bin/bash
+feh -Z -g'600x600' --force-aliasing "$@"
+
