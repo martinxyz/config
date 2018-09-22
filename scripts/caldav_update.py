@@ -39,6 +39,11 @@ for component in gcal.walk():
         events.append((dt, component))
 g.close()
 
+# keep a backup that persists over download errors
+tmp_data = open(fn('calendar.ical'), 'rb').read()
+if len(tmp_data) > 1000:
+    open(fn('calendar_backup.ical'), 'wb').write(tmp_data)
+
 show_days = 16
 today = datetime.date.today()
 d_min = today#+datetime.timedelta(days=1),

@@ -65,12 +65,11 @@ This function should only modify configuration layer settings."
      gtags ; does not seem to do any good (because not using helm, maybe)
 
      (c-c++ :variables ; huh, this layer only adds "disaster" mode and not much else?
-            c-c++-enable-clang-support t
-            )
+            c-c++-enable-clang-support t)
      python
      html
      javascript
-     c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
+     ; c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
 
      ;react
      ;restclient
@@ -846,49 +845,54 @@ you should place your code here."
   (setq c-default-style "double-class-indent")
 
   ;; requires: https://github.com/Andersbakken/rtags
-  (require 'rtags)
-  (cmake-ide-setup)
+  ;; (require 'rtags)
+  (with-eval-after-load 'rtags
+    ;; (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
+    ;; (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
+    (define-key evil-normal-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    (define-key evil-visual-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    (define-key evil-insert-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
+    (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
+    (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
 
-  ;; (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
-  ;; (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
-  (define-key evil-normal-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
-  (define-key evil-visual-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
-  (define-key evil-insert-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
-  (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
-  (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
-  (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
+    (define-key c-mode-base-map (kbd "M-<left>")
+      (function rtags-location-stack-back))
+    (define-key c-mode-base-map (kbd "M-<right>")
+      (function rtags-location-stack-forward))
 
-  (define-key c-mode-base-map (kbd "M-<left>")
-    (function rtags-location-stack-back))
-  (define-key c-mode-base-map (kbd "M-<right>")
-    (function rtags-location-stack-forward))
+    ;; rtags and eldoc, source:
+    ;; https://github.com/Andersbakken/rtags/issues/987
+    (defun fontify-string (str mode)
+      "Return STR fontified according to MODE."
+      (with-temp-buffer
+        (insert str)
+        (delay-mode-hooks (funcall mode))
+        (font-lock-default-function mode)
+        (font-lock-default-fontify-region
+         (point-min) (point-max) nil)
+        (buffer-string)))
+    (defun rtags-eldoc-function ()
+      (let ((summary (rtags-get-summary-text)))
+        (and summary
+             (fontify-string
+              (replace-regexp-in-string
+               "{[^}]*$" ""
+               (mapconcat
+                (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
+                (split-string summary "\r?\n")
+                " "))
+              major-mode))))
+    (defun rtags-eldoc-mode ()
+      (interactive)
+      (setq-local eldoc-documentation-function #'rtags-eldoc-function)
+      (eldoc-mode 1))
+    )
 
-  ;; rtags and eldoc, source:
-  ;; https://github.com/Andersbakken/rtags/issues/987
-  (defun fontify-string (str mode)
-    "Return STR fontified according to MODE."
-    (with-temp-buffer
-      (insert str)
-      (delay-mode-hooks (funcall mode))
-      (font-lock-default-function mode)
-      (font-lock-default-fontify-region
-       (point-min) (point-max) nil)
-      (buffer-string)))
-  (defun rtags-eldoc-function ()
-    (let ((summary (rtags-get-summary-text)))
-      (and summary
-           (fontify-string
-            (replace-regexp-in-string
-             "{[^}]*$" ""
-             (mapconcat
-              (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
-              (split-string summary "\r?\n")
-              " "))
-            major-mode))))
-  (defun rtags-eldoc-mode ()
-    (interactive)
-    (setq-local eldoc-documentation-function #'rtags-eldoc-function)
-    (eldoc-mode 1))
+  ;; (cmake-ide-setup)
+
+  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
+  (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will

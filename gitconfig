@@ -3,7 +3,7 @@
 	email = martin@log2.ch
 
   [color]
-    ui = auto
+	ui = true
     #ui = always
     #diff = auto
     status = always
@@ -14,10 +14,12 @@
     local = yellow
     remote = green
   [color "diff"]
-    meta = yellow bold
-    frag = magenta bold
-    old = red bold
-    new = green bold
+	meta = yellow
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	commit = yellow bold
+	whitespace = red reverse
   [color "status"]
     added = yellow
     changed = green
@@ -49,6 +51,7 @@
 
 [core]
 	excludesfile = /home/martin/.gitignore
+	pager = diff-so-fancy | less --tabs=4 -RFX
 [giggle]
 	compact-mode = false
 	main-window-maximized = false
@@ -76,3 +79,8 @@
 	default = simple
 [merge]
 	conflictstyle = diff3
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
