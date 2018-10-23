@@ -20,16 +20,16 @@ export EMAIL="Martin Renold <martin@log2.ch>"
 
 #mesg y
 
-if [ `tty` = '/dev/vc/2' ] 2>/dev/null || [ `tty` = '/dev/tty2' ] 2>/dev/null ; then
-  if [ ! -r /tmp/.X0-lock ] ; then # nur einmal bitte, xinit ruft diesen code auf
-    mesg n
-    echo "Starte xorg. Logfile: .startx.log"
-    #/usr/X11R6/bin/xinit -- -nolisten tcp > .xinit.log 2>&1
-    #export XSESSION_STARTED
-    #xinit -- -nolisten tcp > .xinit.log 2>&1
-    startx > .startx.log 2>&1
-  fi
-fi
+#if [ `tty` = '/dev/vc/2' ] 2>/dev/null || [ `tty` = '/dev/tty2' ] 2>/dev/null ; then
+#  if [ ! -r /tmp/.X0-lock ] ; then # nur einmal bitte, xinit ruft diesen code auf
+#    mesg n
+#    echo "Starte xorg. Logfile: .startx.log"
+#    #/usr/X11R6/bin/xinit -- -nolisten tcp > .xinit.log 2>&1
+#    #export XSESSION_STARTED
+#    #xinit -- -nolisten tcp > .xinit.log 2>&1
+#    startx > .startx.log 2>&1
+#  fi
+#fi
 
 # UTF-8
 #unset LC_MESSAGES LC_CTYPE LC_NUMERIC

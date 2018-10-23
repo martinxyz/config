@@ -55,6 +55,11 @@ if ! grep -q -s spacemacs .emacs.d/.git/config ; then
     echo "  git clone --branch develop https://github.com/syl20bnr/spacemacs ~/.emacs.d"
 fi
 
+# make gnome3 visual bell less annoying
+gsettings set org.gnome.desktop.wm.preferences audible-bell false  || true
+gsettings set org.gnome.desktop.wm.preferences visual-bell true  || true
+gsettings set org.gnome.desktop.wm.preferences visual-bell-type frame-flash  || true
+
 echo 
 echo "Done."
 echo -n ".gitconfig email: "

@@ -1,7 +1,8 @@
 unset PREFIX_LIST # someone seems to reset $PATH while leaving PREFIX_LIST
 source ~/scripts/bashrc_add_prefix
 
-add_prefix ~/apps
+#add_prefix ~/apps   # crashes gnome3 session, even if ~/apps does not exist
+export PATH=~/apps/bin:$PATH
 export PATH=~/bin:~/scripts:$PATH
 
 # If running interactively, then:

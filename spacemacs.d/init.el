@@ -95,7 +95,7 @@ This function should only modify configuration layer settings."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '() ; '(tern)
+   dotspacemacs-excluded-packages '() ; '(evil-search-highlight-persist)  ; '(tern)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and deletes any unused
@@ -471,7 +471,7 @@ you should place your code here."
   ; HD:
 
   ;(define-key evil-normal-state-map "t" 'evil-visual-line)
-  (define-key evil-normal-state-map "t" 'avy-goto-word-or-subword-1)
+  ; (define-key evil-normal-state-map "t" 'avy-goto-word-or-subword-1)  ; I'm not using that.
   (define-key evil-normal-state-map (kbd "<backspace>") 'evil-visual-line)
   ;(define-key evil-visual-state-map (kbd "<backspace>") 'evil-previous-line)
   (define-key evil-visual-state-map (kbd "<backspace>") 'evil-visual-line)
@@ -501,7 +501,6 @@ you should place your code here."
      (nth 5 (file-attributes f2))
      (nth 5 (file-attributes f1))))
 
-  (define-key evil-normal-state-map "T" 'cycbuf-switch-to-next-buffer)
   ;(define-key evil-normal-state-map "M" 'evil-record-macro)
   (define-key evil-normal-state-map "M" 'delete-other-windows)
   (define-key evil-normal-state-map "K" 'kill-this-buffer)
@@ -519,17 +518,22 @@ you should place your code here."
 
   ;(define-key evil-normal-state-map "v" 'ido-find-file)
   ;(define-key evil-normal-state-map "V" 'ido-switch-buffer)
-  (define-key evil-normal-state-map "v" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
+
+  ;;;; Those two I used a long time (on 'v' and 'V' originally):
+  (define-key evil-normal-state-map "F" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
+  (define-key evil-normal-state-map "V" 'counsel-projectile)
+  (define-key evil-normal-state-map "t" 'counsel-projectile)
+  (define-key evil-normal-state-map "T" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
+
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-find-file) ; a bit slow (one second)
   ; (define-key evil-normal-state-map "v" 'counsel-projectile)
   ;(define-key evil-normal-state-map "v" 'projectile-switch-to-buffer) ; fast, but project-only (too limited, but still better than mixing projects)
   ;; (define-key evil-normal-state-map "v" 'counsel-find-file) ; great (now that it's sorted by mtime again)
-  (define-key evil-normal-state-map "V" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
   ; (define-key evil-normal-state-map "v" 'projectile-find-file)
   ;(define-key evil-normal-state-map "V" 'helm-mini)
-  (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
+  ;; (define-key evil-normal-state-map ":" 'spacemacs/helm-gtags-maybe-dwim)
 
   ; experimental: use rg to get the list of project files (faster)
   ; based on https://github.com/kaushalmodi/.emacs.d/blob/master/general.el#L102
@@ -614,8 +618,8 @@ you should place your code here."
   (define-key evil-visual-state-map "\C-s" 'save-buffer)
   (define-key evil-insert-state-map "\C-s" 'save-buffer)
 
-  ; Ctrl-F is swiper-search, not evil-scroll-page-down
-  (define-key evil-normal-state-map "\C-f" 'swiper-search)
+  ; Ctrl-F is swiper search, not evil-scroll-page-down
+  (define-key evil-normal-state-map "\C-f" 'swiper)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
   ; TODO: there is dotspacemacs-visual-line-move-text -- just enable that instead?
@@ -922,6 +926,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-minimal-buffer-name-column 10)
  '(cycbuf-minimal-file-name-column 10)
  '(delete-trailing-lines nil)
+ '(evil-ex-search-persistent-highlight nil)
  '(evil-repeat-move-cursor nil)
  '(evil-surround-pairs-alist
    (quote
@@ -939,7 +944,7 @@ This function is called at the very end of Spacemacs initialization."
      (60 . evil-surround-read-tag)
      (102 . evil-surround-function))))
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#37474f")
+ '(fci-rule-color "#37474f" t)
  '(flycheck-json-python-json-executable "python3")
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pycompile-executable "python3")
