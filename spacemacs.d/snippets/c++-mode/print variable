@@ -1,4 +1,4 @@
 # key: pv
 # name: print variable
 # --
-std::cout << "$1:" << $1 << "\\n";
+std::cout << "$1:" << $1 << std::endl;

@@ -11,8 +11,10 @@ from numpy import array, zeros
 from numpy.random import randn
 import scipy.signal as signal
 
-N = 512
-fs = 44100
+# N = 512
+N = 2048 * 2
+# fs = 44100
+fs = 44100 / 2
 frame_duration = float(N)/fs
 
 outp = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK)
@@ -30,11 +32,11 @@ b, a = [0.1], [1, 0.9]
 #b,a = signal.iirdesign(wp=0.01, ws=0.4, gstop=60, gpass=1, ftype='ellip')
 
 # "fluss"
-#b,a = signal.iirdesign(wp=0.02, ws=0.4, gstop=60, gpass=1, ftype='ellip')
+b,a = signal.iirdesign(wp=0.02, ws=0.4, gstop=60, gpass=1, ftype='ellip')
 # "flugzeug"
 #b,a = signal.iirdesign(wp=0.03, ws=0.4, gstop=60, gpass=1, ftype='ellip')
 # "wasserfall"
-b,a = signal.iirdesign(wp=0.06, ws=0.8, gstop=60, gpass=1, ftype='ellip')
+#b,a = signal.iirdesign(wp=0.06, ws=0.8, gstop=60, gpass=1, ftype='ellip')
 # "gasleck"
 #b,a = signal.iirdesign(wp=0.5, ws=0.1, gstop=60, gpass=1, ftype='ellip')
 # "fieses zirpen"

@@ -1,4 +1,4 @@
 # key: p
 # name: print (debug)
 # --
-std::cout << "$0\n";
+std::cout << "$0" << std::endl;

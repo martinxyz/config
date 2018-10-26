@@ -29,7 +29,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(typescript
+   '(lua
+     typescript
      rust
      ;; not using the auto-completion layer because it rebinds <tab> in too many places, clashing with dabbrev-expand, and generally produces too much noise
      ;; (auto-completion :variables
@@ -91,6 +92,7 @@ This function should only modify configuration layer settings."
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       cmake-ide
+                                      cmake-mode
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -439,6 +441,7 @@ you should place your code here."
   ;; my own customized versions from ./patched/
   (require 'pabbrev)
   (require 'swbuff)
+  (require 'cmake-mode)
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS" "magit[-:]"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
@@ -763,19 +766,24 @@ you should place your code here."
   ; (add-to-list 'custom-theme-load-path (expand-file-name "~/config/spacemacs.d"))
 
   ; from http://blog.binchen.org/posts/easy-indentation-setup-in-emacs-for-web-development.html
-  ;(defun my-setup-indent (n)
-  ;  ;; java/c/c++
-  ;  (setq-local c-basic-offset n)
-  ;  ;; web development
-  ;  (setq-local coffee-tab-width n) ; coffeescript
-  ;  (setq-local javascript-indent-level n) ; javascript-mode
-  ;  (setq-local js-indent-level n) ; js-mode
-  ;  (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
-  ;  (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-  ;  (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
-  ;  (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
-  ;  (setq-local css-indent-offset n) ; css-mode
-  ;  )
+  (defun my-setup-indent (n)
+    ;; java/c/c++
+    (setq-local c-basic-offset n)
+    ;; web development
+    (setq-local coffee-tab-width n) ; coffeescript
+    (setq-local javascript-indent-level n) ; javascript-mode
+    (setq-local js-indent-level n) ; js-mode
+    (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+    (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+    (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
+    (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
+    (setq-local css-indent-offset n) ; css-mode
+    )
+
+  (defun my-web-indent2()
+    (interactive)
+    (my-setup-indent 2)
+    )
 
   ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
   (add-hook 'prog-mode-hook #'(lambda ()
@@ -846,7 +854,67 @@ you should place your code here."
                  (c-offsets-alist
                   (inclass . ++)
                   (access-label . -))))
-  (setq c-default-style "double-class-indent")
+  ;; source: https://raw.githubusercontent.com/google/styleguide/gh-pages/google-c-style.el
+  ;; Wrapper function needed for Emacs 21 and XEmacs (Emacs 22 offers the more
+  ;; elegant solution of composing a list of lineup functions or quantities with
+  ;; operators such as "add")
+  (defun google-c-lineup-expression-plus-4 (langelem)
+    "Indents to the beginning of the current C expression plus 4 spaces.
+
+This implements title \"Function Declarations and Definitions\"
+of the Google C++ Style Guide for the case where the previous
+line ends with an open parenthese.
+
+\"Current C expression\", as per the Google Style Guide and as
+clarified by subsequent discussions, means the whole expression
+regardless of the number of nested parentheses, but excluding
+non-expression material such as \"if(\" and \"for(\" control
+structures.
+
+Suitable for inclusion in `c-offsets-alist'."
+    (save-excursion
+      (back-to-indentation)
+      ;; Go to beginning of *previous* line:
+      (c-backward-syntactic-ws)
+      (back-to-indentation)
+      (cond
+       ;; We are making a reasonable assumption that if there is a control
+       ;; structure to indent past, it has to be at the beginning of the line.
+       ((looking-at "\\(\\(if\\|for\\|while\\)\\s *(\\)")
+        (goto-char (match-end 1)))
+       ;; For constructor initializer lists, the reference point for line-up is
+       ;; the token after the initial colon.
+       ((looking-at ":\\s *")
+        (goto-char (match-end 0))))
+      (vector (+ 4 (current-column)))))
+
+
+
+  (c-add-style "google"
+               ;; source: https://stackoverflow.com/questions/13825188/suppress-c-namespace-indentation-in-emacs
+               '("k&r"
+                 (c-basic-offset . 2)
+                 (c-offsets-alist
+                  (arglist-intro google-c-lineup-expression-plus-4)
+                  (func-decl-cont . ++)
+                  (member-init-intro . ++)
+                  (inher-intro . ++)
+                  (comment-intro . 0)
+                  (arglist-close . c-lineup-arglist)
+                  (topmost-intro . 0)
+                  (block-open . 0)
+                  (inline-open . 0)
+                  (substatement-open . 0)
+                  (statement-cont . ++)
+                  (label . /)
+                  (case-label . +)
+                  (statement-case-open . +)
+                  (statement-case-intro . +) ; case w/o {
+                  (access-label . /)
+                  (innamespace . 0))))
+
+  ; (setq c-default-style "double-class-indent")
+  (setq c-default-style "google")
 
   ;; requires: https://github.com/Andersbakken/rtags
   ;; (require 'rtags)
@@ -962,7 +1030,8 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil t)
+ '(js2-strict-trailing-comma-warning nil)
+ '(magit-revision-show-gravatars nil)
  '(magit-save-repository-buffers (quote dontask))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
