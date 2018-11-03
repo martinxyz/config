@@ -542,19 +542,9 @@ you should place your code here."
   ; experimental: use rg to get the list of project files (faster)
   ; based on https://github.com/kaushalmodi/.emacs.d/blob/master/general.el#L102
   ; and https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-projectile.el#L79
-  (defconst maxy/rg-arguments
-    `(; "--no-ignore-vcs"
-      "--line-number"
-      "--smart-case"
-      ; "--follow"                 ;Follow symlinks
-      "--max-columns" "350"      ;Emacs doesn't handle long line lengths very well
-      "--ignore-file" ,(concat "/home/" (getenv "USER") "/.ignore")))
-  (defun maxy/advice-projectile-use-rg ()
-    (mapconcat 'identity
-               ; used unaliased version of `rg': \rg
-               (append '("\\rg") maxy/rg-arguments '("--null" "--files")) " "))
-  (if (executable-find "rg")
-      (advice-add 'projectile-get-ext-command :override #'maxy/advice-projectile-use-rg))
+  ;
+  ; Moved to customize: projectile-git-command (calls rg instead of git)
+
   ;; Make the file list creation faster by NOT calling `projectile-get-sub-projects-files'
   (defun maxy/advice-projectile-no-sub-project-files ()
     "Directly call `projectile-get-ext-command'. No need to try to get a list of sub-project files if the vcs is git."
@@ -802,7 +792,8 @@ you should place your code here."
 
   ;; support .vue files
   (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (with-eval-after-load 'flycheck
+    (flycheck-add-mode 'javascript-eslint 'web-mode))
 
   ;; use the current project's eslint binary
   ;; source: https://emacs.stackexchange.com/a/21207/12292
@@ -833,12 +824,6 @@ you should place your code here."
   ;;   ; (spacemacs/load-theme 'sanityinc-tomorrow-night))
   ;;   (spacemacs/load-theme 'sanityinc-tomorrow-night))
   ;; (run-with-idle-timer 10 nil 'my-after-startup-function)
-
-  ; collapse "untracked files" section by default
-  (defun local-magit-initially-hide-untracked (section)
-    (if (eq (magit-section-type section) 'untracked) 'hide))
-  (add-hook 'magit-section-set-visibility-hook
-            'local-magit-initially-hide-untracked)
 
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
@@ -1031,9 +1016,10 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil)
+ '(js2-strict-trailing-comma-warning nil t)
  '(magit-revision-show-gravatars nil)
  '(magit-save-repository-buffers (quote dontask))
+ '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
@@ -1041,6 +1027,7 @@ This function is called at the very end of Spacemacs initialization."
     (magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link)))
  '(projectile-completion-system (quote ido))
  '(projectile-enable-caching nil)
+ '(projectile-git-command "rg --files --null")
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote
