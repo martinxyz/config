@@ -63,7 +63,7 @@ This function should only modify configuration layer settings."
      colors
      ; (colors :variables colors-enable-nyan-cat-progress-bar t) ; no, no, no.
 
-     gtags ; does not seem to do any good (because not using helm, maybe)
+     ; gtags ; does not seem to do any good (because not using helm, maybe)  -- actually does harm, quite intrusive, rtags is better
 
      (c-c++ :variables ; huh, this layer only adds "disaster" mode and not much else?
             c-c++-enable-clang-support t)
@@ -74,6 +74,8 @@ This function should only modify configuration layer settings."
 
      ;react
      ;restclient
+     (cmake :variables cmake-enable-cmake-ide-support t)
+
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -948,9 +950,9 @@ Suitable for inclusion in `c-offsets-alist'."
     )
 
   ;; (cmake-ide-setup)
-
-  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
-  (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
