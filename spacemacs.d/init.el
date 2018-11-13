@@ -1036,6 +1036,7 @@ This function is called at the very end of Spacemacs initialization."
     (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
  '(py-shell-name "python3")
+ '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    (quote
     ((eval progn

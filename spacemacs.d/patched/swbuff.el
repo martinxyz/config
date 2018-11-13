@@ -439,7 +439,7 @@ Run as a `pre-command-hook'."
 (defun swbuff-next-buffer ()
   "Display and activate the next buffer in the buffer list."
   (let ((l (nreverse (swbuff-buffer-list))))
-    (while (cdr l)
+    (while (cdr l)  ; Gah! This is visiting every buffer, triggering many unnecessary hooks.
       (switch-to-buffer (car l))
       (setq l (cdr l)))))
 
