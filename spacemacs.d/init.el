@@ -446,10 +446,8 @@ you should place your code here."
   (require 'cmake-mode)
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS" "magit[-:]"))
-  ; (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
-  ; (define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
-  (define-key evil-normal-state-map "q" 'cycbuf-switch-to-next-buffer)
-  (define-key evil-normal-state-map "Q" 'cycbuf-switch-to-previous-buffer)
+  (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
+  (define-key evil-normal-state-map "Q" 'swbuff-switch-to-previous-buffer)
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)

@@ -46,9 +46,7 @@
 ;; discarded after any command is executed or after the delay
 ;; specified by `swbuff-clear-delay'.
 ;;
-;; The bufferlist is sorted by how recently the buffers were used.  If
-;; you prefer a fixed (cyclic) order set `swbuff-recent-buffers-first'
-;; to nil.
+;; The bufferlist is sorted by how recently the buffers were used.
 ;;
 ;; When the status window disappears because of the clear-delay you
 ;; still stay in switching mode.  The timeout is only a visual
@@ -113,14 +111,6 @@ timeout.  But if you prefer so set it to t."
 If non-nil, the buffer where switching started will be the leftmost in
 the list.  Otherwise it will be the buffer the first command switched
 to."
-  :group 'swbuff
-  :type 'boolean)
-
-(defcustom swbuff-recent-buffers-first t
-  "*Show recent buffers first?
-If non-nil the buffer list is sorted by how recently the buffers were
-used.  If nil, it is as a cyclic list with fixed order.  Note that
-other commands (switch-to-buffer) still change the order."
   :group 'swbuff
   :type 'boolean)
 
@@ -308,6 +298,9 @@ Ignore WINDOW and the minibuffer window."
 (defvar swbuff-buffer-list-holder nil
   "Hold the current displayed buffer list.")
 
+(defvar swbuff-buffer-list-tumbler nil
+  "Hold the rotated list of buffers while switching, selected first.")
+
 (defun swbuff-layout-status-line (window bcurr)
   "Layout a status line in WINDOW current buffer.
 BCURR is the buffer name to highlight."
@@ -399,18 +392,15 @@ delay specified by `swbuff-clear-delay'."
 (defun swbuff-start-switching ()
   "Make sure swbuff-buffer-list-holder is set before proceeding."
   (or swbuff-buffer-list-holder
-      (setq swbuff-buffer-list-holder (swbuff-buffer-list))))
+      (progn
+        (setq swbuff-buffer-list-holder (swbuff-buffer-list))
+        (setq swbuff-buffer-list-tumbler swbuff-buffer-list-holder))))
 
 (defun swbuff-end-switching ()
   "Called when the buffer finally is choosen."
-  (if swbuff-recent-buffers-first
-      (let ((bcurr (current-buffer))
-            (l (nreverse swbuff-buffer-list-holder)))
-        (while l
-          (switch-to-buffer (car l))
-          (setq l (cdr l)))
-        (switch-to-buffer bcurr)))
-  (setq swbuff-buffer-list-holder nil))
+  (switch-to-buffer (current-buffer) nil) ; note: without NORECORD
+  (setq swbuff-buffer-list-holder nil)
+  (setq swbuff-buffer-list-tumbler nil))
 
 (defun swbuff-clear-delay-hook ()
   (swbuff-discard-status-window)
@@ -433,15 +423,18 @@ Run as a `pre-command-hook'."
 
 (defun swbuff-previous-buffer ()
   "Display and activate the buffer at the end of the buffer list."
-  (let ((l (swbuff-buffer-list)))
-    (and l (switch-to-buffer (nth (1- (length l)) l)))))
+  (setq swbuff-buffer-list-tumbler
+        (nconc (last swbuff-buffer-list-tumbler)
+               (butlast swbuff-buffer-list-tumbler)))
+  (switch-to-buffer (car swbuff-buffer-list-tumbler) 't))
 
 (defun swbuff-next-buffer ()
   "Display and activate the next buffer in the buffer list."
-  (let ((l (nreverse (swbuff-buffer-list))))
-    (while (cdr l)  ; Gah! This is visiting every buffer, triggering many unnecessary hooks.
-      (switch-to-buffer (car l))
-      (setq l (cdr l)))))
+  (setq swbuff-buffer-list-tumbler
+        (append (cdr swbuff-buffer-list-tumbler)
+                (cons (car swbuff-buffer-list-tumbler) ())))
+  (switch-to-buffer (car swbuff-buffer-list-tumbler) 't))
+
 
 ;;; Commands
 ;;
