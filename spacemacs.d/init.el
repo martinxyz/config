@@ -616,6 +616,7 @@ you should place your code here."
 
   ; Ctrl-F is swiper search, not evil-scroll-page-down
   (define-key evil-normal-state-map "\C-f" 'swiper)
+  (define-key evil-normal-state-map "/" 'swiper)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
   ; TODO: there is dotspacemacs-visual-line-move-text -- just enable that instead?
@@ -675,8 +676,10 @@ you should place your code here."
   (define-key yas-keymap (kbd "C-<return>") 'yas-next-field)
   (define-key yas-keymap (kbd "<return>") 'yas-next-field)
 
-  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)  ; C-c p a
-  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)  ; C-c p a
+  (define-key evil-insert-state-map (kbd "C-<tab>") 'pabbrev-expand-maybe)
+
+  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)
+  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)
   (spacemacs/set-leader-keys "ph" 'projectile-find-other-file)  ; there is already test/impl: SPC p a
 
   ; pager module doesn't work well with visual-line
