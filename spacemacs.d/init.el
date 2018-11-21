@@ -1054,6 +1054,7 @@ This function is called at the very end of Spacemacs initialization."
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
+ '(swbuff-status-window-layout (quote adjust))
  '(swbuff-window-min-text-height 2)
  '(tab-width 4)
  '(tramp-mode nil)

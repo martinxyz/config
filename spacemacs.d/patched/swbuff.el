@@ -330,9 +330,8 @@ BCURR is the buffer name to highlight."
                 start (point)
                 fillr (if blist separ trail))
           (when (and adjust
-                     (> (- (+ start (length bname) (length fillr))
-                           (* lines width))
-                        width))
+                     (> (+ start (length bname) (length fillr))
+                        (+ (line-beginning-position) width)))
             (newline)
             (setq start (point)
                   lines (1+ lines)))
