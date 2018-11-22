@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pv
+# key: pv
+# --
+print('$1:', $1)
