@@ -725,9 +725,6 @@ you should place your code here."
                      (abbreviate-file-name (buffer-file-name))
                    "%b"))))
 
-  ;; http://stackoverflow.com/questions/898401/how-to-get-focus-follows-mouse-over-buffers-in-emacs
-  (setq mouse-autoselect-window t)
-
   ;; get rid of compilation window on success
   ;; source: http://www.bloomington.in.us/~brutt/emacs-c-dev.html [dead link]
   ;; (setq compilation-finish-function
@@ -1009,6 +1006,7 @@ This function is called at the very end of Spacemacs initialization."
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pycompile-executable "python3")
  '(flycheck-python-pylint-executable "python3")
+ '(git-commit-fill-column 72)
  '(global-pabbrev-mode t)
  '(global-whitespace-mode t)
  '(hl-sexp-background-color "#1c1f26")
@@ -1057,7 +1055,7 @@ This function is called at the very end of Spacemacs initialization."
  '(swbuff-status-window-layout (quote adjust))
  '(swbuff-window-min-text-height 2)
  '(tab-width 4)
- '(tramp-mode nil)
+ '(tramp-mode nil nil (tramp))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
