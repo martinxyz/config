@@ -1,0 +1,18 @@
+#!/bin/bash
+if ! test -d ~/compile/FlameGraph; then
+  echo 'please "install" FlameGraph like this:'
+  echo 'cd ~/compile && git clone https://github.com/brendangregg/FlameGraph'
+  exit 1
+fi
+export PATH=~/compile/FlameGraph/:$PATH
+
+if ! test -f perf.data ; then
+  echo 'perf.data missing; please run perf like this:'
+  echo 'perf record -g ./your-app'
+  exit 1
+fi
+
+if perf script | stackcollapse-perf.pl | flamegraph.pl > perf.svg ; then
+  sensible-browser perf.svg
+fi
+

@@ -530,6 +530,8 @@ you should place your code here."
   (define-key evil-normal-state-map "V" 'counsel-projectile)
   (define-key evil-normal-state-map "t" 'counsel-projectile)
   (define-key evil-normal-state-map "T" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
+  (define-key evil-normal-state-map "\C-t" 'ivy-switch-buffer)
+  (define-key evil-normal-state-map "z" 'ivy-switch-buffer)
 
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
@@ -950,9 +952,14 @@ Suitable for inclusion in `c-offsets-alist'."
     )
 
   ;; (cmake-ide-setup)
-  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+  (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
+
+  (with-eval-after-load "flycheck"
+    (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
+                                    "no-pragma-once-outside-header")))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will

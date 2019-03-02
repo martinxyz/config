@@ -60,8 +60,15 @@ gsettings set org.gnome.desktop.wm.preferences audible-bell false  || true
 gsettings set org.gnome.desktop.wm.preferences visual-bell true  || true
 gsettings set org.gnome.desktop.wm.preferences visual-bell-type frame-flash  || true
 
+gsettings set org.pantheon.desktop.gala.behavior dynamic-workspaces false
+gsettings set org.gnome.desktop.wm.preferences num-workspaces 4
+
+dconf write /org/gnome/mutter/workspaces-only-on-primary false
+dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
+
 echo 
 echo "Done."
+
 echo -n ".gitconfig email: "
 grep email\ = ~/.gitconfig | sed -e 's/.*=.//'
 
