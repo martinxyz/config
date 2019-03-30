@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Hack to get a more useful (IMHO) "git branch" style summary.
 
 Output is sorted by usage (recently modified branches last) and
@@ -25,7 +25,7 @@ if gray:
 os.environ['GIT_PAGER'] = ''
 
 try:
-    output = subprocess.check_output(cmd.split())
+    output = subprocess.check_output(cmd.split()).decode('utf8')
 except subprocess.CalledProcessError:
     sys.exit(1)
 
@@ -54,5 +54,5 @@ for line in output.split('\n'):
         parts = [ss.replace(',', '') for ss in parts if 'HEAD' not in ss and '->' not in ss]
         parts.sort(key=lambda x: x.count('/'))
         s += ', '.join(parts)
-    print s + '\x1b[0m'
+    print(s + '\x1b[0m')
 
