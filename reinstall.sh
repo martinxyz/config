@@ -55,6 +55,11 @@ if ! grep -q -s spacemacs .emacs.d/.git/config ; then
     echo "  git clone --branch develop https://github.com/syl20bnr/spacemacs ~/.emacs.d"
 fi
 
+if ! dpkg -l dconf-editor > /dev/null ; then
+  echo "TODO:"
+  echo "sudo apt-get install dconf-editor"
+fi
+
 # make gnome3 visual bell less annoying
 gsettings set org.gnome.desktop.wm.preferences audible-bell false  || true
 gsettings set org.gnome.desktop.wm.preferences visual-bell true  || true
@@ -62,6 +67,8 @@ gsettings set org.gnome.desktop.wm.preferences visual-bell-type frame-flash  || 
 
 gsettings set org.pantheon.desktop.gala.behavior dynamic-workspaces false
 gsettings set org.gnome.desktop.wm.preferences num-workspaces 4
+
+gsettings set org.gnome.desktop.background show-desktop-icons false
 
 dconf write /org/gnome/mutter/workspaces-only-on-primary false
 dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false

@@ -94,4 +94,8 @@ keycode  59 = comma semicolon comma semicolon braceright braceright braceright
 keycode  60 = period colon period colon colon colon colon colon
 keycode  61 = minus underscore minus underscore underscore underscore underscore underscore
 
+! For some unknown reason, F7 / F8 on the kinesis send Mail / HomePage keycodes
+! (And, they also keep repeating after released.) (Just on one keyboards.)
+!keycode  180 = F7 F7 F7 F7 F7 F7 XF86Switch_VT_7
+!keycode  163 = F8 F8 F8 F8 F8 F8 XF86Switch_VT_8
 

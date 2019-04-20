@@ -29,7 +29,9 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(lua
+   '(systemd
+     yaml
+     lua
      typescript
      rust
      ;; not using the auto-completion layer because it rebinds <tab> in too many places, clashing with dabbrev-expand, and generally produces too much noise
@@ -95,6 +97,8 @@ This function should only modify configuration layer settings."
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       cmake-ide
                                       cmake-mode
+                                      qml-mode
+                                      protobuf-mode
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -451,6 +455,7 @@ you should place your code here."
   ; does not work: (define-key evil-normal-state-map "C-q" 'evil-record-macro)
   ; or maybe start using "SCP o" for my custom stuff:
   (spacemacs/set-leader-keys "oq" 'evil-record-macro)
+  (spacemacs/set-leader-keys "op" 'org-projectile/goto-todos)
 
   (defun maxy-show-manpage ()
     (interactive)
@@ -666,22 +671,31 @@ you should place your code here."
 
   ; org-mode should not override tab in insert-mode
   (with-eval-after-load 'org
-    (define-key org-mode-map (kbd "<tab>") 'pabbrev-expand-maybe))
+    ;; (define-key org-mode-map (kbd "<tab>") 'pabbrev-expand-maybe)
+    ; tab completion should take precedence
+    (define-key org-mode-map (kbd "<tab>") nil)
+    ;; (define-key org-mode-map (kbd "TAB") nil)
+    ;(define-key orgtbl-mode-map (kbd "<tab>") nil)  ; void-variable orgtbl-mode-map
+    ;; (define-key orgtbl-mode-map (kbd "TAB") nil)
+    )
+
+  (require 'qml-mode)
+  (require 'protobuf-mode)
 
   (require 'yasnippet)
   (yas-global-mode 1)
   (define-key yas-minor-mode-map [(tab)]        nil)
-  (define-key yas-minor-mode-map (kbd "TAB")    nil)
+  ;; (define-key yas-minor-mode-map (kbd "TAB")    nil)
   (define-key yas-minor-mode-map (kbd "<tab>")  nil)
-  (define-key yas-minor-mode-map (kbd "C-<return>") 'yas-expand)
+  (define-key yas-minor-mode-map (kbd "<C-return>") 'yas-expand)
   (define-key yas-keymap (kbd "<tab>") 'pabbrev-expand-maybe)
-  (define-key yas-keymap (kbd "C-<return>") 'yas-next-field)
+  (define-key yas-keymap (kbd "<C-return>") 'yas-next-field)
   (define-key yas-keymap (kbd "<return>") 'yas-next-field)
 
-  (define-key evil-insert-state-map (kbd "C-<tab>") 'pabbrev-expand-maybe)
+  (define-key evil-insert-state-map (kbd "<C-tab>") 'pabbrev-expand-maybe)
 
-  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)
-  (define-key evil-normal-state-map (kbd "C-<tab>") 'projectile-find-other-file)
+  (define-key evil-normal-state-map (kbd "<C-tab>") 'projectile-find-other-file)
+  (define-key evil-normal-state-map (kbd "<C-tab>") 'projectile-find-other-file)
   (spacemacs/set-leader-keys "ph" 'projectile-find-other-file)  ; there is already test/impl: SPC p a
 
   ; pager module doesn't work well with visual-line
@@ -780,6 +794,11 @@ you should place your code here."
     (my-setup-indent 2)
     )
 
+  (defun my/json-mode-hook ()
+    (setq tab-width 2))
+  (add-hook 'json-mode-hook 'my/js2-mode-hook)
+  ; or js-indent-level actually?
+
   ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
   (add-hook 'prog-mode-hook #'(lambda ()
                                 (dtrt-indent-mode)
@@ -801,16 +820,21 @@ you should place your code here."
 
   ;; use the current project's eslint binary
   ;; source: https://emacs.stackexchange.com/a/21207/12292
-  (defun my/use-eslint-from-node-modules ()
+  (defun my/use-linter-from-node-modules ()
     (let* ((root (locate-dominating-file
                   (or (buffer-file-name) default-directory)
                   "node_modules"))
            (eslint (and root
                         (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                          root)))
+           (tslint (and root
+                        (expand-file-name "node_modules/tslint/bin/tslint"
                                           root))))
       (when (and eslint (file-executable-p eslint))
-        (setq-local flycheck-javascript-eslint-executable eslint))))
-  (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+        (setq-local flycheck-javascript-eslint-executable eslint))
+      (when (and tslint (file-executable-p tslint))
+        (setq-local flycheck-typescript-tslint-executable tslint))))
+  (add-hook 'flycheck-mode-hook #'my/use-linter-from-node-modules)
 
   ; watch out for trouble on large files, maybe?
   ; nope, trouble is not large files, but it's too distracting
@@ -908,15 +932,29 @@ Suitable for inclusion in `c-offsets-alist'."
 
   ;; requires: https://github.com/Andersbakken/rtags
   ;; (require 'rtags)
+
+  (define-key evil-normal-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
+  (define-key evil-visual-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
+  (define-key evil-insert-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
+  (define-key evil-normal-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
+  (define-key evil-visual-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
+  (define-key evil-insert-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
+  ;; (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
+  ;; (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
+  ;; (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
+
+
   (with-eval-after-load 'rtags
     ;; (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
     ;; (spacemacs/set-leader-keys "od" 'ggtags-find-tag-dwim)
-    (define-key evil-normal-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
-    (define-key evil-visual-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
-    (define-key evil-insert-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    ;; (define-key evil-normal-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    ;; (define-key evil-visual-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
+    ;; (define-key evil-insert-state-map (kbd "M-.") 'rtags-find-symbol-at-point)
     (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
     (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
     (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
+
+    (define-key evil-normal-state-map (kbd ":") 'rtags-find-symbol-at-point)
 
     (define-key c-mode-base-map (kbd "M-<left>")
       (function rtags-location-stack-back))
@@ -1028,6 +1066,8 @@ This function is called at the very end of Spacemacs initialization."
      (t))))
  '(js2-strict-missing-semi-warning nil)
  '(js2-strict-trailing-comma-warning nil t)
+ '(magit-diff-refine-hunk t)
+ '(magit-diff-refine-ignore-whitespace nil)
  '(magit-revision-show-gravatars nil)
  '(magit-save-repository-buffers (quote dontask))
  '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
@@ -1044,6 +1084,31 @@ This function is called at the very end of Spacemacs initialization."
    (quote
     (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
+ '(projectile-other-file-alist
+   (quote
+    (("cpp" "h" "hpp" "ipp")
+     ("ipp" "h" "hpp" "cpp")
+     ("hpp" "h" "ipp" "cpp" "cc")
+     ("cxx" "h" "hxx" "ixx")
+     ("ixx" "h" "hxx" "cxx")
+     ("hxx" "h" "ixx" "cxx")
+     ("c" "h")
+     ("m" "h")
+     ("mm" "h")
+     ("h" "c" "cc" "cpp" "ipp" "hpp" "cxx" "ixx" "hxx" "m" "mm")
+     ("cc" "h" "hh" "hpp")
+     ("hh" "cc")
+     ("vert" "frag")
+     ("frag" "vert")
+     (nil "lock" "gpg")
+     ("lock" "")
+     ("gpg" "")
+     ("html" "css" "js" "ts")
+     ("ts" "html")
+     ("js" "html")
+     ("component.ts" "component.html")
+     ("component.css" "component.html")
+     ("component.html" "component.css" "component.js" "component.ts"))))
  '(py-shell-name "python3")
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
@@ -1085,6 +1150,7 @@ This function is called at the very end of Spacemacs initialization."
      (340 . "#fff59d")
      (360 . "#8bc34a"))))
  '(vc-annotate-very-old-color nil)
+ '(web-mode-auto-close-style 2)
  '(whitespace-style
    (quote
     (face tabs space-before-tab::tab space-before-tab tab-mark)))
@@ -1113,6 +1179,8 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-current-face ((t (:background "dim gray" :weight bold))))
  '(cycbuf-header-face ((t (:foreground "yellow" :weight bold))))
  '(cycbuf-uniquify-face ((t (:foreground "dodger blue"))))
+ '(diff-refine-added ((t (:background "#134019" :foreground "nil"))))
+ '(diff-refine-removed ((t (:background "#442a18" :foreground "nil"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
  '(flx-highlight-face ((t (:inherit font-lock-variable-name-face :weight bold))))
  '(flycheck-error ((t (:underline (:color "#af1010" :style wave)))))

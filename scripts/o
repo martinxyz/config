@@ -1,3 +1,8 @@
 #!/bin/bash
-okular "$@"
-
+if [ $# -eq 0 ] ; then
+    okular
+elif test -r "$1"; then
+    okular "$1"
+else
+    echo "cannot open '$1'"
+fi
