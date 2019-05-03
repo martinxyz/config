@@ -669,15 +669,14 @@ you should place your code here."
   ;; (advice-add 'spacemacs/emmet-expand :override #'pabbrev-expand-maybe)
   ;; (advice-add 'emmet-expand :override #'pabbrev-expand-maybe)  ; TAB key in html-mode
 
-  ; org-mode should not override tab in insert-mode
+  (defun noop () (interactive))
+
+  ;; org-mode should not override tab in insert-mode
   (with-eval-after-load 'org
-    ;; (define-key org-mode-map (kbd "<tab>") 'pabbrev-expand-maybe)
-    ; tab completion should take precedence
-    (define-key org-mode-map (kbd "<tab>") nil)
-    ;; (define-key org-mode-map (kbd "TAB") nil)
-    ;(define-key orgtbl-mode-map (kbd "<tab>") nil)  ; void-variable orgtbl-mode-map
-    ;; (define-key orgtbl-mode-map (kbd "TAB") nil)
-    )
+    (define-key org-mode-map (kbd "<tab>") nil))
+  ;; override spacemacs hook: orgtbl steals my <tab> key
+  (with-eval-after-load 'markdown-mode
+    (remove-hook 'markdown-mode-hook 'orgtbl-mode))
 
   (require 'qml-mode)
   (require 'protobuf-mode)
@@ -1068,9 +1067,10 @@ This function is called at the very end of Spacemacs initialization."
  '(js2-strict-trailing-comma-warning nil t)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
- '(magit-revision-show-gravatars nil)
+ '(magit-revision-show-gravatars nil t)
  '(magit-save-repository-buffers (quote dontask))
  '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
+ '(markdown-indent-function (quote noop))
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages

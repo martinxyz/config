@@ -1094,13 +1094,12 @@ The command `pabbrev-show-previous-binding' prints this out."
 
 
 (defun pabbrev-suggestions-goto-buffer(suggestion-list)
-  "Jump into the suggestions buffer."
-  ;;  (if pabbrev-suggestions-buffer-enable
-  ;;    (pabbrev-suggestions-delete-window))
-  (setq pabbrev-window-configuration (current-window-configuration))
-  (pabbrev-suggestions-buffer suggestion-list "")
-  (shrink-window-if-larger-than-buffer
-   (select-window (get-buffer-window " *pabbrev suggestions*"))))
+  "NEVER Jump into the suggestions buffer."
+  ;; (setq pabbrev-window-configuration (current-window-configuration))
+  ;; (pabbrev-suggestions-buffer suggestion-list "")
+  ;; (shrink-window-if-larger-than-buffer
+  ;;  (select-window (get-buffer-window " *pabbrev suggestions*"))))
+)
 
 (defvar pabbrev-suggestions-from-buffer nil)
 (defvar pabbrev-suggestions-done-suggestions nil)
