@@ -678,6 +678,12 @@ you should place your code here."
   (with-eval-after-load 'markdown-mode
     (remove-hook 'markdown-mode-hook 'orgtbl-mode))
 
+  ;; the tab key belongs to me, damn it!
+  (with-eval-after-load 'company
+    (message "eval-after-load COMPANY okay")
+    (define-key company-active-map (kbd "TAB") nil)
+    (define-key company-active-map (kbd "<tab>") nil))
+
   (require 'qml-mode)
   (require 'protobuf-mode)
 
@@ -1015,6 +1021,8 @@ This function is called at the very end of Spacemacs initialization."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(company-dabbrev-downcase nil)
+ '(company-dabbrev-ignore-case nil)
  '(compilation-ask-about-save nil)
  '(custom-safe-themes
    (quote
@@ -1064,7 +1072,7 @@ This function is called at the very end of Spacemacs initialization."
      (org-refile)
      (t))))
  '(js2-strict-missing-semi-warning nil)
- '(js2-strict-trailing-comma-warning nil t)
+ '(js2-strict-trailing-comma-warning nil)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
  '(magit-revision-show-gravatars nil t)

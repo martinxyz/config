@@ -24,6 +24,8 @@ for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmi
   symlink config/$i .$i
 done
 
+symlink ~/config/flake8 ~/.config/
+
 if [ -d scripts/.svn ] ; then
     echo 'Move ~/scripts out of the way!'
 fi
