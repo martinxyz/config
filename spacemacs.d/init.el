@@ -678,11 +678,18 @@ you should place your code here."
   (with-eval-after-load 'markdown-mode
     (remove-hook 'markdown-mode-hook 'orgtbl-mode))
 
-  ;; the tab key belongs to me, damn it!
   (with-eval-after-load 'company
-    (message "eval-after-load COMPANY okay")
+    ;; the tab key belongs to me, damn it!
     (define-key company-active-map (kbd "TAB") nil)
-    (define-key company-active-map (kbd "<tab>") nil))
+    (define-key company-active-map (kbd "<tab>") nil)
+
+    (delete 'company-dabbrev company-backends)
+    ;; (delete 'company-files company-backends) ; way too slow in $HOME
+    )
+  ;; (with-eval-after-load 'core-auto-completion
+  ;;   (delete 'company-files spacemacs-default-company-backends)
+  ;;   )
+
 
   (require 'qml-mode)
   (require 'protobuf-mode)
@@ -765,19 +772,6 @@ you should place your code here."
   (setq select-enable-primary t)
   ; fix pasting over visual selection, see https://github.com/syl20bnr/spacemacs/issues/4685#issuecomment-278076373
   (fset 'evil-visual-update-x-selection 'ignore)
-
-  ;(delete 'company-dabbrev company-backends)
-  ;(delete 'company-files company-backends) ; way too slow in $HOMe
-
-  ;; (with-eval-after-load 'core-auto-completion
-  ;;   ; way too when showing $HOME
-  ;;   (delete 'company-files spacemacs-default-company-backends)
-  ;;   )
-
-  ; (with-eval-after-load 'company
-  ; (add-to-list 'company-backends 'company-elm))
-
-  ; (add-to-list 'custom-theme-load-path (expand-file-name "~/config/spacemacs.d"))
 
   ; from http://blog.binchen.org/posts/easy-indentation-setup-in-emacs-for-web-development.html
   (defun my-setup-indent (n)
@@ -1075,7 +1069,7 @@ This function is called at the very end of Spacemacs initialization."
  '(js2-strict-trailing-comma-warning nil)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
- '(magit-revision-show-gravatars nil t)
+ '(magit-revision-show-gravatars nil)
  '(magit-save-repository-buffers (quote dontask))
  '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
  '(markdown-indent-function (quote noop))
@@ -1202,6 +1196,7 @@ This function is called at the very end of Spacemacs initialization."
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil))))
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
+ '(ivy-current-match ((t (:inherit highlight :foreground "#b5bd68" :underline nil))))
  '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
  '(match ((t (:background "#1d1f21" :foreground "#ADD9FF" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
