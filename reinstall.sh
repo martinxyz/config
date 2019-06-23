@@ -24,7 +24,10 @@ for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmi
   symlink config/$i .$i
 done
 
-symlink ~/config/flake8 ~/.config/
+symlink ~/config/flake8 ~/.config/flake8
+
+mkdir -p ~/.ipython/profile_default/startup
+symlink ~/config/ipython-startup/60-import-stuff.py ~/.ipython/profile_default/startup/60-import-stuff.py
 
 if [ -d scripts/.svn ] ; then
     echo 'Move ~/scripts out of the way!'

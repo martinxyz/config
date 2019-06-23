@@ -1,4 +1,3 @@
 #!/bin/sh
-ipython3 --no-banner --TerminalInteractiveShell.confirm_exit=False
+ipython3 --no-banner --TerminalInteractiveShell.confirm_exit=False "$@"
 
-# --pylab=auto  # slow
