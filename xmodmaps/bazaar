@@ -22,6 +22,7 @@ keycode  21 = asciicircum grave asciicircum grave asciitilde ogonek
 ! "dead keys" fuer ¨
 !keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam
 keycode  35 = dead_diaeresis exclam dead_diaeresis exclam exclam bracketright dead_macron
+keycode  34 = dead_acute dead_grave dead_acute dead_grave dead_grave
 
 ! shift + shift = ShiftLock (CapsLock replacement)
 keycode 50 =  Shift_L Shift_Lock

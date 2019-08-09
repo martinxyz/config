@@ -53,6 +53,7 @@ This function should only modify configuration layer settings."
      git
      markdown
      org
+     neotree  ; the new default is treemacs, which I wasn't able to get used to
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -997,6 +998,9 @@ Suitable for inclusion in `c-offsets-alist'."
   (with-eval-after-load "flycheck"
     (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
                                     "no-pragma-once-outside-header")))
+
+  ; maybe helps against hangups, https://github.com/proofit404/anaconda-mode/issues/169
+  (setq url-http-attempt-keepalives nil)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
