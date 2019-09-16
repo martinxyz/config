@@ -1001,6 +1001,15 @@ Suitable for inclusion in `c-offsets-alist'."
 
   ; maybe helps against hangups, https://github.com/proofit404/anaconda-mode/issues/169
   (setq url-http-attempt-keepalives nil)
+
+
+  ; http://trey-jackson.blogspot.com/2010/04/emacs-tip-36-abort-minibuffer-when.html
+  (defun stop-using-minibuffer ()
+    "kill the minibuffer"
+    (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+      (abort-recursive-edit)))
+  (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
+
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
