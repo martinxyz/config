@@ -995,6 +995,19 @@ Suitable for inclusion in `c-offsets-alist'."
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
 
+  ; GCC has no way of suppressing the "#pragma once in main file" warning,
+  ; and flycheck has no (non-internal) way to ignore some errors.
+  (defun my-filter-pragma-once-in-main (orig-fun errors)
+    (dolist (err errors)
+      (-when-let (message (flycheck-error-message err))
+        (setf (flycheck-error-message err)
+              (if (string-match-p "#pragma once in main file" message) nil message))
+        ))
+    (funcall orig-fun errors))
+  (with-eval-after-load "flycheck"
+    (advice-add 'flycheck-sanitize-errors :around #'my-filter-pragma-once-in-main))
+
+  ; same for clang
   (with-eval-after-load "flycheck"
     (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
                                     "no-pragma-once-outside-header")))
