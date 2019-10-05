@@ -1041,9 +1041,6 @@ This function is called at the very end of Spacemacs initialization."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
- '(cmake-ide-header-no-flags t)
- '(cmake-ide-header-search-first-including nil)
- '(cmake-ide-header-search-other-file nil)
  '(company-dabbrev-downcase nil)
  '(company-dabbrev-ignore-case nil)
  '(compilation-ask-about-save nil)
