@@ -997,14 +997,14 @@ Suitable for inclusion in `c-offsets-alist'."
 
   ; GCC has no way of suppressing the "#pragma once in main file" warning,
   ; and flycheck has no (non-internal) way to ignore some errors.
-  (defun my-filter-pragma-once-in-main (orig-fun errors)
-    (dolist (err errors)
-      (-when-let (message (flycheck-error-message err))
-        (setf (flycheck-error-message err)
-              (if (string-match-p "#pragma once in main file" message) nil message))
-        ))
-    (funcall orig-fun errors))
   (with-eval-after-load "flycheck"
+    (eval-when-compile (require 'flycheck))  ; for flycheck-error struct
+    (defun my-filter-pragma-once-in-main (orig-fun errors)
+      (dolist (err errors)
+        (-when-let (msg (flycheck-error-message err))
+          (setf (flycheck-error-message err)
+                (if (string-match-p "#pragma once in main file" msg) nil msg))))
+      (funcall orig-fun errors))
     (advice-add 'flycheck-sanitize-errors :around #'my-filter-pragma-once-in-main))
 
   ; same for clang
@@ -1098,7 +1098,7 @@ This function is called at the very end of Spacemacs initialization."
  '(js2-strict-trailing-comma-warning nil t)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
- '(magit-revision-show-gravatars nil)
+ '(magit-revision-show-gravatars nil t)
  '(magit-save-repository-buffers (quote dontask))
  '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
  '(markdown-indent-function (quote noop))
@@ -1113,7 +1113,7 @@ This function is called at the very end of Spacemacs initialization."
  '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-globally-ignored-directories
    (quote
-    (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages")))
+    (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages" ".pyc" "__pycache__")))
  '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
  '(projectile-other-file-alist
    (quote
@@ -1144,7 +1144,9 @@ This function is called at the very end of Spacemacs initialization."
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    (quote
-    ((eval progn
+    ((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
+     (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")
+     (eval progn
            (add-to-list
             (quote exec-path)
             (concat

@@ -59,10 +59,13 @@ export HISTSIZE=160000
 shopt -s histreedit
 shopt -s histappend
 
-export EDITOR=vim
-export VISUAL=vim
-export CVS_EDITOR=vim
-export CVS_RSH=ssh
+if which nvim > /dev/null; then
+   export EDITOR=nvim
+   export VISUAL=nvim
+else
+   export EDITOR=vim
+   export VISUAL=vim
+fi
 export RSYNC_RSH=ssh
 # export SHELL=bash
 export SHELL=/bin/bash
