@@ -88,7 +88,6 @@ if [ -e /usr/share/bash-completion/completions/git ]; then
   . /usr/share/bash-completion/completions/git
 fi
 
-. ~/scripts/bash-completion-eg.sh
 complete -o bashdefault -o default -o nospace -F _git i
 
 ~/scripts/calshow.py
