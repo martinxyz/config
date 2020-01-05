@@ -77,7 +77,8 @@ This function should only modify configuration layer settings."
 
      ;react
      ;restclient
-     (cmake :variables cmake-enable-cmake-ide-support t)
+     lsp
+     ;; (cmake :variables cmake-enable-cmake-ide-support t)
 
      )
    ;; List of additional packages that will be installed without being
@@ -104,7 +105,8 @@ This function should only modify configuration layer settings."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '() ; '(evil-search-highlight-persist)  ; '(tern)
+   dotspacemacs-excluded-packages '(importmagic)  ; importmagic uses too much RAM for too little gain
+                                        ; '(evil-search-highlight-persist)  ; '(tern)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and deletes any unused
@@ -234,7 +236,7 @@ It should only modify the values of Spacemacs settings."
    ;; and TAB or `C-m' and `RET'.
    ;; In the terminal, these pairs are generally indistinguishable, so this only
    ;; works in the GUI. (default nil)
-   dotspacemacs-distinguish-gui-tab nil
+   dotspacemacs-distinguish-gui-tab t
    ;; If non-nil `Y' is remapped to `y$' in Evil states. (default nil)
    dotspacemacs-remap-Y-to-y$ nil
    ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
@@ -537,7 +539,8 @@ you should place your code here."
   (define-key evil-normal-state-map "t" 'counsel-projectile)
   (define-key evil-normal-state-map "T" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
   (define-key evil-normal-state-map "\C-t" 'ivy-switch-buffer)
-  (define-key evil-normal-state-map "z" 'ivy-switch-buffer)
+  ;; (define-key evil-normal-state-map "z" 'ivy-switch-buffer)
+  (define-key evil-normal-state-map "z" 'counsel-buffer-or-recentf)
 
   ;(define-key evil-normal-state-map "v" 'counsel-projectile-switch-to-buffer) ; grep-like interface
   ;(define-key evil-normal-state-map "v" 'ivy-switch-buffer) ; fast (SPC b b) but I also want to switch to any project file
@@ -625,6 +628,7 @@ you should place your code here."
   ; Ctrl-F is swiper search, not evil-scroll-page-down
   (define-key evil-normal-state-map "\C-f" 'swiper)
   (define-key evil-normal-state-map "/" 'swiper)
+  (define-key evil-normal-state-map "\C-j" 'spacemacs/jump-to-definition)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
   ; TODO: there is dotspacemacs-visual-line-move-text -- just enable that instead?
@@ -788,20 +792,21 @@ you should place your code here."
     (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
     (setq-local css-indent-offset n) ; css-mode
     )
+  ;; Use .editorconfig instead?
+  ;; (defun my-web-indent2()
+  ;;   (interactive)
+  ;;   (my-setup-indent 2)
+  ;;   )
 
-  (defun my-web-indent2()
-    (interactive)
-    (my-setup-indent 2)
-    )
-
-  (defun my/json-mode-hook ()
-    (setq tab-width 2))
-  (add-hook 'json-mode-hook 'my/js2-mode-hook)
-  ; or js-indent-level actually?
+  (defun my-json-mode-hook ()
+    (setq js-indent-level 2)
+    (setq tab-width 2)
+    (dtrt-indent-mode 't))
+  (add-hook 'json-mode-hook 'my-json-mode-hook)
 
   ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
   (add-hook 'prog-mode-hook #'(lambda ()
-                                (dtrt-indent-mode)
+                                (dtrt-indent-mode 't)
                                 (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
   ; (but .editorconfig works, I think?)
@@ -939,9 +944,14 @@ Suitable for inclusion in `c-offsets-alist'."
   (define-key evil-normal-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
   (define-key evil-visual-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
   (define-key evil-insert-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
+  (define-key evil-normal-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
+  (define-key evil-visual-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
+  (define-key evil-insert-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
   ;; (define-key evil-normal-state-map (kbd "M-,") 'rtags-find-references-at-point)
   ;; (define-key evil-visual-state-map (kbd "M-,") 'rtags-find-references-at-point)
   ;; (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
+
+  (define-key evil-normal-state-map (kbd "C-p") 'evil-jump-forward)
 
 
   (with-eval-after-load 'rtags
@@ -957,9 +967,9 @@ Suitable for inclusion in `c-offsets-alist'."
     (define-key evil-normal-state-map (kbd ":") 'rtags-find-symbol-at-point)
 
     (define-key c-mode-base-map (kbd "M-<left>")
-      (function rtags-location-stack-back))
+      (function xref-pop-marker-stack))
     (define-key c-mode-base-map (kbd "M-<right>")
-      (function rtags-location-stack-forward))
+      (function xref-push-marker-stack))
 
     ;; rtags and eldoc, source:
     ;; https://github.com/Andersbakken/rtags/issues/987
@@ -989,11 +999,15 @@ Suitable for inclusion in `c-offsets-alist'."
       (eldoc-mode 1))
     )
 
+  (require 'rtags)
   ;; (cmake-ide-setup)
   (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
+
+  ;; (require 'lsp-mode)
+  ;; (add-hook 'c++-mode-hook #'lsp)
 
   ; GCC has no way of suppressing the "#pragma once in main file" warning,
   ; and flycheck has no (non-internal) way to ignore some errors.
@@ -1008,7 +1022,7 @@ Suitable for inclusion in `c-offsets-alist'."
     (advice-add 'flycheck-sanitize-errors :around #'my-filter-pragma-once-in-main))
 
   ; same for clang
-  (with-eval-after-load "flycheck"
+  (with-eval-after-load 'flycheck
     (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
                                     "no-pragma-once-outside-header")))
 
@@ -1055,6 +1069,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-minimal-buffer-name-column 20)
  '(cycbuf-minimal-file-name-column 8)
  '(delete-trailing-lines nil)
+ '(dumb-jump-confirm-jump-to-modified-file nil)
  '(evil-ex-search-persistent-highlight nil)
  '(evil-repeat-move-cursor nil)
  '(evil-surround-pairs-alist
@@ -1096,6 +1111,13 @@ This function is called at the very end of Spacemacs initialization."
      (t))))
  '(js2-strict-missing-semi-warning nil)
  '(js2-strict-trailing-comma-warning nil t)
+ '(lsp-eldoc-enable-hover nil)
+ '(lsp-enable-indentation nil)
+ '(lsp-enable-on-type-formatting nil)
+ '(lsp-prefer-flymake nil)
+ '(lsp-restart (quote ignore))
+ '(lsp-ui-doc-enable nil)
+ '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
  '(magit-revision-show-gravatars nil t)
@@ -1141,6 +1163,7 @@ This function is called at the very end of Spacemacs initialization."
      ("component.css" "component.html")
      ("component.html" "component.css" "component.js" "component.ts"))))
  '(py-shell-name "python3")
+ '(python-shell-interpreter "python3")
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    (quote

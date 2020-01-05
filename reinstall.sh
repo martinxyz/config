@@ -24,6 +24,9 @@ for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmi
   symlink config/$i .$i
 done
 
+mkdir -p ~/.config/nvim
+symlink ~/config/vimrc ~/.config/nvim/init.vim
+
 symlink ~/config/flake8 ~/.config/flake8
 
 mkdir -p ~/.ipython/profile_default/startup
