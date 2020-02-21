@@ -19,7 +19,7 @@ test -h .viper && rm .viper
 mkdir -p .config/matplotlib
 symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
-for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmii-3.5 pylintrc wcalc_preload spacemacs.d tmux.conf; do
+for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmii-3.5 pylintrc wcalc_preload spacemacs.d tmux.conf inputrc; do
   test -r config/$i || echo config/$i does not exist
   symlink config/$i .$i
 done
@@ -51,7 +51,7 @@ perl -p -i -e 's/bash_completion /bash_completion_disabled /g' ~/.bashrc
 
 # test -h .Xdefaults && rm .Xdefaults # replaced by Xdefaults
 test -h .Xresources && rm .Xresources # nope
-test -h .inputrc && rm .inputrc # use system-wide file
+# test -h .inputrc && rm .inputrc # use system-wide file
 
 mkdir -p .config/git
 symlink ../../config/gitignore .config/git/ignore
@@ -84,6 +84,11 @@ dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
 echo 
 echo "Done."
 
+echo
+echo "Got Emacs >= 27?"
+emacs --version|head -n 1
+
+echo
 echo -n ".gitconfig email: "
 grep email\ = ~/.gitconfig | sed -e 's/.*=.//'
 

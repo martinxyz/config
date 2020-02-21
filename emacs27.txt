@@ -1,0 +1,4 @@
+# modern emacs on old ubuntu
+sudo snap install emacs --beta --classic
+# --> emacs 27.0.60
+

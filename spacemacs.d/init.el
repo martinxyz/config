@@ -1116,6 +1116,7 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-enable-on-type-formatting nil)
  '(lsp-prefer-flymake nil)
  '(lsp-restart (quote ignore))
+ '(lsp-signature-auto-activate nil)
  '(lsp-ui-doc-enable nil)
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)

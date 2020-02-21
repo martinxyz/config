@@ -4,7 +4,7 @@ import numpy as np
 #import matplotlib.pyplot as plt  # too slow
 import os, sys, random, time, re, pprint, math
 pp = pprint
-from numpy import log, log2, exp, pi, sin, cos
+from numpy import log, log2, exp, pi, sin, cos, sqrt
 from numpy import arange, zeros, ones, linspace, arange
 
 def plot(*args, **argv):  # because always loading %matplotlib is too slow
