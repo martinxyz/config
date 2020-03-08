@@ -68,8 +68,14 @@ This function should only modify configuration layer settings."
 
      ; gtags ; does not seem to do any good (because not using helm, maybe)  -- actually does harm, quite intrusive, rtags is better
 
-     (c-c++ :variables ; huh, this layer only adds "disaster" mode and not much else?
-            c-c++-enable-clang-support t)
+     ; https://develop.spacemacs.org/layers/+lang/c-c++/README.html#rtags
+     (c-c++ :variables
+            c-c++-backend 'rtags  ; old, proven, fast
+            ;; c-c++-backend 'lsp-clangd  ; memory-hungry, requires clangd >=9 to work well
+            c-c++-enable-google-style t
+            c-c++-enable-google-newline t
+            ; c-c++-enable-clang-format-on-save t  ; maybe! (manually: SPC m = =)
+            )
      python
      html
      javascript
@@ -78,8 +84,7 @@ This function should only modify configuration layer settings."
      ;react
      ;restclient
      lsp
-     ;; (cmake :variables cmake-enable-cmake-ide-support t)
-
+     (cmake :variables cmake-enable-cmake-ide-support t)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -97,7 +102,6 @@ This function should only modify configuration layer settings."
                                       company ; for company-clang-arguments
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
-                                      cmake-ide
                                       cmake-mode
                                       qml-mode
                                       protobuf-mode
@@ -450,7 +454,6 @@ you should place your code here."
   ;; my own customized versions from ./patched/
   (require 'pabbrev)
   (require 'swbuff)
-  (require 'cmake-mode)
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS" "magit[-:]"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
@@ -695,6 +698,9 @@ you should place your code here."
   ;;   (delete 'company-files spacemacs-default-company-backends)
   ;;   )
 
+
+  ;; (setq spacemacs-default-jump-handlers
+  ;;       (remove 'evil-goto-definition spacemacs-default-jump-handlers))
 
   (require 'qml-mode)
   (require 'protobuf-mode)
@@ -971,6 +977,9 @@ Suitable for inclusion in `c-offsets-alist'."
     (define-key c-mode-base-map (kbd "M-<right>")
       (function xref-push-marker-stack))
 
+    ; the customized rtags-periodic-reparse-timeout gets reset for some reason
+    ;; (rtags-set-periodic-reparse-timeout 1.5)
+
     ;; rtags and eldoc, source:
     ;; https://github.com/Andersbakken/rtags/issues/987
     (defun fontify-string (str mode)
@@ -999,9 +1008,11 @@ Suitable for inclusion in `c-offsets-alist'."
       (eldoc-mode 1))
     )
 
-  (require 'rtags)
-  ;; (cmake-ide-setup)
   (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+
+  ; not sure why those aren't there by default
+  (add-to-list 'spacemacs-jump-handlers-c++-mode '(rtags-find-symbol-at-point :async t))
+  (add-to-list 'spacemacs-jump-handlers-c-mode '(rtags-find-symbol-at-point :async t))
 
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
   ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
@@ -1059,10 +1070,9 @@ This function is called at the very end of Spacemacs initialization."
  '(company-dabbrev-ignore-case nil)
  '(compilation-ask-about-save nil)
  '(custom-safe-themes
-   (quote
-    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
- '(cycbuf-buffer-sort-function (quote cycbuf-sort-by-recency))
- '(cycbuf-dont-show-regexp (quote ("^ " "^\\*cycbuf\\*$" "^\\*.*\\*$" "TAGS")))
+   '("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default))
+ '(cycbuf-buffer-sort-function 'cycbuf-sort-by-recency)
+ '(cycbuf-dont-show-regexp '("^ " "^\\*cycbuf\\*$" "^\\*.*\\*$" "TAGS"))
  '(cycbuf-max-window-height 2)
  '(cycbuf-maximal-buffer-name-column 30)
  '(cycbuf-maximal-file-name-column 20)
@@ -1073,8 +1083,7 @@ This function is called at the very end of Spacemacs initialization."
  '(evil-ex-search-persistent-highlight nil)
  '(evil-repeat-move-cursor nil)
  '(evil-surround-pairs-alist
-   (quote
-    ((40 "(" . ")")
+   '((40 "(" . ")")
      (91 "[" . "]")
      (123 "{" . "}")
      (41 "(" . ")")
@@ -1086,12 +1095,11 @@ This function is called at the very end of Spacemacs initialization."
      (62 "<" . ">")
      (116 . evil-surround-read-tag)
      (60 . evil-surround-read-tag)
-     (102 . evil-surround-function))))
+     (102 . evil-surround-function)))
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f")
  '(flycheck-checkers
-   (quote
-    (ada-gnat asciidoctor asciidoc c/c++-gcc c/c++-clang c/c++-cppcheck cfengine chef-foodcritic coffee coffee-coffeelint coq css-csslint css-stylelint cuda-nvcc cwl d-dmd dockerfile-hadolint emacs-lisp emacs-lisp-checkdoc erlang-rebar3 erlang eruby-erubis fortran-gfortran go-gofmt go-golint go-vet go-build go-test go-errcheck go-unconvert go-staticcheck groovy haml handlebars haskell-stack-ghc haskell-ghc haskell-hlint html-tidy javascript-eslint javascript-jshint javascript-standard json-jsonlint json-python-json json-jq jsonnet less less-stylelint llvm-llc lua-luacheck lua markdown-markdownlint-cli markdown-mdl nix nix-linter opam perl perl-perlcritic php php-phpmd php-phpcs processing proselint protobuf-protoc pug puppet-parser puppet-lint python-flake8 python-pylint python-pycompile python-mypy r-lintr racket rpm-rpmlint rst-sphinx rst ruby-rubocop ruby-reek ruby-rubylint ruby ruby-jruby rust-cargo rust rust-clippy scala scala-scalastyle scheme-chicken scss-lint scss-stylelint sass/scss-sass-lint sass scss sh-bash sh-posix-dash sh-posix-bash sh-zsh sh-shellcheck slim slim-lint sql-sqlint systemd-analyze tcl-nagelfar tex-chktex tex-lacheck texinfo textlint typescript-tslint verilog-verilator vhdl-ghdl xml-xmlstarlet xml-xmllint yaml-jsyaml yaml-ruby emacs-lisp-package)))
+   '(ada-gnat asciidoctor asciidoc c/c++-gcc c/c++-clang c/c++-cppcheck cfengine chef-foodcritic coffee coffee-coffeelint coq css-csslint css-stylelint cuda-nvcc cwl d-dmd dockerfile-hadolint emacs-lisp emacs-lisp-checkdoc erlang-rebar3 erlang eruby-erubis fortran-gfortran go-gofmt go-golint go-vet go-build go-test go-errcheck go-unconvert go-staticcheck groovy haml handlebars haskell-stack-ghc haskell-ghc haskell-hlint html-tidy javascript-eslint javascript-jshint javascript-standard json-jsonlint json-python-json json-jq jsonnet less less-stylelint llvm-llc lua-luacheck lua markdown-markdownlint-cli markdown-mdl nix nix-linter opam perl perl-perlcritic php php-phpmd php-phpcs processing proselint protobuf-protoc pug puppet-parser puppet-lint python-flake8 python-pylint python-pycompile python-mypy r-lintr racket rpm-rpmlint rst-sphinx rst ruby-rubocop ruby-reek ruby-rubylint ruby ruby-jruby rust-cargo rust rust-clippy scala scala-scalastyle scheme-chicken scss-lint scss-stylelint sass/scss-sass-lint sass scss sh-bash sh-posix-dash sh-posix-bash sh-zsh sh-shellcheck slim slim-lint sql-sqlint systemd-analyze tcl-nagelfar tex-chktex tex-lacheck texinfo textlint typescript-tslint verilog-verilator vhdl-ghdl xml-xmlstarlet xml-xmllint yaml-jsyaml yaml-ruby emacs-lisp-package))
  '(flycheck-json-python-json-executable "python3")
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pycompile-executable "python3")
@@ -1102,45 +1110,41 @@ This function is called at the very end of Spacemacs initialization."
  '(hl-sexp-background-color "#1c1f26")
  '(ivy-extra-directories nil)
  '(ivy-sort-functions-alist
-   (quote
-    ((read-file-name-internal . compare-files-by-date)
+   '((read-file-name-internal . compare-files-by-date)
      (internal-complete-buffer)
      (counsel-git-grep-function)
      (Man-goto-section)
      (org-refile)
-     (t))))
+     (t)))
  '(js2-strict-missing-semi-warning nil)
  '(js2-strict-trailing-comma-warning nil t)
  '(lsp-eldoc-enable-hover nil)
  '(lsp-enable-indentation nil)
  '(lsp-enable-on-type-formatting nil)
  '(lsp-prefer-flymake nil)
- '(lsp-restart (quote ignore))
+ '(lsp-restart 'ignore)
  '(lsp-signature-auto-activate nil)
- '(lsp-ui-doc-enable nil)
+ '(lsp-ui-doc-enable nil t)
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
  '(magit-revision-show-gravatars nil t)
- '(magit-save-repository-buffers (quote dontask))
- '(magit-section-initial-visibility-alist (quote ((stashes . hide) (untracked . hide))))
- '(markdown-indent-function (quote noop))
+ '(magit-save-repository-buffers 'dontask)
+ '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
+ '(markdown-indent-function 'noop)
  '(mouse-yank-at-point t)
  '(pabbrev-idle-timer-verbose nil)
  '(package-selected-packages
-   (quote
-    (magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link)))
- '(projectile-completion-system (quote ido))
+   '(magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
+ '(projectile-completion-system 'ido)
  '(projectile-enable-caching nil)
  '(projectile-git-command "rg --files --null")
- '(projectile-globally-ignored-buffers (quote ("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH")))
+ '(projectile-globally-ignored-buffers '("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH"))
  '(projectile-globally-ignored-directories
-   (quote
-    (".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages" ".pyc" "__pycache__")))
- '(projectile-globally-ignored-files (quote ("TAGS" "GTAGS" "GRTAGS" "GPATH")))
+   '(".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages" ".pyc" "__pycache__"))
+ '(projectile-globally-ignored-files '("TAGS" "GTAGS" "GRTAGS" "GPATH"))
  '(projectile-other-file-alist
-   (quote
-    (("cpp" "h" "hpp" "ipp")
+   '(("cpp" "h" "hpp" "ipp")
      ("ipp" "h" "hpp" "cpp")
      ("hpp" "h" "ipp" "cpp" "cc")
      ("cxx" "h" "hxx" "ixx")
@@ -1162,33 +1166,30 @@ This function is called at the very end of Spacemacs initialization."
      ("js" "html")
      ("component.ts" "component.html")
      ("component.css" "component.html")
-     ("component.html" "component.css" "component.js" "component.ts"))))
+     ("component.html" "component.css" "component.js" "component.ts")))
  '(py-shell-name "python3")
- '(python-shell-interpreter "python3")
+ '(python-shell-interpreter "python3" t)
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
-   (quote
-    ((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
+   '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
      (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")
      (eval progn
-           (add-to-list
-            (quote exec-path)
-            (concat
-             (locate-dominating-file default-directory ".dir-locals.el")
-             "node_modules/.bin/"))))))
+           (add-to-list 'exec-path
+                        (concat
+                         (locate-dominating-file default-directory ".dir-locals.el")
+                         "node_modules/.bin/")))))
  '(sp-escape-quotes-after-insert nil)
  '(sp-escape-wrapped-region nil)
  '(swbuff-clear-delay 20)
  '(swbuff-clear-delay-ends-switching t)
  '(swbuff-separator "  ")
- '(swbuff-status-window-layout (quote adjust))
+ '(swbuff-status-window-layout 'adjust)
  '(swbuff-window-min-text-height 2)
  '(tab-width 4)
- '(tramp-mode nil nil (tramp))
+ '(tramp-mode nil)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
-   (quote
-    ((20 . "#f36c60")
+   '((20 . "#f36c60")
      (40 . "#ff9800")
      (60 . "#fff59d")
      (80 . "#8bc34a")
@@ -1205,15 +1206,13 @@ This function is called at the very end of Spacemacs initialization."
      (300 . "#f36c60")
      (320 . "#ff9800")
      (340 . "#fff59d")
-     (360 . "#8bc34a"))))
+     (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
  '(web-mode-auto-close-style 2)
  '(whitespace-style
-   (quote
-    (face tabs space-before-tab::tab space-before-tab tab-mark)))
+   '(face tabs space-before-tab::tab space-before-tab tab-mark))
  '(yas-snippet-dirs
-   (quote
-    ("~/.spacemacs.d/snippets" "/home/martin/.emacs.d/snippets" yasnippet-snippets-dir))))
+   '("~/.spacemacs.d/snippets" "/home/martin/.emacs.d/snippets" yasnippet-snippets-dir)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1259,6 +1258,7 @@ This function is called at the very end of Spacemacs initialization."
  '(region ((t (:background "#1D4570"))))
  '(rtags-errline ((t (:background "#321212" :underline (:color "red" :style wave)))))
  '(rtags-fixitline ((t (:background "#303012" :underline (:color "brown" :style wave)))))
+ '(rtags-warnline ((t (:foreground "white" :underline (:color "khaki4" :style wave)))))
  '(show-paren-match ((t (:background "#443947" :foreground "#fff"))))
  '(smerge-base ((t (:background "#21210c"))))
  '(smerge-lower ((t (:background "#142114"))))
