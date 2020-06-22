@@ -1,2 +1,4 @@
 *.pyc
+/VSCodium/User/globalStorage
+/VSCodium/User/workspaceStorage
 

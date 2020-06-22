@@ -26,8 +26,8 @@ done
 
 mkdir -p ~/.config/nvim
 symlink ~/config/vimrc ~/.config/nvim/init.vim
-
 symlink ~/config/flake8 ~/.config/flake8
+symlink ~/config/sway ~/.config/sway
 
 mkdir -p ~/.ipython/profile_default/startup
 symlink ~/config/ipython-startup/60-import-stuff.py ~/.ipython/profile_default/startup/60-import-stuff.py
@@ -36,6 +36,9 @@ if [ -d scripts/.svn ] ; then
     echo 'Move ~/scripts out of the way!'
 fi
 symlink config/scripts scripts
+
+mkdir -p ~/.config/VSCodium
+symlink ~/config/VSCodium/User ~/.config/VSCodium/User
 
 # xmodmap fvwm2rc
 
@@ -81,6 +84,8 @@ gsettings set org.gnome.desktop.background show-desktop-icons false
 dconf write /org/gnome/mutter/workspaces-only-on-primary false
 dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
 
+echo "To disable gnome3 dynamic workspaces: aptii gnome-tweaks"
+echo "Firefox scroll-wheel: about:config min_line_scroll_amount = 50"
 echo 
 echo "Done."
 

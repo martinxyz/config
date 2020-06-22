@@ -4,3 +4,9 @@
 echo -en "\x07"
 notify-send "Beep." $@
 
+# beep on all outputs
+# (when redirecting mpv to active speakers for music, I often turn them off)
+for device in $(mpv --audio-device=help|grep pulse|cut -d\' -f2); do
+  (mpv --audio-device="$device" /musik/sammlung/age_up.mp3 &) > /dev/null 2>&1
+done
+

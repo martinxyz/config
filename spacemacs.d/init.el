@@ -52,6 +52,7 @@ This function should only modify configuration layer settings."
      emacs-lisp
      git
      markdown
+     shell-scripts  ; enables shellcheck
      org
      neotree  ; the new default is treemacs, which I wasn't able to get used to
      ;; (shell :variables
@@ -538,7 +539,7 @@ you should place your code here."
 
   ;;;; Those two I used a long time (on 'v' and 'V' originally):
   (define-key evil-normal-state-map "F" 'counsel-projectile) ; great but slow (two seconds without projectile-enable-caching) ; (minor usability issue: shows large backup-copy folder with non-git files before the git files)
-  (define-key evil-normal-state-map "V" 'counsel-projectile)
+  ;; (define-key evil-normal-state-map "V" 'counsel-projectile)  ; I'm prefering V for "visual-line" now (vim default)
   (define-key evil-normal-state-map "t" 'counsel-projectile)
   (define-key evil-normal-state-map "T" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
   (define-key evil-normal-state-map "\C-t" 'ivy-switch-buffer)
@@ -872,6 +873,21 @@ you should place your code here."
   (with-eval-after-load 'evil
     (defalias #'forward-evil-word #'forward-evil-symbol))
 
+  ; "patch" until https://github.com/abo-abo/swiper/issues/2492 has an upstream solution
+  (with-eval-after-load 'ivy
+    (defun ivy-occur-next-error (n &optional reset)
+      "A `next-error-function' for `ivy-occur-mode'."
+      (interactive "p")
+      (when reset
+        (goto-char (point-min)))
+      (setq n (or n 1))
+      (let ((ivy-calling t))
+        (cond ((< n 0) (ivy-occur-previous-line (- n)))
+              (t (ivy-occur-next-line n))))
+      ; the window's point overrides the buffer's point every time it's redisplayed
+      (cl-dolist (window (get-buffer-window-list nil nil t))
+        (set-window-point window (point)))))
+
   ;; https://www.emacswiki.org/emacs/IndentingC
   (c-add-style "double-class-indent"
                '("k&r"
@@ -1123,8 +1139,9 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-enable-on-type-formatting nil)
  '(lsp-prefer-flymake nil)
  '(lsp-restart 'ignore)
+ '(lsp-rust-server 'rust-analyzer)
  '(lsp-signature-auto-activate nil)
- '(lsp-ui-doc-enable nil t)
+ '(lsp-ui-doc-enable nil)
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
@@ -1168,7 +1185,7 @@ This function is called at the very end of Spacemacs initialization."
      ("component.css" "component.html")
      ("component.html" "component.css" "component.js" "component.ts")))
  '(py-shell-name "python3")
- '(python-shell-interpreter "python3" t)
+ '(python-shell-interpreter "python3")
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
@@ -1252,6 +1269,8 @@ This function is called at the very end of Spacemacs initialization."
  '(isearch-fail ((t (:inherit font-lock-warning-face :inverse-video nil))))
  '(ivy-current-match ((t (:inherit highlight :foreground "#b5bd68" :underline nil))))
  '(lazy-highlight ((t (:background "#3b3735" :foreground "nil" :inverse-video nil))))
+ '(lsp-lsp-flycheck-warning-unnecessary-face ((t (:foreground "dim gray"))) t)
+ '(lsp-ui-sideline-code-action ((t (:inherit success))))
  '(match ((t (:background "#1d1f21" :foreground "#ADD9FF" :inverse-video nil))))
  '(pabbrev-single-suggestion-face ((t (:foreground "gray33"))))
  '(pabbrev-suggestions-face ((t (:foreground "gray25"))))

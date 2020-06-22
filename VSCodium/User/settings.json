@@ -1,0 +1,75 @@
+{
+    "window.zoomLevel": 1,
+    "telemetry.enableCrashReporter": false,
+    "workbench.enableExperiments": false,
+    "workbench.settings.enableNaturalLanguageSearch": false,
+    "update.enableWindowsBackgroundUpdates": false,
+    "update.mode": "none",
+    "extensions.autoCheckUpdates": false,
+    "extensions.autoUpdate": false,
+    "update.showReleaseNotes": false,
+    "editor.scrollBeyondLastLine": false,
+    "vscode-neovim.neovimPath": "/usr/bin/nvim",
+    "keyboard.dispatch": "keyCode",
+    "editor.cursorSurroundingLines": 6,
+    "rust-analyzer.updates.channel": "nightly",
+    "vim.debug.loggingLevelForConsole": "debug",
+    "vim.normalModeKeyBindings": [
+        {
+            "before": [
+                "q"
+            ],
+            "commands": [
+                "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+            ]
+        },
+        {
+            "before": [
+                "<C-e>"
+            ],
+            "commands": [
+                "workbench.action.terminal.newInActiveWorkspace"
+            ]
+        },
+        {
+            "before": [
+                "<C-t>"
+            ],
+            "commands": [
+                "workbench.action.quickOpen"
+            ]
+        },
+        {
+            "before": [
+                "<C-w>"
+            ],
+            "commands": [
+                "workbench.action.closeActiveEditor"
+            ]
+        },
+        {
+            "before": [
+                ";"
+            ],
+            "after": [
+                "A",
+                ";",
+                "<Esc>"
+            ]
+        }
+    ],
+        "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [":"],
+            "commands": [
+                "workbench.action.showCommands",
+            ]
+        }
+    ],
+    "vim.commandLineModeKeyBindingsNonRecursive": [
+    ],
+    "vim.visualModeKeyBindings": [
+    
+    ],
+    "window.menuBarVisibility": "toggle"
+}
