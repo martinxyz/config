@@ -11,5 +11,10 @@
     {
         "key": "ctrl+shift+=",
         "command": "-workbench.action.zoomIn"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "search.action.focusSearchList",
+        "when": "sideBarFocus"
     }
 ]

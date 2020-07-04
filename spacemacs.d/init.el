@@ -742,7 +742,9 @@ you should place your code here."
     (save-excursion
       (end-of-line)
       (insert ";")))
-  (define-key evil-visual-state-map ";" 'evilnc-comment-operator)
+  (define-key evil-visual-state-map ";" 'evilnc-comment-operator)  ; should learn using C-/ instead
+  (define-key evil-visual-state-map (kbd "C-/") 'evilnc-comment-operator)
+  (define-key evil-normal-state-map (kbd "C-/") 'comment-line)
 
   (setq-default spacemacs-show-trailing-whitespace nil)
 

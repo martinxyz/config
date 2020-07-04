@@ -71,5 +71,6 @@
     "vim.visualModeKeyBindings": [
     
     ],
-    "window.menuBarVisibility": "toggle"
+    "window.menuBarVisibility": "toggle",
+    "files.autoSave": "onFocusChange"
 }
