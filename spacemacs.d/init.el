@@ -722,6 +722,8 @@ you should place your code here."
   (define-key evil-normal-state-map (kbd "<C-tab>") 'projectile-find-other-file)
   (spacemacs/set-leader-keys "ph" 'projectile-find-other-file)  ; there is already test/impl: SPC p a
 
+  (define-key evil-motion-state-map "B" 'magit-blame-addition)
+
   ; pager module doesn't work well with visual-line
   ;(global-set-key [next] 'evil-scroll-down)
   ;(global-set-key [prior] 'evil-scroll-up)
@@ -875,8 +877,8 @@ you should place your code here."
   (with-eval-after-load 'evil
     (defalias #'forward-evil-word #'forward-evil-symbol))
 
-  ; "patch" until https://github.com/abo-abo/swiper/issues/2492 has an upstream solution
   (with-eval-after-load 'ivy
+    ; "patch" until https://github.com/abo-abo/swiper/issues/2492 has an upstream solution
     (defun ivy-occur-next-error (n &optional reset)
       "A `next-error-function' for `ivy-occur-mode'."
       (interactive "p")
@@ -888,7 +890,23 @@ you should place your code here."
               (t (ivy-occur-next-line n))))
       ; the window's point overrides the buffer's point every time it's redisplayed
       (cl-dolist (window (get-buffer-window-list nil nil t))
-        (set-window-point window (point)))))
+        (set-window-point window (point))))
+
+    ; I'm missing some previous hydra heads
+    (defhydra+ hydra-ivy (:hint nil :color pink)
+      ; based on ivy-hydra-20200608.1010/ivy-hydra.el
+      "
+^ ^ ^ ^ ^ ^ | ^Call^      ^ ^  | ^Cancel^ | ^Options^ | Action _w_/_s_/_a_: %-14s(ivy-action-name)
+^-^-^-^-^-^-+-^-^---------^-^--+-^-^------+-^-^-------+-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^---------------------------
+^ ^ _k_ ^ ^ | _f_ollow _o_ccur | _i_nsert | _c_: calling %-5s(if ivy-calling \"on\" \"off\") _C_ase-fold: %-10`ivy-case-fold-search
+_h_ ^+^ _l_ | _d_one      ^ ^  | _o_ops   | _M_: matcher %-5s(ivy--matcher-desc)^^^^^^^^^^^^ _T_runcate: %-11`truncate-lines
+^ ^ _j_ ^ ^ | _g_o        ^ ^  | ^ ^      | _<_/_>_: shrink/grow^^^^^^^^^^^^^^^^^^^^^^^^^^^^ _D_efinition of this menu
+"
+      ("o" ivy-occur :exit t)
+      ("l" ivy-call)
+      )
+    )
+
 
   ;; https://www.emacswiki.org/emacs/IndentingC
   (c-add-style "double-class-indent"
@@ -1087,6 +1105,7 @@ This function is called at the very end of Spacemacs initialization."
  '(company-dabbrev-downcase nil)
  '(company-dabbrev-ignore-case nil)
  '(compilation-ask-about-save nil)
+ '(create-lockfiles nil)
  '(custom-safe-themes
    '("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default))
  '(cycbuf-buffer-sort-function 'cycbuf-sort-by-recency)
@@ -1187,7 +1206,7 @@ This function is called at the very end of Spacemacs initialization."
      ("component.css" "component.html")
      ("component.html" "component.css" "component.js" "component.ts")))
  '(py-shell-name "python3")
- '(python-shell-interpreter "python3")
+ '(python-shell-interpreter "python3" t)
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
