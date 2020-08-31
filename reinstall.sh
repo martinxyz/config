@@ -28,6 +28,7 @@ mkdir -p ~/.config/nvim
 symlink ~/config/vimrc ~/.config/nvim/init.vim
 symlink ~/config/flake8 ~/.config/flake8
 symlink ~/config/sway ~/.config/sway
+symlink ~/config/xkb ~/.xkb
 
 mkdir -p ~/.ipython/profile_default/startup
 symlink ~/config/ipython-startup/60-import-stuff.py ~/.ipython/profile_default/startup/60-import-stuff.py
@@ -84,16 +85,22 @@ gsettings set org.gnome.desktop.background show-desktop-icons false
 dconf write /org/gnome/mutter/workspaces-only-on-primary false
 dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
 
+echo
 echo "To disable gnome3 dynamic workspaces: aptii gnome-tweaks"
 echo "Firefox scroll-wheel: about:config min_line_scroll_amount = 50"
-echo 
+echo
 echo "Done."
 
 echo
 echo "Got Emacs >= 27?"
 emacs --version|head -n 1
 
+if ! test -x ~/.local/bin/vscode-json-languageserver; then
+  echo
+  echo "run this manually:"
+  echo "npm i -g vscode-json-languageserver"
+fi
+
 echo
 echo -n ".gitconfig email: "
 grep email\ = ~/.gitconfig | sed -e 's/.*=.//'
-

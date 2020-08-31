@@ -78,7 +78,12 @@ This function should only modify configuration layer settings."
             ; c-c++-enable-clang-format-on-save t  ; maybe! (manually: SPC m = =)
             )
      python
-     html
+     (html :variables
+           css-enable-lsp 't
+           less-enable-lsp 't
+           scss-enable-lsp 't
+           html-enable-lsp 't
+           )
      javascript
      ; c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
 
@@ -678,6 +683,10 @@ you should place your code here."
   ;; (advice-add 'spacemacs/emmet-expand :override #'pabbrev-expand-maybe)
   ;; (advice-add 'emmet-expand :override #'pabbrev-expand-maybe)  ; TAB key in html-mode
 
+  ; to have lsp in .svelte buffers
+  ; spacemacs//setup-lsp-for-html-buffer enables this only for .html
+  (add-hook 'web-mode-hook #'lsp t)
+
   (defun noop () (interactive))
 
   ;; org-mode should not override tab in insert-mode
@@ -821,18 +830,18 @@ you should place your code here."
                                 (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
   ; (but .editorconfig works, I think?)
-  (defun my-web-mode-hook ()
-    ; for .vue files. Do not indent script inside tag (rule from eslint-plugin-vue).
-    (setq web-mode-script-padding 0)
-    )
-  (add-hook 'web-mode-hook  'my-web-mode-hook)
+  ;; (defun my-web-mode-hook ()
+  ;;   ; for .vue files. Do not indent script inside tag (rule from eslint-plugin-vue).
+  ;;   (setq web-mode-script-padding 0)
+  ;;   )
+  ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
 
   (editorconfig-mode 1)
 
   ;; support .vue files
-  (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
-  (with-eval-after-load 'flycheck
-    (flycheck-add-mode 'javascript-eslint 'web-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
+  ;; (with-eval-after-load 'flycheck
+  ;;   (flycheck-add-mode 'javascript-eslint 'web-mode))
 
   ;; use the current project's eslint binary
   ;; source: https://emacs.stackexchange.com/a/21207/12292
@@ -1084,6 +1093,15 @@ Suitable for inclusion in `c-offsets-alist'."
       (abort-recursive-edit)))
   (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
 
+  ; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
+  (setq lsp-clients-angular-language-server-command
+        '("node"
+          "/home/martin/.local/lib/node_modules/@angular/language-server"
+          "--ngProbeLocations"
+          "/home/martin/.local/lib/node_modules"
+          "--tsProbeLocations"
+          "/home/martin/.local/lib/node_modules"
+          "--stdio"))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -1135,8 +1153,6 @@ This function is called at the very end of Spacemacs initialization."
      (102 . evil-surround-function)))
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#37474f")
- '(flycheck-checkers
-   '(ada-gnat asciidoctor asciidoc c/c++-gcc c/c++-clang c/c++-cppcheck cfengine chef-foodcritic coffee coffee-coffeelint coq css-csslint css-stylelint cuda-nvcc cwl d-dmd dockerfile-hadolint emacs-lisp emacs-lisp-checkdoc erlang-rebar3 erlang eruby-erubis fortran-gfortran go-gofmt go-golint go-vet go-build go-test go-errcheck go-unconvert go-staticcheck groovy haml handlebars haskell-stack-ghc haskell-ghc haskell-hlint html-tidy javascript-eslint javascript-jshint javascript-standard json-jsonlint json-python-json json-jq jsonnet less less-stylelint llvm-llc lua-luacheck lua markdown-markdownlint-cli markdown-mdl nix nix-linter opam perl perl-perlcritic php php-phpmd php-phpcs processing proselint protobuf-protoc pug puppet-parser puppet-lint python-flake8 python-pylint python-pycompile python-mypy r-lintr racket rpm-rpmlint rst-sphinx rst ruby-rubocop ruby-reek ruby-rubylint ruby ruby-jruby rust-cargo rust rust-clippy scala scala-scalastyle scheme-chicken scss-lint scss-stylelint sass/scss-sass-lint sass scss sh-bash sh-posix-dash sh-posix-bash sh-zsh sh-shellcheck slim slim-lint sql-sqlint systemd-analyze tcl-nagelfar tex-chktex tex-lacheck texinfo textlint typescript-tslint verilog-verilator vhdl-ghdl xml-xmlstarlet xml-xmllint yaml-jsyaml yaml-ruby emacs-lisp-package))
  '(flycheck-json-python-json-executable "python3")
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-pycompile-executable "python3")
@@ -1156,8 +1172,6 @@ This function is called at the very end of Spacemacs initialization."
  '(js2-strict-missing-semi-warning nil)
  '(js2-strict-trailing-comma-warning nil t)
  '(lsp-eldoc-enable-hover nil)
- '(lsp-enable-indentation nil)
- '(lsp-enable-on-type-formatting nil)
  '(lsp-prefer-flymake nil)
  '(lsp-restart 'ignore)
  '(lsp-rust-server 'rust-analyzer)
@@ -1166,7 +1180,7 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
- '(magit-revision-show-gravatars nil t)
+ '(magit-revision-show-gravatars nil)
  '(magit-save-repository-buffers 'dontask)
  '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
  '(markdown-indent-function 'noop)

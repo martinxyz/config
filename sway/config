@@ -1,16 +1,41 @@
-# Read `man 5 sway` for a complete reference.
+# man 5 sway
 
 xwayland force
+
+### Output configuration
+#
+# swaymsg -t get_outputs
+#
+#output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+output * bg /home/martin/grafik/background/default fill "#796147"
+output eDP-1 disable
+output HDMI-A-1 enable
+output HDMI-A-1 dpms on
+output HDMI-A-1 mode 1920x1200 pos 0 0
+output HDMI-A-2 enable
+output HDMI-A-2 dpms on
+output HDMI-A-2 mode 1920x1080 pos 1920 -470
+output HDMI-A-2 transform 270
+
+### Input configuration
+#
+# man 5 sway-input
+# swaymsg -t get_inputs
 input * {
     xkb_layout ch
-    # xkb_variant nodeadkeys
 }
-
-# None of those work. After configuration, manually running this in a term works.
-#exec_always xmodmap /home/martin/.xmodmap &
-#exec_always xmodmap /home/martin/.xmodmap &
-#exec_always urxvt -e 'xmodmap ~/.xmodmap; sleep 2'
-#exec_always urxvt -e bash -c 'set -x; sleep 2 ; xmodmap ~/.xmodmap ; sleep 2' &
+# This did not work: (manually running works)
+# exec_always xmodmap /home/martin/.xmodmap &
+#
+# https://github.com/swaywm/sway/issues/4250#issuecomment-503397827
+# https://wiki.archlinux.org/index.php/X_keyboard_extension
+#
+# almost works, Algr-j ([) is dead for some reason:
+# input type:keyboard xkb_layout ch-german-bazaar
+#
+# input 10730:258:Kinesis_Advantage2_Keyboard xkb_file ~/config/xkb/bazaar.xkbmap
+input type:keyboard xkb_file ~/config/xkb/bazaar.xkbmap
+# see also: /usr/share/X11/xkb/symbols/ch
 
 ### Variables
 #
@@ -32,69 +57,23 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 #set $highlight #3daee9
 #set $prompt #18b218
 # set $menu /home/martin/bin/bemenu-run-wrapper --fn $uifont -b -p "▶" --tf "$prompt" --hf "$highlight" --sf "$highlight" --scf "$highlight" | xargs swaymsg exec
-
-### Output configuration
 #
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-#output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-output * bg /home/martin/grafik/background/default fill "#796147"
-output eDP-1 disable
-#output HDMI-A-1 pos 0 0
-#output HDMI-A-2 pos 1920 0
-output HDMI-A-1 mode 1920x1200 pos 0 0
-output HDMI-A-2 mode 1920x1080 pos 1920 0
-#output HDMI-A-1 enable
-#output HDMI-A-1 dpms on
-#output HDMI-A-2 enable
-#output HDMI-A-2 dpms on
-
-#
-# Example configuration:
-#
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0   # XXX wrong, x/y space-separated
-#
-# You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Idle configuration
-#
-# Example configuration:
 #
 # exec swayidle -w \
 #          timeout 300 'swaylock -f -c 000000' \
 #          timeout 600 'swaymsg "output * dpms off"' \
 #               resume 'swaymsg "output * dpms on"' \
 #          before-sleep 'swaylock -f -c 000000'
-#
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
 
-#exec swayidle -w \
-#         timeout 1800 'swaymsg "output * dpms off"' \
-#              resume 'swaymsg "output * dpms on"'
+# my old home-desktop timeouts: 900 (activate GLSlideshow_maxy) 5400 (screen off)
 #
-#
-# my old timeouts: 900 (activate GLSlideshow_maxy) 5400 (screen off)
-
 # starting and -quit'ing xscreensaver on-demand resulted in a left-over opengl child for every activation
 exec xscreensaver -no-splash &   # note: no locking on wayland (use swaylock instead)
 # I have configured the maximum timeout (12h) in xscreensaver-demo, because it is bad at detecting activity
 exec swayidle -w timeout 800 'xscreensaver-command -activate' resume 'xscreensaver-command -deactivate' \
                  timeout 5400 'swaymsg "output * dpms off"'   resume 'swaymsg "output * dpms on"'
-
-### Input configuration
-#
-# Example configuration:
-#
-#   input "2:14:SynPS/2_Synaptics_TouchPad" {
-#       dwt enabled
-#       tap enabled
-#       natural_scroll enabled
-#       middle_emulation enabled
-#   }
-#
-# You can get the names of your inputs by running: swaymsg -t get_inputs
-# Read `man 5 sway-input` for more information about this section.
 
 ### Key bindings
 #
@@ -214,6 +193,7 @@ exec swayidle -w timeout 800 'xscreensaver-command -activate' resume 'xscreensav
     # Show the next scratchpad window or hide the focused scratchpad window.
     # If there are multiple scratchpad windows, this command cycles through them.
     bindsym $mod+minus scratchpad show
+
 #
 # Resizing containers:
 #
@@ -222,33 +202,34 @@ mode "resize" {
     # right will grow the containers width
     # up will shrink the containers height
     # down will grow the containers height
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
+    bindsym $left resize shrink width 25px
+    bindsym $down resize grow height 25px
+    bindsym $up resize shrink height 25px
+    bindsym $right resize grow width 25px
 
     # Ditto, with arrow keys
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
+    bindsym Left resize shrink width 25px
+    bindsym Down resize grow height 25px
+    bindsym Up resize shrink height 25px
+    bindsym Right resize grow width 25px
 
     # Return to default mode
     bindsym Return mode "default"
     bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
 }
 bindsym $mod+r mode "resize"
 
 #
 # Status Bar:
 #
-# Read `man 5 sway-bar` for more information about this section.
+# man 5 sway-bar
 bar {
     position top
 
     # When the status_command prints a new line to stdout, swaybar updates.
     # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+    status_command while date +'%Y-%m-%d %H:%M:%S'; do sleep 1; done
 
     colors {
         statusline #ffffff
