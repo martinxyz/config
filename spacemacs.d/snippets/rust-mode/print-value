@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print-value
+# key: pv
+# --
+println!("$1: {:?}", $1);

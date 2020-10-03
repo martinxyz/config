@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # cronjob script to backup to USB sticks (need to be user-mountable)
 
 from os import system, path

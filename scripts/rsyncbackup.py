@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Backup a directory into timestamped snapshots using rsync and hardlinks.
 
 For installation, write a python script in the same directory like this one:
@@ -111,7 +111,7 @@ def backup(src, backupdir, ping=None, force=False):
         assert os.path.exists('excludes'), 'Please create an "excludes" file in the backup directory. Suggested content:' + excludes_example_content
         (lastbackup, needed, delete) = scan_old_backups()
         if force:
-            print 'Forced'
+            print('Forced')
             needed = 2
         if needed == 0:
             # print 'Not needed.'
@@ -127,9 +127,9 @@ def backup(src, backupdir, ping=None, force=False):
         if needed > 1:
             pass  # print 'Too many emtpy slots, starting without checking load.'
         if needed > 2:
-            print src
-            print 'WARNING: no recent backups found, maybe something is wrong!'
-            print '         (Three or more empty slots. Retrying...)'
+            print(src)
+            print('WARNING: no recent backups found, maybe something is wrong!')
+            print('         (Three or more empty slots. Retrying...)')
 
         if ping and os.system('ping -q -c 1 ' + ping + ' >/dev/null') != 0:
             # print ping, 'does not respond to ping, skipping'
@@ -138,7 +138,7 @@ def backup(src, backupdir, ping=None, force=False):
         if not os.path.exists('next'):
             os.system('mkdir next')
         else:
-            print 'Continuing with existing next/ directory from interrupted or erroneous rsync.'
+            print('Continuing with existing next/ directory from interrupted or erroneous rsync.')
         timestamp = time.strftime('%Y%m%d')
 
         assert not '"' in ssh
@@ -147,9 +147,9 @@ def backup(src, backupdir, ping=None, force=False):
             command += ' --link-dest=' + os.path.join(backupdir, lastbackup)
         result = os.system(command)
         if result != 0:
-            print src
-            print 'WARNING: rsync returned exit code', + os.WEXITSTATUS(result)
-            print '         the next/ directory might hold partial results'
+            print(src)
+            print('WARNING: rsync returned exit code', + os.WEXITSTATUS(result))
+            print('         the next/ directory might hold partial results')
             return
         # os.system('touch next') # rsync resets mtime (or ctime?... only one of them)
         os.rename('next', timestamp)

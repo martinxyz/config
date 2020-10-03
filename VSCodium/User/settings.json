@@ -72,5 +72,8 @@
     
     ],
     "window.menuBarVisibility": "toggle",
-    "files.autoSave": "onFocusChange"
+    "files.autoSave": "onFocusChange",
+    "rust-client.engine": "rust-analyzer",
+    "svelte.language-server.runtime": "/usr/bin/node",
+    "workbench.sideBar.location": "right"
 }
