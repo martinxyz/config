@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Music playlist server controlling mplayer as backend.
 See playlist-example.py to find out how to use it.
@@ -9,16 +9,22 @@ mpv_socket = '/home/martin/.cache/mplaylists-mpvsocket'
 
 # playlog = None
 playlog_path = '/home/martin/sich/playlog'
-playlog = open(playlog_path, 'a')
-
+playlog = open(playlog_path, 'ab')
 
 import os, sys, random, re, time, socket
 stdout = sys.stdout
+
+### globals
+
+User_selectSongFunc = None
+mplayer = None
+User_pool = None
 
 ### Helper functions, they all return a list of filenames
 
 def ReadDirectory(dir):
     "returns a list of filenames in the directory, with dir prefix"
+    dir = dir.encode('utf8')
     result = []
     for filename in os.listdir(dir):
         result.append(os.path.join(dir, filename))
@@ -27,19 +33,23 @@ def ReadDirectory(dir):
 def ReadPlaylist(filename):
     "returns a list of filenames (maybe you'll need to make them absolute paths)"
     result = []
-    for line in open(filename).readlines():
-        line = line.split('#')[0].strip()
+    for line in open(filename, 'rb').readlines():
+        line = line.split(b'#')[0].strip()
         if line: result.append(line)
     return result
     
 def CopySongs(playlist, regexp = None, remove=False):
     "returns a list of the strings matching regexp, without removing them from playlist"
     if not regexp and not remove: return playlist[:]
+    try:
+        regexp = regexp.decode('utf8', errors='ignore')
+    except:
+        pass
     result = []
     regexp = regexp.replace(' ', '.*') # "easy" regexps
     regexp = re.compile(regexp, re.IGNORECASE)
     for filename in playlist[:]:
-        if regexp.search(filename):
+        if regexp.search(filename.decode('utf8', errors='ignore')):
             if remove: playlist.remove(filename)
             result.append(filename)
     return result
@@ -52,22 +62,22 @@ def CopyRare(playlist, percent=25):
     count = {}
     for name in playlist:
         count[name] = 0
-    for line in open(playlog_path):
-        name = line.split(' ', 1)[1][:-1]
+    for line in open(playlog_path, 'rb'):
+        name = line.split(b' ', 1)[1][:-1]
         if name not in count: continue
         count[name] += 1
 
-    l = [(count, name) for (name, count) in count.items()]
+    l = [(count, name) for (name, count) in list(count.items())]
     l.sort()
-    i = len(l) * percent / 100
+    i = len(l) * percent // 100
     return [name for count, name in l[:i]]
 
 
 ### Fuzzy string matching
 
 def filename_words(filename):
-    s = filename.split('/')[-1]
-    words = re.findall(r'[a-zA-Z]+', s)
+    s = filename.split(b'/')[-1]
+    words = re.findall(rb'[a-zA-Z]+', s)
     return [w.lower() for w in words]
 
 def filename_similarity(s1, s2):
@@ -99,10 +109,10 @@ class SongSelector:
         return self.select()
     
     def log(self, s):
-        self.output.write(s + '\n')
+        write2any(self.output, s)
 
     def select(self):
-        raise NotImplemented, 'abstract method'
+        raise NotImplemented('abstract method')
 
     def random(self, playlist):
         for i in range(20):
@@ -118,17 +128,17 @@ class SongSelector:
 
         try:
             next = playlist[playlist.index(prev) + 1]
-        except ValueError, IndexError:
+        except ValueError as IndexError:
             next = self.random(playlist)
 
         if next in self.history:
             next = self.random(playlist)
 
         next_score = filename_similarity(prev, next)
-        print 'next', next, 'score', next_score
+        print('next', next, 'score', next_score)
         better = []
 
-        sample_size = len(playlist)/10
+        sample_size = len(playlist)//10
         if sample_size < 100:
             sample_size = len(playlist)
 
@@ -139,14 +149,14 @@ class SongSelector:
             if score > next_score:
                 better.append(candidate)
     
-        print 'better:', len(better)
-        print '\n'.join(better)
+        print('better:', len(better))
+        print('\n'.join([fn.decode('utf8', errors='replace') for fn in better]))
         if better:
             if random.randrange(5) == 0:
-                print 'Choosing random anyway.'
+                print('Choosing random anyway.')
                 next = self.random(playlist)
             else:
-                print 'Chossing a better one.'
+                print('Chossing a better one.')
                 next = random.choice(better)
         return next
 
@@ -160,7 +170,7 @@ def NextSong(f, userrequest):
     global future, history, last_button_t 
     if future:
         filename = future.pop(0)
-        f.write('From the stack: (%d items left now)\n' % (len(future)))
+        write2any(f, 'From the stack: (%d items left now)\n' % (len(future)))
     else:
         filename = User_selectSongFunc(history, userrequest, f)
         assert filename
@@ -168,26 +178,26 @@ def NextSong(f, userrequest):
         t = time.time()
         dt = t - last_button_t
         if userrequest:
-            playlog.write('AFTER %.3f SKIP ' % dt + history[-1] + '\n')
+            playlog.write(b'AFTER %.3f SKIP ' % dt + history[-1] + b'\n')
         else:
-            playlog.write('AFTER %.3f DONE ' % dt + history[-1] + '\n')
+            playlog.write(b'AFTER %.3f DONE ' % dt + history[-1] + b'\n')
         #playlog.flush()
         last_button_t = t
-    f.write(os.path.basename(filename).replace('_', ' ') + '\n')
+    write2any(f, os.path.basename(filename).replace(b'_', b' ').decode('utf8', errors='replace') + '\n')
     history.append(filename)
-    return filename.split(' # ')[0] # remove "comment" keywords
+    return filename.split(b' # ')[0] # remove "comment" keywords
 
 def PrevSong(f = stdout):
     global future, history
     if len(history) < 2:
-        return ''
+        return b''
     # the current one is already in the history
     filename = history.pop()
     future.insert(0, filename)
     # the previous one
 
     filename = history[-1]
-    f.write(os.path.basename(filename).replace('_', ' ') + '\n')
+    write2any(f, os.path.basename(filename).replace(b'_', b' ').decode('utf8', errors='replace') + '\n')
     return filename
 
 def Command(command, f = stdout):
@@ -196,45 +206,56 @@ def Command(command, f = stdout):
     info = None
     if not command:
         future = []
-        f.write('Stack cleaned.\n')
+        write2any(f, 'Stack cleaned.\n')
     else:
         arg = command[1:].strip()
-        arg_regexp = arg.replace(' ', '.*') # "easy" regexps
-        command = command[0]
-        if command == '-':
+        write2any(f, 'arg %r\n' % arg)
+        arg_regexp = arg.replace(b' ', b'.*') # "easy" regexps
+        write2any(f, 'arg_regexp %r\n' % arg_regexp)
+        command = command[0:1]
+        if command == b'-':
             taken = TakeSongs(future, arg_regexp)
             info = 'Removed %d songs from the stack.' % (len(taken))
-        if command == 'm' and future:
+        if command == b'm' and future:
             future = []
             mplayer.stop()
-        if (command == 'm' and arg) or command == '+':
+        if (command == b'm' and arg) or command == b'+':
             added = CopySongs(User_pool, arg_regexp)
-            info = 'Added %d songs to the stack.' % (len(added))
+            info = 'Added %d songs to the stack. (playlist len %d)' % (len(added), len(User_pool))
             future += added
             if added: 
-                if command == 'm': mplayer.stop()
+                if command == b'm': mplayer.stop()
                 random.shuffle(future)
-        if command == '=':
+        if command == b'=':
             added = CopySongs(User_pool, arg_regexp)
             added.sort()
             info = 'Appended %d songs to the stack.' % (len(added))
             future = future + added
-        if command == '>':
+        if command == b'>':
             added = CopySongs(User_pool, arg_regexp)
             random.shuffle(added)
             info = 'Inserted %d songs to the stack.' % (len(added))
             future = added + future
 
     if future:
-        f.write('--- Stack ---\n')
+        write2any(f, '--- Stack ---\n')
         if len(future) > 100:
-            f.write('[not listing %d files]\n' % len(future))
+            write2any(f, '[not listing %d files]\n' % len(future))
         else:
-            f.write('\n'.join(future) + '\n')
-        f.write('--- End of Stack ---\n')
+            write2any(f, '\n'.join([fn.decode('utf8', errors='replace') for fn in future]) + '\n')
+        write2any(f, '--- End of Stack ---\n')
     else:
-        f.write('Stack is empty.\n')
-    if info: f.write(info + '\n')
+        write2any(f, 'Stack is empty.\n')
+    if info: write2any(f, info + '\n')
+
+### Unicode hack
+
+def write2any(output, s):
+    # write a unicode string to stdout (utf8) or to tcp socket (bytes)
+    if hasattr(output, 'encoding') and output.encoding == 'utf-8':
+        output.write(s + '\n')
+    else:
+        output.write(s.encode('utf-8') + b'\n')
 
 ### Events, mplayer backend and other twisted stuff
 
@@ -261,73 +282,76 @@ rm             remove current song from disk (the one printed by 'i')
 """
 
 class Prompt(basic.LineReceiver):
-    from os import linesep as delimiter
+    delimiter = b'\n'
     def connectionMade(self):
-        self.sendLine('(enter h for help)')
+        self.sendLine(b'(enter h for help)')
     def lineReceived(self, line):
+        self.sendLine(b'received ' + repr(line).encode('utf8'))
         global mplayer
-        line = line.strip()
 
         # wireless numpad hacks
-        line = line.replace('\x1b[2~', '0')
-        line = line.replace('\x1b[8~', '1')
-        line = line.replace('\x1b[B', '2')
-        line = line.replace('\x1b[6~', '3')
-        if line == '0': line = 's'
-        if line == '1': line = ''
-        if line == '2': line = 'p'
-        if line == '3': line = 'n'
-        if line == '*': line = 'm http'
+        line = line.replace(b'\x1b[2~', b'0')
+        line = line.replace(b'\x1b[8~', b'1')
+        line = line.replace(b'\x1b[B', b'2')
+        line = line.replace(b'\x1b[6~', b'3')
+        line = line.strip()
 
-        if not line or line == 'n':
+        if line == b'0': line = b's'
+        if line == b'1': line = b''
+        if line == b'2': line = b'p'
+        if line == b'3': line = b'n'
+        if line == b'*': line = b'm http'
+
+        if not line or line == b'n':
             if mplayer.paused:
                 mplayer.pause()
-                self.sendLine('[continued]')
+                self.sendLine(b'[continued]')
             else:
                 mplayer.stop()
                 play(NextSong(f=self.transport, userrequest=True))
-        elif line == 'h' or line == '?':
-            self.sendLine(help)
-        elif line == 's':
+        elif line == b'h' or line == b'?':
+            self.sendLine(help.encode('utf8'))
+        elif line == b's':
             if mplayer.paused:
                 mplayer.stop()
                 mplayer = mplayer_stopped
                 PrevSong()
-                self.sendLine('[stopped]')
+                self.sendLine(b'[stopped]')
             elif mplayer.stopped:
-                self.sendLine('Already stopped!')
+                self.sendLine(b'Already stopped!')
             else:
                 mplayer.pause()
-                self.sendLine('[paused]')
-        elif line == 'i':
+                self.sendLine(b'[paused]')
+        elif line == b'i':
             if not history:
-                print "Nothing, waiting for your first command"
+                print("Nothing, waiting for your first command")
             else:
                 self.sendLine(history[-1])
         elif line == 'rm':
             if not history:
-                print "Nothing to remove."
+                print("Nothing to remove.")
             else:
                 try:
                     os.remove(history[-1])
                     #del history[-1]
                 except OSError:
-                    self.sendLine('cannot remove ' + history[-1])
+                    self.sendLine(b'cannot remove ' + history[-1])
                 else:
-                    self.sendLine('removed ' + history[-1])
-            self.lineReceived('n')
-        elif line == 'p':
+                    self.sendLine(b'removed ' + history[-1])
+            self.lineReceived(b'n')
+        elif line == b'p':
             mplayer.stop()
             play(PrevSong(self.transport))
-        elif line == 'q' or line == 'k':
-            if self is commandline or line == 'k':
+        elif line == b'q' or line == b'k':
+            if self is commandline or line == b'k':
                 mplayer.stop()
                 mplayer = mplayer_stopped
                 reactor.stop()
             else:
                 self.transport.loseConnection()
         else:
-            Command(line.strip(), self.transport)
+            self.sendLine(b'command ' + repr(line.strip()).encode('utf8'))
+            Command(line.strip(), f=self.transport)
 
 class Mplayer(protocol.ProcessProtocol):
     stopped = False
@@ -358,7 +382,7 @@ class Mplayer(protocol.ProcessProtocol):
         try:
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             ds.connect(mpv_socket)
-            ds.send('{ "command": ["quit"] }\n')
+            ds.send(b'{ "command": ["quit"] }\n')
         except socket.error:
             pass
     def pause(self):
@@ -366,7 +390,7 @@ class Mplayer(protocol.ProcessProtocol):
         try:
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             ds.connect(mpv_socket)
-            ds.send('{ "command": ["keypress", "p"] }\n')
+            ds.send(b'{ "command": ["keypress", "p"] }\n')
             self.paused = not self.paused
         except socket.error:
             pass
@@ -382,7 +406,7 @@ mplayer_stopped = Mplayer_stopped()
 
 def play(song):
     global mplayer
-    if song.startswith('-'): return
+    if song.startswith(b'-'): return
     mplayer = Mplayer()
     # ?? why does 'wc' work without full path, but not 'mplayer'?
     # reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
@@ -424,5 +448,5 @@ def Main(pool, selectSongFunc = RandomPoolSong):
     mplayer.stop()
 
 if __name__ == '__main__':
-    print 'Do not run directly, try playlist-example.py instead.'
+    print('Do not run directly, try playlist-example.py instead.')
 

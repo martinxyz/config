@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 #interval = 60*60
 interval = 60*60*9
@@ -15,10 +15,10 @@ if os.path.exists(f) and \
     lines = lines[:3]
     if ''.join(lines).strip():
         # calendar not empty
-        print
+        print()
         for line in lines:
-            print line[:80]
-        print
+            print(line[:80])
+        print()
         os.utime(f, None) # touch
 
 # my new calendar: read-only text file, synced via caldav
@@ -32,8 +32,8 @@ if os.path.exists(fn('content')):
         lines = lines[:3]
         if ''.join(lines).strip():
             # calendar not empty
-            print
+            print()
             for line in lines:
-                print line[:80]
-            print
+                print(line[:80])
+            print()
             with open(fn('last-shown'), 'w'): pass # touch or create

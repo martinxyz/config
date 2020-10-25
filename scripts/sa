@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 "standard action script"
 import sys, os
 
 things = sys.argv[1:]
 if not things:
-    print "Parameter expected."
+    print("Parameter expected.")
     sys.exit(1)
 
 for thing in things:
@@ -12,12 +12,12 @@ for thing in things:
     if isurl:
         if thing.startswith('http://prdownloads.sourceforge.net'):
             if thing.endswith('?download'):
-	        part = thing[34:-9]
+	            part = thing[34:-9]
             else:
-	        part = thing[34:]
+	            part = thing[34:]
             #thing = 'http://switch.dl.sourceforge.net/sourceforge' + part
             thing = 'http://puzzle.dl.sourceforge.net/sourceforge' + part
-            print 'Sourceforge Mirrorlink! ==>', thing
+            print('Sourceforge Mirrorlink! ==>', thing)
         command = 'wget -O- ' + thing
     else:
         command = 'cat ' + thing
@@ -52,6 +52,6 @@ for thing in things:
         else:
             command = 'youtube-dl ' + thing + ' && mplayer ' + name
     else:
-        print 'No idea what to do.'
+        print('No idea what to do.')
         command = 'file ' + thing
     os.system(command)
