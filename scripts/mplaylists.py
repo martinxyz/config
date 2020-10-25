@@ -4,14 +4,13 @@ Music playlist server controlling mplayer as backend.
 See playlist-example.py to find out how to use it.
 """
 mpv_path = '/usr/bin/mpv'
-mpv_socket = '/home/martin/.cache/mplaylists-mpvsocket'
 # echo '{ "command": ["get_property", "playback-time"] }' | socat - ~/.cache/mplaylists-mpvsocket
 
 # playlog = None
 playlog_path = '/home/martin/sich/playlog'
 playlog = open(playlog_path, 'ab')
 
-import os, sys, random, re, time, socket
+import os, sys, random, re, time, socket, tempfile, uuid
 stdout = sys.stdout
 
 ### globals
@@ -19,6 +18,8 @@ stdout = sys.stdout
 User_selectSongFunc = None
 mplayer = None
 User_pool = None
+tempdir = None
+commandline = None
 
 ### Helper functions, they all return a list of filenames
 
@@ -49,7 +50,15 @@ def CopySongs(playlist, regexp = None, remove=False):
     regexp = regexp.replace(' ', '.*') # "easy" regexps
     regexp = re.compile(regexp, re.IGNORECASE)
     for filename in playlist[:]:
-        if regexp.search(filename.decode('utf8', errors='ignore')):
+        # allow to search latin1 and unicode filenames by unicode query
+        try:
+            fn = filename.decode('utf8')
+        except UnicodeDecodeError:
+            try:
+                fn = filename.decode('latin1')
+            except UnicodeDecodeError:
+                fn = filename.decode('utf8', errors='ignore')
+        if regexp.search(fn):
             if remove: playlist.remove(filename)
             result.append(filename)
     return result
@@ -109,7 +118,7 @@ class SongSelector:
         return self.select()
     
     def log(self, s):
-        write2any(self.output, s)
+        write2any(self.output, s + '\n')
 
     def select(self):
         raise NotImplemented('abstract method')
@@ -209,9 +218,7 @@ def Command(command, f = stdout):
         write2any(f, 'Stack cleaned.\n')
     else:
         arg = command[1:].strip()
-        write2any(f, 'arg %r\n' % arg)
         arg_regexp = arg.replace(b' ', b'.*') # "easy" regexps
-        write2any(f, 'arg_regexp %r\n' % arg_regexp)
         command = command[0:1]
         if command == b'-':
             taken = TakeSongs(future, arg_regexp)
@@ -221,7 +228,7 @@ def Command(command, f = stdout):
             mplayer.stop()
         if (command == b'm' and arg) or command == b'+':
             added = CopySongs(User_pool, arg_regexp)
-            info = 'Added %d songs to the stack. (playlist len %d)' % (len(added), len(User_pool))
+            info = 'Added %d songs to the stack.' % (len(added))
             future += added
             if added: 
                 if command == b'm': mplayer.stop()
@@ -253,9 +260,9 @@ def Command(command, f = stdout):
 def write2any(output, s):
     # write a unicode string to stdout (utf8) or to tcp socket (bytes)
     if hasattr(output, 'encoding') and output.encoding == 'utf-8':
-        output.write(s + '\n')
+        output.write(s)
     else:
-        output.write(s.encode('utf-8') + b'\n')
+        output.write(s.encode('utf-8'))
 
 ### Events, mplayer backend and other twisted stuff
 
@@ -286,7 +293,6 @@ class Prompt(basic.LineReceiver):
     def connectionMade(self):
         self.sendLine(b'(enter h for help)')
     def lineReceived(self, line):
-        self.sendLine(b'received ' + repr(line).encode('utf8'))
         global mplayer
 
         # wireless numpad hacks
@@ -350,50 +356,52 @@ class Prompt(basic.LineReceiver):
             else:
                 self.transport.loseConnection()
         else:
-            self.sendLine(b'command ' + repr(line.strip()).encode('utf8'))
             Command(line.strip(), f=self.transport)
 
 class Mplayer(protocol.ProcessProtocol):
     stopped = False
-    def __init__(self):
+    def __init__(self, song):
         self.paused = False
-
+        self.uuid = str(uuid.uuid4())
+        self.mpv_socket = os.path.join(tempdir, self.uuid)
+        reactor.spawnProcess(self, mpv_path, [mpv_path, "-really-quiet", "--input-ipc-server=" + self.mpv_socket, "-vo", "null", song], None)
+    def __del__(self):
+        try:
+            os.remove(self.mpv_socket)
+        except FileNotFoundError:
+            pass
     def connectionMade(self):
-        #print "Mplayer process started."
+        # print(self.uuid, 'Mplayer process started.')
         pass
     def outReceived(self, data):
-        #print data,
-        #if data.startswith('A:'):
-        #    self.pos = data
+        # print(self.uuid, 'outReceived: %r' % data)
         pass
     def errReceived(self, data):
-        #print "errReceived! with %d bytes!" % len(data)
-        #print data,
+        # print(self.uuid, 'errReceived! %r' % data)
         pass
     def processEnded(self, status_object):
-        #print 'processEnded (mplayer =', mplayer, ')'
-        #print "Mplayer processEnded, status %d" % status_object.value.exitCode
+        # print(self.uuid, 'processEnded (mplayer =', mplayer, ')')
+        # print('Mplayer processEnded, status %r' % status_object.value.exitCode)
         if self is mplayer: # the main player automatically goes on
             if not self.paused:
                 play(NextSong(f=stdout, userrequest=False))
     def stop(self):
+        print(self.uuid, 'stop()')
         if self.paused: self.pause()
-        #self.transport.write('q\n')
         try:
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            ds.connect(mpv_socket)
+            ds.connect(self.mpv_socket)
             ds.send(b'{ "command": ["quit"] }\n')
         except socket.error:
-            pass
+            self.transport.signalProcess('TERM')
     def pause(self):
-        #self.transport.write('p\n')
         try:
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            ds.connect(mpv_socket)
+            ds.connect(self.mpv_socket)
             ds.send(b'{ "command": ["keypress", "p"] }\n')
             self.paused = not self.paused
         except socket.error:
-            pass
+            self.transport.signalProcess('TERM')
 
 class Mplayer_stopped:
     paused = False
@@ -407,10 +415,7 @@ mplayer_stopped = Mplayer_stopped()
 def play(song):
     global mplayer
     if song.startswith(b'-'): return
-    mplayer = Mplayer()
-    # ?? why does 'wc' work without full path, but not 'mplayer'?
-    # reactor.spawnProcess(mplayer, mplayer_path, [mplayer_path, "-slave", "-really-quiet", "-ao", "alsa", "-vo", "null", song], None)
-    reactor.spawnProcess(mplayer, mpv_path, [mpv_path, "-really-quiet", "--input-ipc-server=" + mpv_socket, "-vo", "null", song], None)
+    mplayer = Mplayer(song)
 
 def RandomPoolSong():
     return random.choice(User_pool)
@@ -424,7 +429,7 @@ def Main(pool, selectSongFunc = RandomPoolSong):
     pool song is choosen instead.
     
     """
-    global User_selectSongFunc, User_pool
+    global User_selectSongFunc, User_pool, tempdir
     User_selectSongFunc = selectSongFunc
     User_pool = pool
 
@@ -441,11 +446,15 @@ def Main(pool, selectSongFunc = RandomPoolSong):
     global mplayer
     mplayer = mplayer_stopped
     args = sys.argv[1:]
-    if args: Command(' '.join(sys.argv[1:]))
 
-    reactor.run()
 
-    mplayer.stop()
+    with tempfile.TemporaryDirectory(prefix='mplaylists-') as tempdir:
+
+        if args: Command(' '.join(sys.argv[1:]))
+
+        reactor.run()
+
+        mplayer.stop()
 
 if __name__ == '__main__':
     print('Do not run directly, try playlist-example.py instead.')
