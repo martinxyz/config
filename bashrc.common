@@ -90,7 +90,10 @@ fi
 
 complete -o bashdefault -o default -o nospace -F _git i
 
-~/scripts/calshow.py
+if [ -d ~/.caldav-remind ]; then
+   # FIXME: python startup slows down opening of terms; rewrite in rust?
+   ~/scripts/calshow.py
+fi
 
 # messy chdir history
 
