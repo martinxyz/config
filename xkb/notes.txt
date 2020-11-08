@@ -1,0 +1,14 @@
+This is so much more complicated than ~/.xmodmap used to be.
+
+Mostly followed this:
+http://linux.lsdev.sil.org/wiki/index.php/Building_an_XKB_Keyboard
+
+setxkbmap ch de # switch back - this one work
+#setxkbmap ch maxy # why does this not work?  (using gnome3 selector menu works)
+
+/usr/share/X11/xkb/symbols/
+/usr/share/X11/xkb/rules/evdev.xml
+
+It is possible to SOMEHOW set it locally in Gnome3, just for the current user, but...
+https://help.ubuntu.com/community/Custom%20keyboard%20layout%20definitions
+https://askubuntu.com/questions/482678/how-to-add-a-new-keyboard-layout-custom-keyboard-layout-definition
