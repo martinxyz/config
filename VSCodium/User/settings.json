@@ -14,6 +14,16 @@
     "editor.cursorSurroundingLines": 6,
     "rust-analyzer.updates.channel": "nightly",
     "vim.debug.loggingLevelForConsole": "debug",
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-f>": false,
+        "<C-s>": false
+    },
     "vim.normalModeKeyBindings": [
         {
             "before": [
@@ -56,21 +66,28 @@
                 ";",
                 "<Esc>"
             ]
+        },
+        {
+            "before": [
+                "<tab>"
+            ],
+            "commands": [
+                "editor.action.reindentlines"
+            ]
         }
     ],
-        "vim.normalModeKeyBindingsNonRecursive": [
+    "vim.normalModeKeyBindingsNonRecursive": [
         {
-            "before": [":"],
+            "before": [
+                ":"
+            ],
             "commands": [
                 "workbench.action.showCommands",
             ]
         }
     ],
-    "vim.commandLineModeKeyBindingsNonRecursive": [
-    ],
-    "vim.visualModeKeyBindings": [
-    
-    ],
+    "vim.commandLineModeKeyBindingsNonRecursive": [],
+    "vim.visualModeKeyBindings": [],
     "window.menuBarVisibility": "toggle",
     "files.autoSave": "onFocusChange",
     "rust-client.engine": "rust-analyzer",

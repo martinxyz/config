@@ -1,7 +1,7 @@
 # packages to install on new systems
 
 sudo apt install vim emacs build-essential manpages-dev \
-  atop htop tree git tig ripgrep meld
+  atop htop tree git tig ripgrep meld tmux
 
 # desktop
 sudo apt libnotify-bin

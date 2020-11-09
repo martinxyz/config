@@ -364,44 +364,53 @@ class Mplayer(protocol.ProcessProtocol):
         self.paused = False
         self.uuid = str(uuid.uuid4())
         self.mpv_socket = os.path.join(tempdir, self.uuid)
+        print(self.uuid, 'spawning')
         reactor.spawnProcess(self, mpv_path, [mpv_path, "-really-quiet", "--input-ipc-server=" + self.mpv_socket, "-vo", "null", song], None)
     def __del__(self):
+        print(self.uuid, 'destructor')
         try:
             os.remove(self.mpv_socket)
         except FileNotFoundError:
             pass
     def connectionMade(self):
-        # print(self.uuid, 'Mplayer process started.')
+        print(self.uuid, 'Mplayer process started.')
         pass
     def outReceived(self, data):
-        # print(self.uuid, 'outReceived: %r' % data)
+        print(self.uuid, 'outReceived: %r' % data)
         pass
     def errReceived(self, data):
-        # print(self.uuid, 'errReceived! %r' % data)
+        print(self.uuid, 'errReceived! %r' % data)
         pass
     def processEnded(self, status_object):
-        # print(self.uuid, 'processEnded (mplayer =', mplayer, ')')
-        # print('Mplayer processEnded, status %r' % status_object.value.exitCode)
+        print(self.uuid, 'processEnded (mplayer =', mplayer, ')')
+        print('Mplayer processEnded, status %r' % status_object.value.exitCode)
         if self is mplayer: # the main player automatically goes on
             if not self.paused:
                 play(NextSong(f=stdout, userrequest=False))
     def stop(self):
         print(self.uuid, 'stop()')
         if self.paused: self.pause()
-        try:
+        try:  # XXX what if mpv didn't get around to create the pipe yet?
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             ds.connect(self.mpv_socket)
             ds.send(b'{ "command": ["quit"] }\n')
         except socket.error:
+            print(self.uuid, 'sending TERM')
             self.transport.signalProcess('TERM')
+        except Exception as e:
+            print(self.uuid, 'Exc %r' % e)
     def pause(self):
+        print(self.uuid, 'pause()')
         try:
             ds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             ds.connect(self.mpv_socket)
             ds.send(b'{ "command": ["keypress", "p"] }\n')
             self.paused = not self.paused
         except socket.error:
+            print(self.uuid, 'sending TERM')
             self.transport.signalProcess('TERM')
+        except Exception as e:
+            print(self.uuid, 'Exc %r' % e)
 
 class Mplayer_stopped:
     paused = False

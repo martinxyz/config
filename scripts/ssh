@@ -13,8 +13,10 @@
 if [ -t 1 ] ; then
     # running in terminal
     echo -n -e "\e]49;#000040\a" # non-penetrant blue
+    konsoleprofile colors=Breeze-ssh || true
     /usr/bin/ssh "$@"
     echo -n -e "\e]49;#000000\a" # black
+    konsoleprofile colors=Breeze || true
 else
     # do not disturb scripts (like git ssh)
     /usr/bin/ssh "$@"

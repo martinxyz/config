@@ -22,9 +22,11 @@ def volume_keys(keyset):
         return
     elif plus:
         subprocess.call(['amixer', '-q', 'sset', 'Master', '1%+'])
+        #subprocess.call(['amixer', '-q', 'sset', 'Master', '1%+'])
         #subprocess.call(['amixer', '-c', '1', '-q', 'sset', 'Master', '1%+'])
     elif minus:
         subprocess.call(['amixer', '-q', 'sset', 'Master', '1%-'])
+        #subprocess.call(['amixer', '-q', 'sset', 'Master', '1%-'])
         #subprocess.call(['amixer', '-c', '1', '-q', 'sset', 'Master', '1%-'])
 
 
