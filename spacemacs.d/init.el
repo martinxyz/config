@@ -29,7 +29,11 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(systemd
+   '(fsharp,
+     nginx
+     (csharp :variables csharp-backend 'nil)
+     ansible
+     systemd
      yaml
      lua
      typescript
@@ -71,8 +75,9 @@ This function should only modify configuration layer settings."
 
      ; https://develop.spacemacs.org/layers/+lang/c-c++/README.html#rtags
      (c-c++ :variables
-            c-c++-backend 'rtags  ; old, proven, fast
+            ;; c-c++-backend 'rtags  ; old, proven, fast
             ;; c-c++-backend 'lsp-clangd  ; memory-hungry, requires clangd >=9 to work well
+            c-c++-backend 'lsp-ccls  ; okay-ish
             c-c++-enable-google-style t
             c-c++-enable-google-newline t
             ; c-c++-enable-clang-format-on-save t  ; maybe! (manually: SPC m = =)
@@ -84,13 +89,16 @@ This function should only modify configuration layer settings."
            scss-enable-lsp 't
            html-enable-lsp 't
            )
-     javascript
+     ;; javascript
+     (javascript :variables javascript-backend 'lsp)
+     tern
      ; c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
 
      ;react
      ;restclient
-     lsp
-     (cmake :variables cmake-enable-cmake-ide-support t)
+     ;; lsp  ;; breaks my typescript workflow
+     ;; (cmake :variables cmake-enable-cmake-ide-support t)
+     (cmake :variables cmake-enable-cmake-ide-support nil)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -111,11 +119,12 @@ This function should only modify configuration layer settings."
                                       cmake-mode
                                       qml-mode
                                       protobuf-mode
+                                      groovy-mode
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(importmagic)  ; importmagic uses too much RAM for too little gain
+   dotspacemacs-excluded-packages '(importmagic org-brain)  ; importmagic uses too much RAM for too little gain
                                         ; '(evil-search-highlight-persist)  ; '(tern)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -636,7 +645,7 @@ you should place your code here."
 
   ; Ctrl-F is swiper search, not evil-scroll-page-down
   (define-key evil-normal-state-map "\C-f" 'swiper)
-  (define-key evil-normal-state-map "/" 'swiper)
+  ;; (define-key evil-normal-state-map "/" 'swiper)
   (define-key evil-normal-state-map "\C-j" 'spacemacs/jump-to-definition)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
@@ -824,10 +833,11 @@ you should place your code here."
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
+  ; breaks web mode
   ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
-  (add-hook 'prog-mode-hook #'(lambda ()
-                                (dtrt-indent-mode 't)
-                                (dtrt-indent-adapt)))
+  ;; (add-hook 'prog-mode-hook #'(lambda ()
+  ;;                               (dtrt-indent-mode 't)
+  ;;                               (dtrt-indent-adapt)))
   ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
   ; (but .editorconfig works, I think?)
   ;; (defun my-web-mode-hook ()
@@ -1093,6 +1103,13 @@ Suitable for inclusion in `c-offsets-alist'."
       (abort-recursive-edit)))
   (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
 
+  (defun remove-dos-eol ()
+    "Do not show ^M in files containing mixed UNIX and DOS line endings."
+    (interactive)
+    (setq buffer-display-table (make-display-table))
+    (aset buffer-display-table ?\^M []))
+  (add-hook 'csharp-mode-hook 'remove-dos-eol)
+
   ; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
   (setq lsp-clients-angular-language-server-command
         '("node"
@@ -1133,6 +1150,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-maximal-file-name-column 20)
  '(cycbuf-minimal-buffer-name-column 20)
  '(cycbuf-minimal-file-name-column 8)
+ '(dabbrev-case-replace nil)
  '(delete-trailing-lines nil)
  '(dumb-jump-confirm-jump-to-modified-file nil)
  '(evil-ex-search-persistent-highlight nil)
@@ -1182,7 +1200,7 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
- '(magit-revision-show-gravatars nil)
+ '(magit-revision-show-gravatars nil t)
  '(magit-save-repository-buffers 'dontask)
  '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
  '(markdown-indent-function 'noop)
@@ -1215,14 +1233,17 @@ This function is called at the very end of Spacemacs initialization."
      (nil "lock" "gpg")
      ("lock" "")
      ("gpg" "")
-     ("html" "css" "js" "ts")
+     ("html" "css" "scss" "js" "ts")
      ("ts" "html")
      ("js" "html")
      ("component.ts" "component.html")
      ("component.css" "component.html")
-     ("component.html" "component.css" "component.js" "component.ts")))
+     ("component.scss" "component.html")
+     ("component.spec.ts" "component.ts")
+     ("component.html" "component.spec.ts" "component.css" "component.scss" "component.js" "component.ts")))
+
  '(py-shell-name "python3")
- '(python-shell-interpreter "python3")
+ '(python-shell-interpreter "python3" t)
  '(rtags-path "/home/martin/.local/bin/")
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
@@ -1291,6 +1312,7 @@ This function is called at the very end of Spacemacs initialization."
  '(cycbuf-uniquify-face ((t (:foreground "dodger blue"))))
  '(diff-refine-added ((t (:background "#134019" :foreground "nil"))))
  '(diff-refine-removed ((t (:background "#442a18" :foreground "nil"))))
+ '(escape-glyph ((t (:foreground "dim gray"))))
  '(evil-ex-lazy-highlight ((t (:inherit lazy-highlight))))
  '(flx-highlight-face ((t (:inherit font-lock-variable-name-face :weight bold))))
  '(flycheck-error ((t (:underline (:color "#af1010" :style wave)))))
