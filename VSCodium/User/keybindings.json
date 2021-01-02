@@ -18,8 +18,32 @@
         "when": "sideBarFocus"
     },
     {
+        "key": "q",
+        "command": "workbench.action.quickOpenNavigateNext",
+        "when": "inQuickOpen"
+    },
+    {
+        "key": "shift+q",
+        "command": "workbench.action.quickOpenNavigatePrevious",
+        "when": "inQuickOpen"
+    },
+    {
         "key": "ctrl+b",
         "command": "-extension.vim_ctrl+b",
         "when": "editorTextFocus && vim.active && vim.use<C-b> && !inDebugRepl && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+/",
+        "command": "-editor.action.commentLine",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+/",
+        "command": "editor.action.commentLine"
+    },
+    {
+        "key": "ctrl+k ctrl+/",
+        "command": "-editor.foldAllBlockComments",
+        "when": "editorTextFocus && foldingEnabled"
     }
 ]

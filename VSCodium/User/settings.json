@@ -22,15 +22,73 @@
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-f>": false,
-        "<C-s>": false
+        "<C-s>": false,
+        "<C-/>": true
     },
     "vim.normalModeKeyBindings": [
+        {
+            "before": [
+                "t"
+            ],
+            "commands": [
+                "workbench.action.quickOpen"
+                
+            ]
+        },
+        {
+            "before": [
+                "<Backspace>"
+            ],
+            "after": [
+                "V"
+                
+            ]
+        },
         {
             "before": [
                 "q"
             ],
             "commands": [
                 "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+            ]
+        },
+        {
+            "before": [
+                "["
+            ],
+            "commands": [
+                "extension.vim_down",
+                "scrollLineDown",
+                "extension.vim_down",
+                "scrollLineDown",
+                "extension.vim_down",
+                "scrollLineDown",
+                "extension.vim_down",
+                "scrollLineDown"
+            ]
+        },
+        {
+            "before": [
+                "]"
+            ],
+            "commands": [
+                "extension.vim_up",
+                "scrollLineUp",
+                "extension.vim_up",
+                "scrollLineUp",
+                "extension.vim_up",
+                "scrollLineUp",
+                "extension.vim_up",
+                "scrollLineUp"
+            ]
+        },
+        {
+            "before": [
+                "<C-/>"
+            ],
+            "commands": [
+                "editor.action.commentLine",
+                "extension.vim_down"
             ]
         },
         {
@@ -82,7 +140,7 @@
                 ":"
             ],
             "commands": [
-                "workbench.action.showCommands",
+                "workbench.action.showCommands"
             ]
         }
     ],
@@ -91,6 +149,10 @@
     "window.menuBarVisibility": "toggle",
     "files.autoSave": "onFocusChange",
     "rust-client.engine": "rust-analyzer",
-    "svelte.language-server.runtime": "/usr/bin/node",
-    "workbench.sideBar.location": "right"
+    "svelte.language-server.runtime": "/home/martin/.local/bin/node",
+    "workbench.sideBar.location": "right",
+    "typescript.npm": "/home/martin/.local/bin/npm",
+    "rust-analyzer.diagnostics.disabled": [
+        "macro-error", "unresolved-proc-macro"
+    ]
 }
