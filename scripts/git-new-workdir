@@ -1,4 +1,0 @@
-#!/bin/bash
-
-exec bash /usr/share/doc/git/contrib/workdir/git-new-workdir "$@"
-
