@@ -1,6 +1,7 @@
 {
     "window.zoomLevel": 1,
     "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
     "update.enableWindowsBackgroundUpdates": false,
@@ -9,21 +10,34 @@
     "extensions.autoUpdate": false,
     "update.showReleaseNotes": false,
     "editor.scrollBeyondLastLine": false,
+    "editor.codeLens": false,
+    "editor.cursorSurroundingLines": 8,
     "vscode-neovim.neovimPath": "/usr/bin/nvim",
     "keyboard.dispatch": "keyCode",
-    "editor.cursorSurroundingLines": 6,
-    "rust-analyzer.updates.channel": "nightly",
-    "vim.debug.loggingLevelForConsole": "debug",
     "vim.easymotion": true,
     "vim.incsearch": true,
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": true,
     "vim.hlsearch": true,
+    "window.menuBarVisibility": "toggle",
+    "files.autoSave": "onFocusChange",
+    "rust-client.engine": "rust-analyzer",
+    "workbench.sideBar.location": "right",
+    "typescript.npm": "/home/martin/.local/bin/npm",
+    "svelte.language-server.runtime": "/home/martin/.local/bin/node",
+    "rust-analyzer.diagnostics.disabled": [
+        "macro-error", "unresolved-proc-macro"
+    ],
+    "rust-analyzer.updates.channel": "nightly",
+    "svelte.language-server.runtime": "/usr/bin/node",
+    "workbench.sideBar.location": "right",
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-f>": false,
         "<C-s>": false,
-        "<C-/>": true
+        "<C-/>": true,
+        "<C-d>": true,
+        "<C-w>": false
     },
     "vim.normalModeKeyBindings": [
         {
@@ -145,14 +159,5 @@
         }
     ],
     "vim.commandLineModeKeyBindingsNonRecursive": [],
-    "vim.visualModeKeyBindings": [],
-    "window.menuBarVisibility": "toggle",
-    "files.autoSave": "onFocusChange",
-    "rust-client.engine": "rust-analyzer",
-    "svelte.language-server.runtime": "/home/martin/.local/bin/node",
-    "workbench.sideBar.location": "right",
-    "typescript.npm": "/home/martin/.local/bin/npm",
-    "rust-analyzer.diagnostics.disabled": [
-        "macro-error", "unresolved-proc-macro"
-    ]
+    "vim.visualModeKeyBindings": []
 }

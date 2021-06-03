@@ -771,7 +771,7 @@ before packages are loaded."
 
   ; Ctrl-F is swiper search, not evil-scroll-page-down
   (define-key evil-normal-state-map "\C-f" 'swiper)
-  ;; (define-key evil-normal-state-map "/" 'swiper)
+  (define-key evil-normal-state-map "/" 'swiper)
   (define-key evil-normal-state-map "\C-j" 'spacemacs/jump-to-definition)
 
   ; move lines around (source: https://github.com/syl20bnr/spacemacs/issues/5365#issuecomment-192973053)
@@ -1150,6 +1150,7 @@ Suitable for inclusion in `c-offsets-alist'."
   ;; (define-key evil-insert-state-map (kbd "M-,") 'rtags-find-references-at-point)
 
   (define-key evil-normal-state-map (kbd "C-p") 'evil-jump-forward)
+  (define-key evil-normal-state-map (kbd "C--" )'evil-jump-backward)
 
 
   (with-eval-after-load 'rtags
