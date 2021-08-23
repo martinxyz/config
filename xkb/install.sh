@@ -5,7 +5,7 @@ if ! grep 'xkb_symbols "maxy"' /usr/share/X11/xkb/symbols/ch; then
     cp /usr/share/X11/xkb/symbols/ch symbols/ch.system
 fi
 
-sudo cp symbols/ch.system /usr/share/X11/xkb/symbols/ch
+sudo cp symbols/ch /usr/share/X11/xkb/symbols/ch
 sudo rm -f /var/lib/xkb/*.kkm  # was empty in my system, but just in case
 
 if ! grep "<name>maxy</name>" /usr/share/X11/xkb/rules/evdev.xml > /dev/null; then 

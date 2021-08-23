@@ -12,3 +12,10 @@ setxkbmap ch de # switch back - this one work
 It is possible to SOMEHOW set it locally in Gnome3, just for the current user, but...
 https://help.ubuntu.com/community/Custom%20keyboard%20layout%20definitions
 https://askubuntu.com/questions/482678/how-to-add-a-new-keyboard-layout-custom-keyboard-layout-definition
+
+... or like this
+setxkbmap -layout ch -variant maxy
+setxkbmap -layout ch -variant de
+
+https://medium.com/@damko/a-simple-humble-but-comprehensive-guide-to-xkb-for-linux-6f1ad5e13450
+
