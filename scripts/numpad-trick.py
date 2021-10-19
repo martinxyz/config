@@ -4,13 +4,19 @@ import asyncio
 from evdev import ecodes
 import socket
 import subprocess
+import sys
+import time
 
-fn = '/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd'
-device = evdev.InputDevice(fn)
-device.grab()  # prevent X11 from getting the events, too
-
+print('trace 0', file=sys.stderr)
 mplaylist = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 mplaylist.connect(('localhost', 28443))
+
+fn = '/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd'
+print('trace 1', file=sys.stderr)
+device = evdev.InputDevice(fn)
+print('trace 2', file=sys.stderr)
+device.grab()  # prevent X11 from getting the events, too
+print('trace 3', file=sys.stderr)
 
 active_keycodes = set()
 
@@ -68,14 +74,16 @@ async def listen_to_numpad():
                 mplaylist.send(b's\n')
         if event.code == ecodes.KEY_NUMLOCK:
             continue
-        print(evdev.categorize(event))
+        print(evdev.categorize(event), file=sys.stderr)
 
 
-print('numpad-trick.py: starting asyncio loop')
+print('numpad-trick.py: starting asyncio loop', file=sys.stderr)
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(listen_to_numpad())
+print('end of run_until_complete()', file=sys.stderr)
 loop.close()
+print('end of script', file=sys.stderr)
 
 # asyncio.run(listen_to_numpad())
 # loop = asyncio.get_event_loop()

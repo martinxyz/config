@@ -7,7 +7,6 @@
     "update.enableWindowsBackgroundUpdates": false,
     "update.mode": "none",
     "extensions.autoCheckUpdates": false,
-    "extensions.autoUpdate": false,
     "update.showReleaseNotes": false,
     "editor.scrollBeyondLastLine": false,
     "editor.codeLens": false,
@@ -19,7 +18,7 @@
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": true,
     "vim.hlsearch": true,
-    "window.menuBarVisibility": "toggle",
+    "window.menuBarVisibility": "compact",
     "files.autoSave": "onFocusChange",
     "rust-client.engine": "rust-analyzer",
     "workbench.sideBar.location": "right",
@@ -28,7 +27,6 @@
     "rust-analyzer.diagnostics.disabled": [
         "macro-error", "unresolved-proc-macro"
     ],
-    "rust-analyzer.updates.channel": "nightly",
     "svelte.language-server.runtime": "/usr/bin/node",
     "workbench.sideBar.location": "right",
     "vim.handleKeys": {
@@ -156,8 +154,63 @@
             "commands": [
                 "workbench.action.showCommands"
             ]
+        },
+        {
+            "before": [
+                "<space>"
+            ],
+            "commands": [
+                "vspacecode.space"
+            ]
+        },
+        {
+            "before": [
+                ","
+            ],
+            "commands": [
+                "vspacecode.space",
+                {
+                    "command": "whichkey.triggerKey",
+                    "args": "m"
+                }
+            ]
         }
     ],
     "vim.commandLineModeKeyBindingsNonRecursive": [],
-    "vim.visualModeKeyBindings": []
+    "vim.visualModeKeyBindings": [],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<space>"
+            ],
+            "commands": [
+                "vspacecode.space"
+            ]
+        },
+        {
+            "before": [
+                ","
+            ],
+            "commands": [
+                "vspacecode.space",
+                {
+                    "command": "whichkey.triggerKey",
+                    "args": "m"
+                }
+            ]
+        }
+    ],
+    "extensions.autoUpdate": false,
+    "rust-analyzer.lruCapacity": 512,
+    "editor.renderWhitespace": "none",
+    "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+            "*.mutable": {
+                "underline": false,
+            }
+        }
+    }
+}
+
 }

@@ -59,7 +59,7 @@ export HISTSIZE=160000
 shopt -s histreedit
 shopt -s histappend
 
-if which nvim > /dev/null; then
+if type nvim > /dev/null; then
    export EDITOR=nvim
    export VISUAL=nvim
 else
