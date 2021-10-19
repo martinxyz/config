@@ -2,6 +2,7 @@
     "window.zoomLevel": 1,
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
+    "telemetry.telemetryLevel": "off",
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
     "update.enableWindowsBackgroundUpdates": false,
@@ -11,7 +12,6 @@
     "editor.scrollBeyondLastLine": false,
     "editor.codeLens": false,
     "editor.cursorSurroundingLines": 8,
-    "vscode-neovim.neovimPath": "/usr/bin/nvim",
     "keyboard.dispatch": "keyCode",
     "vim.easymotion": true,
     "vim.incsearch": true,
@@ -27,8 +27,6 @@
     "rust-analyzer.diagnostics.disabled": [
         "macro-error", "unresolved-proc-macro"
     ],
-    "svelte.language-server.runtime": "/usr/bin/node",
-    "workbench.sideBar.location": "right",
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-f>": false,
@@ -210,7 +208,6 @@
                 "underline": false,
             }
         }
-    }
-}
-
+    },
+    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim"
 }
