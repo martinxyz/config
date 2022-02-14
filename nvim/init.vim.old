@@ -172,6 +172,9 @@ if !exists('g:vscode')
 	" set background=dark
 
 
+        " Highlights all occurrences of your search
+        "set hlsearch
+
 	" Tab complete now ignores these
 	set wildignore=*.o,*.obj,*~,*.pyc,*.pyo
 

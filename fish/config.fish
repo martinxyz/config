@@ -7,6 +7,10 @@ if status is-interactive
     alias ls "ls -rt --color=auto"
     alias l "exa -s modified"
     alias i git
+    alias ... "cd ../.."
+    alias .... "cd ../../.."
+    alias ..... "cd ../../../.."
+    alias ...... "cd ../../../../.."
     abbr -a -- - 'cd -'
 
     set -xg EDITOR nvim
@@ -22,4 +26,12 @@ if status is-interactive
     end
 
     set -xg LD_LIBRARY_PATH /home/martin/.local/lib
+
+
+    if test -d ~/.caldav-remind
+       ~/scripts/calshow-rust/target/release/calshow
+    end
+
+    sleep 0.05  # reduces "first prompt sometimes empty" problem?
 end
+

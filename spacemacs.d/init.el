@@ -32,7 +32,19 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(emacs-lisp
+   '(vimscript
+     (python :variables python-backend 'lsp python-lsp-server 'pylsp)
+     ;; (python :variables python-backend 'lsp python-lsp-server 'mspyls)
+     ;; (python :variables python-backend 'lsp python-lsp-server 'pylsp)
+     ;; (python :variables
+     ;;         python-backend 'lsp
+     ;;         python-lsp-server 'mspyls
+     ;;         python-lsp-git-root "~/dev/python/python-language-server")
+     ;; (python :variables
+     ;;         python-backend 'lsp
+     ;;         python-lsp-server 'pylsp)
+     csv
+     emacs-lisp
      fsharp
      nginx
      (csharp :variables csharp-backend 'nil)
@@ -84,7 +96,7 @@ This function should only modify configuration layer settings."
             c-c++-enable-google-newline t
             ; c-c++-enable-clang-format-on-save t  ; maybe! (manually: SPC m = =)
             )
-     python
+
      (html :variables
            css-enable-lsp 't
            less-enable-lsp 't
@@ -683,7 +695,7 @@ before packages are loaded."
   ;; (define-key evil-normal-state-map "V" 'counsel-projectile)  ; I'm prefering V for "visual-line" now (vim default)
   (define-key evil-normal-state-map "t" 'counsel-projectile)
   (define-key evil-normal-state-map "T" 'projectile-find-file-dwim)  ; a bit faster than counsel-projectile, and a bit lower quality (it only spends time in sorting by mtime, if enabled I guess, not in file-truename; but still too slow)
-  (define-key evil-normal-state-map "\C-t" 'ivy-switch-buffer)
+  (define-key evil-normal-state-map "\C-t" 'lsp-ivy-workspace-symbol)
   ;; (define-key evil-normal-state-map "z" 'ivy-switch-buffer)
   (define-key evil-normal-state-map "z" 'counsel-buffer-or-recentf)
 
@@ -744,7 +756,9 @@ before packages are loaded."
     (interactive)
     ;(start-process "terminal" nil "~/scripts/bigterm"))
     ; background it to avoid "active processes exist" question when exiting emacs
-    (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&"))
+    ;; (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&")) ; cargo missing from $PATH
+    ;; (start-process "terminal" nil "~/scripts/bigterm")) ; cargo missing from $PATH
+    (start-process "terminal" nil "konsole")) ; $PATH okay
 
   ;; Uralte Gewohnheiten aus Borland-Produkten
   (global-set-key  [f4]  'next-error)
@@ -1335,7 +1349,7 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-rust-analyzer-server-display-inlay-hints t)
  '(lsp-rust-server 'rust-analyzer)
  '(lsp-signature-auto-activate nil)
- '(lsp-ui-doc-enable nil t)
+ '(lsp-ui-doc-enable nil)
  '(lsp-ui-sideline-delay 0.8)
  '(magit-diff-refine-hunk t)
  '(magit-diff-refine-ignore-whitespace nil)
@@ -1381,8 +1395,9 @@ This function is called at the very end of Spacemacs initialization."
      ("component.spec.ts" "component.ts")
      ("component.html" "component.spec.ts" "component.css" "component.scss" "component.js" "component.ts")))
  '(py-shell-name "python3")
- '(python-shell-interpreter "python3")
+ '(python-shell-interpreter "python3" t)
  '(rtags-path "/home/martin/.local/bin/")
+ '(rust-format-on-save t)
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
      (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")

@@ -19,13 +19,14 @@ test -h .viper && rm .viper
 mkdir -p .config/matplotlib
 symlink ../../config/matplotlibrc .config/matplotlib/matplotlibrc
 
-for i in vimrc gvimrc vim cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmii-3.5 pylintrc wcalc_preload spacemacs.d tmux.conf inputrc; do
+for i in vimrc cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmii-3.5 pylintrc wcalc_preload spacemacs.d tmux.conf inputrc; do
   test -r config/$i || echo config/$i does not exist
   symlink config/$i .$i
 done
 
-mkdir -p ~/.config/nvim
-symlink ~/config/init.vim ~/.config/nvim/init.vim
+symlink ~/config/nvim ~/.config/nvim
+symlink ~/config/flake8 ~/.config/flake8
+
 symlink ~/config/flake8 ~/.config/flake8
 symlink ~/config/sway ~/.config/sway
 symlink ~/config/xkb ~/.xkb
@@ -59,6 +60,8 @@ test -h .Xresources && rm .Xresources # nope
 
 mkdir -p .config/git
 symlink ../../config/gitignore .config/git/ignore
+
+file .*|grep broken.symbolic.link
 
 if ! grep -q -s spacemacs .emacs.d/.git/config ; then
     echo

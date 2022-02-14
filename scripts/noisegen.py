@@ -58,5 +58,5 @@ while 1:
     res = outp.write(data)
 
     if res <= 0:
-        print 'ERR', res
+        print('ERR', res)
 

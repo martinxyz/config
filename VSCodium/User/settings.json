@@ -1,5 +1,4 @@
 {
-    "window.zoomLevel": 1,
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
     "telemetry.telemetryLevel": "off",
@@ -18,14 +17,15 @@
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": true,
     "vim.hlsearch": true,
-    "window.menuBarVisibility": "compact",
+    "window.menuBarVisibility": "toggle",
     "files.autoSave": "onFocusChange",
     "rust-client.engine": "rust-analyzer",
     "workbench.sideBar.location": "right",
     "typescript.npm": "/home/martin/.local/bin/npm",
     "svelte.language-server.runtime": "/home/martin/.local/bin/node",
     "rust-analyzer.diagnostics.disabled": [
-        "macro-error", "unresolved-proc-macro"
+        "macro-error",
+        "unresolved-proc-macro"
     ],
     "vim.handleKeys": {
         "<C-a>": false,
@@ -42,7 +42,6 @@
             ],
             "commands": [
                 "workbench.action.quickOpen"
-                
             ]
         },
         {
@@ -51,7 +50,6 @@
             ],
             "after": [
                 "V"
-                
             ]
         },
         {
@@ -142,7 +140,15 @@
             "commands": [
                 "editor.action.reindentlines"
             ]
-        }
+        },
+        {
+            "before": [
+                "<S-m>"
+            ],
+            "commands": [
+                "workbench.action.maximizeEditor"
+            ]
+        },
     ],
     "vim.normalModeKeyBindingsNonRecursive": [
         {
@@ -199,7 +205,7 @@
         }
     ],
     "extensions.autoUpdate": false,
-    "rust-analyzer.lruCapacity": 512,
+    "rust-analyzer.lruCapacity": 256,
     "editor.renderWhitespace": "none",
     "editor.semanticTokenColorCustomizations": {
         "enabled": true,
@@ -209,5 +215,11 @@
             }
         }
     },
-    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim"
+    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+    "magit.display-buffer-function": "same-column",
+    "rust-analyzer.inlayHints.enable": true,
+    "editor.formatOnSave": true,
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.server.path": "/home/martin/.local/bin/rust-analyzer",
+    "window.zoomLevel": 1
 }
