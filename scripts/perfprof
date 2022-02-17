@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e # exit on error
+rm -f profile_perf.png
+perf script | gprof2dot.py -f perf | dot -Tpng -o profile_perf.png
+feh profile_perf.png
+

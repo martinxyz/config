@@ -1,70 +1,74 @@
 // Place your key bindings in this file to override the defaultsauto[]
 [
-    {
-        "key": "ctrl+oem_minus",
-        "command": "-workbench.action.zoomOut"
-    },
-    {
-        "key": "ctrl+shift+t",
-        "command": "workbench.action.tasks.test"
-    },
-    {
-        "key": "ctrl+shift+1",
-        "command": "workbench.action.zoomIn"
-    },
-    {
-        "key": "ctrl+shift+=",
-        "command": "-workbench.action.zoomIn"
-    },
-    {
-        "key": "ctrl+numpad_add",
-        "command": "-workbench.action.zoomIn"
-    },
-    {
-        "key": "ctrl+shift+2",
-        "command": "workbench.action.zoomReset"
-    },
-    {
-        "key": "ctrl+numpad0",
-        "command": "-workbench.action.zoomReset"
-    },
-    {
-        "key": "ctrl+oem_minus",
-        "command": "workbench.action.navigateBack"
-    },
-    {
-        "key": "ctrl+j",
-        "command": "search.action.focusSearchList",
-        "when": "sideBarFocus"
-    },
-    {
-        "key": "ctrl+t",
-        "command": "-extension.vim_ctrl+t",
-        "when": "editorTextFocus && vim.active && vim.use<C-t> && !inDebugRepl"
-    },
-    {
-        "key": "q",
-        "command": "workbench.action.quickOpenNavigateNext",
-        "when": "inQuickOpen"
-    },
-    {
-        "key": "shift+q",
-        "command": "workbench.action.quickOpenNavigatePrevious",
-        "when": "inQuickOpen"
-    },
-    {
-        "key": "ctrl+/",
-        "command": "-editor.action.commentLine",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "key": "ctrl+/",
-        "command": "editor.action.commentLine"
-    },
-    {
-        "key": "ctrl+b",
-        "command": "-extension.vim_ctrl+b",
-        "when": "editorTextFocus && vim.active && vim.use<C-b> && !inDebugRepl && vim.mode != 'Insert'"
+	{
+		"key": "ctrl+oem_minus",
+		"command": "-workbench.action.zoomOut"
+	},
+	{
+		"key": "ctrl+shift+t",
+		"command": "workbench.action.tasks.test"
+	},
+	{
+		"key": "ctrl+shift+1",
+		"command": "workbench.action.zoomIn"
+	},
+	{
+		"key": "ctrl+shift+=",
+		"command": "-workbench.action.zoomIn"
+	},
+	{
+		"key": "ctrl+numpad_add",
+		"command": "-workbench.action.zoomIn"
+	},
+	{
+		"key": "ctrl+shift+2",
+		"command": "workbench.action.zoomReset"
+	},
+	{
+		"key": "ctrl+numpad0",
+		"command": "-workbench.action.zoomReset"
+	},
+	{
+		"key": "ctrl+oem_minus",
+		"command": "workbench.action.navigateBack"
+	},
+	{
+		"key": "ctrl+j",
+		"command": "search.action.focusSearchList",
+		"when": "sideBarFocus"
+	},
+	{
+		"key": "ctrl+t",
+		"command": "-extension.vim_ctrl+t",
+		"when": "editorTextFocus && vim.active && vim.use<C-t> && !inDebugRepl"
+	},
+	// To switch windows (Ctrl-Tab style)
+	// sadly this also blocks "q" search and various popus
+	/*
+	{
+		"key": "q",
+		"command": "workbench.action.quickOpenNavigateNext",
+		"when": "inQuickOpen"
+	},
+	{
+		"key": "shift+q",
+		"command": "workbench.action.quickOpenNavigatePrevious",
+		"when": "inQuickOpen"
+	},
+	*/
+	{
+		"key": "ctrl+/",
+		"command": "-editor.action.commentLine",
+		"when": "editorTextFocus && !editorReadonly"
+	},
+	{
+		"key": "ctrl+/",
+		"command": "editor.action.commentLine"
+	},
+	{
+		"key": "ctrl+b",
+		"command": "-extension.vim_ctrl+b",
+		"when": "editorTextFocus && vim.active && vim.use<C-b> && !inDebugRepl && vim.mode != 'Insert'"
 	},
 	{
 		"key": "space",
@@ -192,5 +196,19 @@
 	{
 		"key": "ctrl+-",
 		"command": "workbench.action.zoomOut"
-	}
+	},
+	// see also: https://github.com/CozyPenguin/vscode-nvim-setup
+	// keyboard quickfix
+	{
+		"key": "ctrl+.",
+		"command": "keyboard-quickfix.openQuickFix",
+		"when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+	},
+	// use ':' key for commands even if no editor tab is opened
+	// {
+	// 	"key": "Shift+.",
+	// 	"command": "vscode-neovim.send",
+	// 	"when": "!inputFocus && !editorTextFocus",
+	// 	"args": ":"
+	// }
 ]

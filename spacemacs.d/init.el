@@ -51,7 +51,6 @@ This function should only modify configuration layer settings."
      ansible
      systemd
      yaml
-     lua
      typescript
      gpu
      rust
