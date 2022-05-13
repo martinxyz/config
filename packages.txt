@@ -2,7 +2,7 @@
 
 sudo apt install vim emacs build-essential manpages-dev \
   atop htop tree git tig gitk meld ripgrep tmux \
-  curl httpie feh okular evince tofromdos joe shellcheck renameutils
+  curl httpie feh okular evince tofrodos joe shellcheck renameutils
 
 # desktop
 sudo apt libnotify-bin

@@ -35,3 +35,5 @@ if status is-interactive
     sleep 0.05  # reduces "first prompt sometimes empty" problem?
 end
 
+set -xg DOTNET_CLI_TELEMETRY_OPTOUT true
+
