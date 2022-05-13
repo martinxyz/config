@@ -963,12 +963,6 @@ before packages are loaded."
   ; navigate snake_case as whole word
   (add-hook 'c-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
 
-  ;(spacemacs/set-leader-keys "d" 'helm-mini)
-  ;(spacemacs/set-leader-keys "os" 'ag-project)
-
-  ; was: spacemacs/search-project-auto
-  ;(spacemacs/set-leader-keys "/" 'counsel-git-grep)
-
   (define-key spacemacs-web-mode-map "," 'spacemacs/web-mode-transient-state/body)
   ; (set-frame-font "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO8859-1")
 
@@ -999,51 +993,13 @@ before packages are loaded."
   ; fix pasting over visual selection, see https://github.com/syl20bnr/spacemacs/issues/4685#issuecomment-278076373
   (fset 'evil-visual-update-x-selection 'ignore)
 
-  ; from http://blog.binchen.org/posts/easy-indentation-setup-in-emacs-for-web-development.html
-  (defun my-setup-indent (n)
-    ;; java/c/c++
-    (setq-local c-basic-offset n)
-    ;; web development
-    (setq-local coffee-tab-width n) ; coffeescript
-    (setq-local javascript-indent-level n) ; javascript-mode
-    (setq-local js-indent-level n) ; js-mode
-    (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
-    (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-    (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
-    (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
-    (setq-local css-indent-offset n) ; css-mode
-    )
-  ;; Use .editorconfig instead?
-  ;; (defun my-web-indent2()
-  ;;   (interactive)
-  ;;   (my-setup-indent 2)
-  ;;   )
-
   (defun my-json-mode-hook ()
     (setq js-indent-level 2)
     (setq tab-width 2)
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
-  ; breaks web mode
-  ; watch https://github.com/syl20bnr/spacemacs/issues/3203 for updates
-  ;; (add-hook 'prog-mode-hook #'(lambda ()
-  ;;                               (dtrt-indent-mode 't)
-  ;;                               (dtrt-indent-adapt)))
-  ; sadly dtrt-indent does not work with web-mode, see https://github.com/jscheid/dtrt-indent/issues/28
-  ; (but .editorconfig works, I think?)
-  ;; (defun my-web-mode-hook ()
-  ;;   ; for .vue files. Do not indent script inside tag (rule from eslint-plugin-vue).
-  ;;   (setq web-mode-script-padding 0)
-  ;;   )
-  ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
-
   (editorconfig-mode 1)
-
-  ;; support .vue files
-  ;; (add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
-  ;; (with-eval-after-load 'flycheck
-  ;;   (flycheck-add-mode 'javascript-eslint 'web-mode))
 
   ;; use the current project's eslint binary
   ;; source: https://emacs.stackexchange.com/a/21207/12292
@@ -1063,22 +1019,11 @@ before packages are loaded."
         (setq-local flycheck-typescript-tslint-executable tslint))))
   (add-hook 'flycheck-mode-hook #'my/use-linter-from-node-modules)
 
-  ; watch out for trouble on large files, maybe?
-  ; nope, trouble is not large files, but it's too distracting
-  ;(spacemacs/toggle-automatic-symbol-highlight-on)
-
   ; some javascript stuff picked from https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-javascript.el
   (setq-default js2-strict-trailing-comma-warning nil ; it's encouraged to use trailing comma in ES6
                 js2-idle-timer-delay 0.5 ; NOT too big for real time syntax check
                 js2-skip-preprocessor-directives t
                 js2-strict-inconsistent-return-warning nil) ; return <=> return null
-
-  ;; (load-theme 'sanityinc-tomorrow-night)
-  ;; (defun my-after-startup-function ()
-  ;;   (message "loading sanityinc theme again")
-  ;;   ; (spacemacs/load-theme 'sanityinc-tomorrow-night))
-  ;;   (spacemacs/load-theme 'sanityinc-tomorrow-night))
-  ;; (run-with-idle-timer 10 nil 'my-after-startup-function)
 
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
