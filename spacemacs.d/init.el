@@ -33,7 +33,7 @@ This function should only modify configuration layer settings."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(vimscript
-     (python :variables python-backend 'lsp python-lsp-server 'pylsp)
+     (python :variables python-backend 'lsp python-lsp-server 'pyright)
      ;; (python :variables python-backend 'lsp python-lsp-server 'mspyls)
      ;; (python :variables python-backend 'lsp python-lsp-server 'pylsp)
      ;; (python :variables
@@ -131,8 +131,8 @@ This function should only modify configuration layer settings."
                                       ;(pabbrev :location (recipe :fetcher file
                                       ;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       cmake-mode
-                                      qml-mode
-                                      protobuf-mode
+                                      ;; qml-mode
+                                      ;; protobuf-mode
                                       groovy-mode
                                       )
    ;; A list of packages that cannot be updated.
@@ -626,6 +626,9 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ; (company-clang-arguments works either way; just get to rid of the startup errors)
   (defmacro spacemacs|add-company-backends (&rest props))
 
+  ; just to suppress a warning when opening magit
+  (setq forge-add-default-bindings nil)
+
   (message "end of user-init")
   )
 
@@ -902,8 +905,8 @@ before packages are loaded."
   ;; (setq spacemacs-default-jump-handlers
   ;;       (remove 'evil-goto-definition spacemacs-default-jump-handlers))
 
-  (require 'qml-mode)
-  (require 'protobuf-mode)
+  ;; (require 'qml-mode)
+  ;; (require 'protobuf-mode)
 
   (require 'yasnippet)
   (yas-global-mode 1)
@@ -994,8 +997,8 @@ before packages are loaded."
   (fset 'evil-visual-update-x-selection 'ignore)
 
   (defun my-json-mode-hook ()
-    (setq js-indent-level 2)
-    (setq tab-width 2)
+    (setq js-indent-level 4)
+    (setq tab-width 4)
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
@@ -1202,6 +1205,8 @@ Suitable for inclusion in `c-offsets-alist'."
     )
 
   (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
+  ;; (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++11")))
 
   ; not sure why those aren't there by default
   (add-to-list 'spacemacs-jump-handlers-c++-mode '(rtags-find-symbol-at-point :async t))
@@ -1229,7 +1234,6 @@ Suitable for inclusion in `c-offsets-alist'."
   (with-eval-after-load 'flycheck
     (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
                                     "no-pragma-once-outside-header")))
-
   ; maybe helps against hangups, https://github.com/proofit404/anaconda-mode/issues/169
   (setq url-http-attempt-keepalives nil)
 
@@ -1275,6 +1279,7 @@ This function is called at the very end of Spacemacs initialization."
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(browse-url-browser-function 'browse-url-firefox)
  '(company-dabbrev-downcase nil)
  '(company-dabbrev-ignore-case nil)
  '(compilation-ask-about-save nil)
@@ -1421,6 +1426,12 @@ This function is called at the very end of Spacemacs initialization."
      (340 . "#fff59d")
      (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
+ '(warning-suppress-log-types
+   '((lsp-mode)
+     (comp)))
+ '(warning-suppress-types
+   '((lsp-mode)
+     (comp)))
  '(web-mode-auto-close-style 2)
  '(whitespace-style
    '(face tabs space-before-tab::tab space-before-tab tab-mark))
@@ -1460,6 +1471,7 @@ This function is called at the very end of Spacemacs initialization."
  '(flycheck-info ((t (:underline (:color "#505050" :style wave)))))
  '(flycheck-warning ((t (:underline (:color "#9f5c00" :style wave)))))
  '(ggtags-highlight ((t nil)))
+ '(highlight-parentheses-highlight ((nil (:weight ultra-bold))) t)
  '(ido-first-match ((t (:weight bold))))
  '(ido-subdir ((t (:foreground "#729FCF"))))
  '(isearch ((t (:background "#3b3735" :foreground "#EAF46F" :inverse-video nil))))

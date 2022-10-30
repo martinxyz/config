@@ -8,7 +8,8 @@ unset PAGER
 # konsole -e bash -l -c /usr/bin/fish "$@"
 # konsole -e /usr/bin/fish "$@"
 # konsole -e bash "$@"
-konsole -e /home/martin/.local/bin/fish -l "$@"
+# konsole -e /home/martin/.local/bin/fish -l "$@"
+konsole -e /usr/bin/fish -l "$@"
 
 #konsole "$@"
 exit $?

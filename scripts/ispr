@@ -1,5 +1,4 @@
-#!/bin/bash
-set -e
+#!/bin/sh
 git stash
 git pull --rebase
 git unstash

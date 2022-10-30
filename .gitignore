@@ -1,4 +1,7 @@
 *.pyc
 /VSCodium/User/globalStorage
 /VSCodium/User/workspaceStorage
-
+/VSCodium/User/History
+*-old
+*.old
+/fish/fishd.tmp.*

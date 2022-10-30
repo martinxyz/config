@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """Simple work-time calculator.
 
 Enter time expressions in the form "07:30-10:54 + 13:15-18:15"
