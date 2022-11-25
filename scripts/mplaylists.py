@@ -310,13 +310,21 @@ class Prompt(basic.LineReceiver):
 
         if not line or line == b'n':
             if mplayer.paused:
-                mplayer.pause()
+                mplayer.pause()  # continue
                 self.sendLine(b'[continued]')
             else:
                 mplayer.stop()
                 play(NextSong(f=self.transport, userrequest=True))
         elif line == b'h' or line == b'?':
             self.sendLine(help.encode('utf8'))
+        elif line == b'P':
+            # for "play_pause" media key (on headphones)
+            if mplayer.paused:
+                mplayer.pause()  # continue
+            elif mplayer.stopped:
+                play(NextSong(f=self.transport, userrequest=True))
+            else:
+                mplayer.pause()
         elif line == b's':
             if mplayer.paused:
                 mplayer.stop()

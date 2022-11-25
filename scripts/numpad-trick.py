@@ -6,6 +6,7 @@ import socket
 import subprocess
 import sys
 import time
+from pynput import keyboard
 
 print('trace 0', file=sys.stderr)
 mplaylist = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,6 +77,17 @@ async def listen_to_numpad():
             continue
         print(evdev.categorize(event), file=sys.stderr)
 
+def on_press(key):
+    if key == keyboard.Key.media_play_pause:
+        mplaylist.send(b'P\n')
+    if key == keyboard.Key.media_next:
+        mplaylist.send(b'n\n')
+    if key == keyboard.Key.media_previous:
+        mplaylist.send(b'p\n')
+
+print('numpad-trick.py: starting pynp keyboard listener')
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
 
 print('numpad-trick.py: starting asyncio loop', file=sys.stderr)
 
