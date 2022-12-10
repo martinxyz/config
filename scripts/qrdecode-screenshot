@@ -1,0 +1,15 @@
+#!/bin/bash
+# apt install zxing-cpp-tools
+#
+# Notes:
+# For camera input, use "decoder". Sadly it doesn't do screenshots.
+# https://gitlab.gnome.org/World/decoder/
+#
+# Problem with zbarimg: does not reliably work on
+# those qr codes with a swiss cross in the center.
+#
+# ZXing just works:
+
+cd ~/Screenshots
+ZXingReader "$(ls -rt | tail -n 1)"
+
