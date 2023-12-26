@@ -8,18 +8,21 @@ import sys
 import time
 from pynput import keyboard
 
-print('trace 0', file=sys.stderr)
-mplaylist = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-mplaylist.connect(('localhost', 28443))
-
 fn = '/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-kbd'
-print('trace 1', file=sys.stderr)
 device = evdev.InputDevice(fn)
-print('trace 2', file=sys.stderr)
 device.grab()  # prevent X11 from getting the events, too
-print('trace 3', file=sys.stderr)
 
 active_keycodes = set()
+
+def mplaylist_send(s):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect(('localhost', 28443))
+        sock.send(s)
+    except Exception as e:
+        print('Failed to send to mplaylist:\n', e, file=sys.stderr)
+    finally:
+        sock.close()
 
 
 def volume_keys(keyset):
@@ -66,24 +69,30 @@ async def listen_to_numpad():
                 active_key_task = asyncio.ensure_future(handle_active_keys())
 
             if event.code == ecodes.KEY_KPENTER:
-                mplaylist.send(b'\n')
+                mplaylist_send(b'\n')
             if event.code == ecodes.KEY_KP1:
-                mplaylist.send(b'p\n')
+                mplaylist_send(b'p\n')
             if event.code == ecodes.KEY_KP2:
-                mplaylist.send(b'n\n')
+                mplaylist_send(b'n\n')
             if event.code == ecodes.KEY_KP0:
-                mplaylist.send(b's\n')
+                mplaylist_send(b's\n')
         if event.code == ecodes.KEY_NUMLOCK:
             continue
         print(evdev.categorize(event), file=sys.stderr)
 
 def on_press(key):
-    if key == keyboard.Key.media_play_pause:
-        mplaylist.send(b'P\n')
-    if key == keyboard.Key.media_next:
-        mplaylist.send(b'n\n')
-    if key == keyboard.Key.media_previous:
-        mplaylist.send(b'p\n')
+    try:
+        if key == keyboard.Key.media_play_pause:
+            mplaylist_send(b'P\n')
+        if key == keyboard.Key.media_next:
+            mplaylist_send(b'n\n')
+        if key == keyboard.Key.media_previous:
+            mplaylist_send(b'p\n')
+    except Exception as e:
+        print(e)
+        time.sleep(5)
+        print('Exiting with error.')
+        sys.exit(1)
 
 print('numpad-trick.py: starting pynp keyboard listener')
 listener = keyboard.Listener(on_press=on_press)
