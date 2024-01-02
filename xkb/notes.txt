@@ -1,3 +1,7 @@
+just run ./install.sh
+
+---
+
 This is so much more complicated than ~/.xmodmap used to be.
 
 Mostly followed this:

@@ -85,6 +85,10 @@ gsettings set org.gnome.desktop.wm.preferences num-workspaces 4
 
 gsettings set org.gnome.desktop.background show-desktop-icons false
 
+gsettings set org.gnome.nautilus.preferences default-folder-viewer list-view
+gsettings set org.gnome.nautilus.preferences default-sort-order mtime
+gsettings set org.gnome.nautilus.preferences default-sort-in-reverse-order true
+
 dconf write /org/gnome/mutter/workspaces-only-on-primary false
 dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
 

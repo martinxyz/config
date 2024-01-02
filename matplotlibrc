@@ -1,4 +1,4 @@
 # example config file: site-packages/matplotlib/mpl-data/matplotlibrc
 
-backend : GTK4Agg
+#backend : GTK4Agg
 

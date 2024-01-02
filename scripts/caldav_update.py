@@ -70,6 +70,8 @@ for dt, event in sorted(events, key=lambda x: x[0]):
         if isinstance(value, str):
             if 'Ein Service von fcal.ch. NUR zum inter' in value:
                 continue
+            if value == 'TRUE' or value == 'FALSE':
+                continue
             s += ', ' + value
     if len(s) > 79:
         s = s[:79-3] + '...'

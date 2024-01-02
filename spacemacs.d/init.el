@@ -32,8 +32,11 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(vimscript
+   '(asciidoc
+     vimscript
      (python :variables python-backend 'lsp python-lsp-server 'pyright)
+     (vue)
+     ;; (vue :variables vue-backend 'lsp)
      ;; (python :variables python-backend 'lsp python-lsp-server 'mspyls)
      ;; (python :variables python-backend 'lsp python-lsp-server 'pylsp)
      ;; (python :variables
@@ -46,12 +49,19 @@ This function should only modify configuration layer settings."
      csv
      emacs-lisp
      fsharp
+     kotlin
      nginx
      (csharp :variables csharp-backend 'lsp)
      ansible
      systemd
      yaml
-     typescript
+     (typescript :variables
+                 typescript-fmt-tool 'prettier
+                 typescript-linter 'eslint
+                 typescript-backend 'lsp
+                 ; typescript-fmt-on-save t
+                 ; default: 'tide
+                 )
      gpu
      rust
      ;; not using the auto-completion layer because it rebinds <tab> in too many places, clashing with dabbrev-expand, and generally produces too much noise
@@ -103,7 +113,10 @@ This function should only modify configuration layer settings."
            html-enable-lsp 't
            )
      ;; javascript
-     (javascript :variables javascript-backend 'lsp)
+     (javascript :variables
+                 javascript-backend 'lsp
+                 javascript-fmt-tool 'prettier
+                 )
      tern
      ; c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
 
@@ -134,6 +147,7 @@ This function should only modify configuration layer settings."
                                       ;; qml-mode
                                       ;; protobuf-mode
                                       groovy-mode
+                                      sqlite3 ; just to silence the warning
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -155,6 +169,10 @@ This function should only modify configuration layer settings."
 This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
+
+  ; https://github.com/emacs-lsp/lsp-pyright/issues/66
+  (setq lsp-pyright-multi-root nil)
+
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
@@ -999,6 +1017,7 @@ before packages are loaded."
   (defun my-json-mode-hook ()
     (setq js-indent-level 4)
     (setq tab-width 4)
+;    (prettier-js-mode 't)
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
@@ -1218,22 +1237,24 @@ Suitable for inclusion in `c-offsets-alist'."
   ;; (require 'lsp-mode)
   ;; (add-hook 'c++-mode-hook #'lsp)
 
-  ; GCC has no way of suppressing the "#pragma once in main file" warning,
-  ; and flycheck has no (non-internal) way to ignore some errors.
-  (with-eval-after-load "flycheck"
-    (eval-when-compile (require 'flycheck))  ; for flycheck-error struct
-    (defun my-filter-pragma-once-in-main (orig-fun errors)
-      (dolist (err errors)
-        (-when-let (msg (flycheck-error-message err))
-          (setf (flycheck-error-message err)
-                (if (string-match-p "#pragma once in main file" msg) nil msg))))
-      (funcall orig-fun errors))
-    (advice-add 'flycheck-sanitize-errors :around #'my-filter-pragma-once-in-main))
+  ; The config below doesn't work in new emacs versions due to some flycheck macro expansion stuff:
+  ;
+  ;; GCC has no way of suppressing the "#pragma once in main file" warning,
+  ;; and flycheck has no (non-internal) way to ignore some errors.
+  ; (with-eval-after-load "flycheck"
+  ;   (eval-when-compile (require 'flycheck))  ; for flycheck-error struct
+  ;   (defun my-filter-pragma-once-in-main (orig-fun errors)
+  ;     (dolist (err errors)
+  ;       (-when-let (msg (flycheck-error-message err))
+  ;         (setf (flycheck-error-message err)
+  ;               (if (string-match-p "#pragma once in main file" msg) nil msg))))
+  ;     (funcall orig-fun errors))
+  ;   (advice-add 'flycheck-sanitize-errors :around #'my-filter-pragma-once-in-main))
 
   ; same for clang
-  (with-eval-after-load 'flycheck
-    (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
-                                    "no-pragma-once-outside-header")))
+  ;; (with-eval-after-load 'flycheck
+  ;;   (setq flycheck-clang-warnings `(,@flycheck-clang-warnings
+  ;;                                   "no-pragma-once-outside-header")))
   ; maybe helps against hangups, https://github.com/proofit404/anaconda-mode/issues/169
   (setq url-http-attempt-keepalives nil)
 
@@ -1336,6 +1357,7 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-file-watch-threshold 10000)
  '(lsp-prefer-flymake nil)
  '(lsp-restart 'ignore)
+ '(lsp-rust-analyzer-cargo-watch-args ["--target-dir" "target/check-rustanalyzer"])
  '(lsp-rust-analyzer-server-display-inlay-hints t)
  '(lsp-rust-server 'rust-analyzer)
  '(lsp-signature-auto-activate nil)
@@ -1388,6 +1410,8 @@ This function is called at the very end of Spacemacs initialization."
  '(python-shell-interpreter "python3" t)
  '(rtags-path "/home/martin/.local/bin/")
  '(rust-format-on-save t)
+ '(rustic-ansi-faces
+   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
      (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")
@@ -1426,12 +1450,8 @@ This function is called at the very end of Spacemacs initialization."
      (340 . "#fff59d")
      (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
- '(warning-suppress-log-types
-   '((lsp-mode)
-     (comp)))
- '(warning-suppress-types
-   '((lsp-mode)
-     (comp)))
+ '(warning-suppress-log-types '((lsp-mode) (comp)))
+ '(warning-suppress-types '((lsp-mode) (comp)))
  '(web-mode-auto-close-style 2)
  '(whitespace-style
    '(face tabs space-before-tab::tab space-before-tab tab-mark))
@@ -1448,7 +1468,7 @@ This function is called at the very end of Spacemacs initialization."
  '(ahs-edit-mode-face ((t (:background "#3b3735" :foreground "Coral3"))))
  '(ahs-face ((t (:background "#3b3735"))))
  '(ahs-plugin-bod-face ((t (:background "#3b3735" :foreground "DodgerBlue"))))
- '(ahs-plugin-defalt-face ((t (:background "#3b3735" :foreground "Orange1"))))
+ '(ahs-plugin-defalt-face ((t (:background "#3b3735" :foreground "Orange1"))) t)
  '(ahs-plugin-whole-buffer-face ((t (:background "#3b3735"))))
  '(avy-lead-face ((t (:foreground "orange"))))
  '(avy-lead-face-0 ((t (:foreground "yellow"))))

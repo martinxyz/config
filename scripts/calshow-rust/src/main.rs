@@ -1,14 +1,14 @@
-use std::{fs::File, io::BufReader, time::{Duration}};
-use std::io::prelude::*;
 use std::env;
+use std::io::prelude::*;
 use std::path::Path;
+use std::{fs::File, io::BufReader, time::Duration};
 
 fn main() -> std::io::Result<()> {
-    let interval_secs = 60*60*9;
-    
+    let interval_secs = 60 * 60 * 9;
+
     let path_base = Path::new(&env::var("HOME").unwrap()).join(".caldav-remind");
     let path_last_shown = path_base.join("last-shown");
-    
+
     let showtime = match path_last_shown.metadata() {
         Err(_) => true,
         Ok(metadata) => match metadata.modified()?.elapsed() {
@@ -16,12 +16,13 @@ fn main() -> std::io::Result<()> {
             Ok(duration) => duration >= Duration::from_secs(interval_secs),
         },
     };
-    
+
     if showtime {
         // read-only text file, synced via caldav
         let file = File::open(path_base.join("content"))?;
         let reader = BufReader::new(file);
-        let lines = reader.lines()
+        let lines = reader
+            .lines()
             .map(|s| String::from(s.unwrap_or(String::from("???")).trim()))
             .filter(|s| !s.is_empty())
             .take(3)

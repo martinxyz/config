@@ -36,4 +36,5 @@ if status is-interactive
 end
 
 set -xg DOTNET_CLI_TELEMETRY_OPTOUT true
+# set -xg FIREJAIL_FILE_COPY_LIMIT 5000
 
