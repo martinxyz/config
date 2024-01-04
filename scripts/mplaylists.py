@@ -373,7 +373,7 @@ class Mplayer(protocol.ProcessProtocol):
         self.uuid = str(uuid.uuid4())
         self.mpv_socket = os.path.join(tempdir, self.uuid)
         print(self.uuid, 'spawning')
-        reactor.spawnProcess(self, mpv_path, [mpv_path, "-really-quiet", "--input-ipc-server=" + self.mpv_socket, "-vo", "null", song], None)
+        reactor.spawnProcess(self, mpv_path, [mpv_path, "--really-quiet", "--input-ipc-server=" + self.mpv_socket, "--vo=null", song], env=os.environ)
     def __del__(self):
         print(self.uuid, 'destructor')
         try:
@@ -394,6 +394,9 @@ class Mplayer(protocol.ProcessProtocol):
         print('Mplayer processEnded, status %r' % status_object.value.exitCode)
         if self is mplayer: # the main player automatically goes on
             if not self.paused:
+                if status_object.value.exitCode != 0:
+                    print(self.uuid, 'non-zero exit code; trying next song')
+                    time.sleep(1)
                 play(NextSong(f=stdout, userrequest=False))
     def stop(self):
         print(self.uuid, 'stop()')
