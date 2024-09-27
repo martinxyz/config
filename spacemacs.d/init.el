@@ -32,7 +32,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(asciidoc
+   '(lua
+     asciidoc
      vimscript
      (python :variables python-backend 'lsp python-lsp-server 'pyright)
      (vue)
@@ -59,8 +60,8 @@ This function should only modify configuration layer settings."
                  typescript-fmt-tool 'prettier
                  typescript-linter 'eslint
                  typescript-backend 'lsp
-                 ; typescript-fmt-on-save t
-                 ; default: 'tide
+                 ;; typescript-fmt-on-save t
+                 ;; default: 'tide
                  )
      gpu
      rust
@@ -1412,6 +1413,7 @@ This function is called at the very end of Spacemacs initialization."
  '(rust-format-on-save t)
  '(rustic-ansi-faces
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(rustic-format-trigger 'on-save)
  '(safe-local-variable-values
    '((cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
      (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")

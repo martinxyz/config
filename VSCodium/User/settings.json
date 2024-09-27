@@ -17,7 +17,6 @@
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": true,
     "vim.hlsearch": true,
-    "window.menuBarVisibility": "toggle",
     "files.autoSave": "onFocusChange",
     "rust-client.engine": "rust-analyzer",
     "workbench.sideBar.location": "right",
@@ -215,11 +214,14 @@
             }
         }
     },
-    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+    "vscode-neovim.neovimExecutablePaths.linux": "/home/martin/.local/bin/nvim",
     "magit.display-buffer-function": "same-column",
     "rust-analyzer.inlayHints.enable": true,
     "editor.formatOnSave": true,
     "rust-analyzer.checkOnSave.command": "clippy",
     "rust-analyzer.server.path": "/home/martin/.local/bin/rust-analyzer",
-    "window.zoomLevel": 1
+    "window.zoomLevel": 1,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    }
 }

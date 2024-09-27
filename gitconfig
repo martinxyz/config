@@ -52,7 +52,7 @@
 
 [core]
 	excludesfile = /home/martin/.gitignore
-	pager = diff-so-fancy | less --tabs=4 -RFX
+    # pager = diff-so-fancy | less --tabs=4 -RFX
 [giggle]
 	compact-mode = false
 	main-window-maximized = false
@@ -92,3 +92,33 @@
 	smudge = git-lfs smudge -- %f
 [init]
 	defaultBranch = main
+
+[diff]
+    tool = difftastic
+
+[difftool]
+    prompt = false
+
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+
+[alias]
+    # `git dlog` to show `git log -p` with difftastic.
+    dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
+    logt = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
+    dshow = "!f() { GIT_EXTERNAL_DIFF=difft git show --ext-diff $@; }; f"
+    showt = "!f() { GIT_EXTERNAL_DIFF=difft git show --ext-diff $@; }; f"
+
+    difft = difftool
+    dft = difftool
+    d = difftool
+
+[pager]
+    difftool = true
+[diff]
+    external = difft
+
+[branch]
+	sort = -committerdate
+[column]
+	ui = auto
