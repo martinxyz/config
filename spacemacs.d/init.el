@@ -37,6 +37,7 @@ This function should only modify configuration layer settings."
      vimscript
      (python :variables python-backend 'lsp python-lsp-server 'pyright)
      (vue)
+     svelte
      ;; (vue :variables vue-backend 'lsp)
      ;; (python :variables python-backend 'lsp python-lsp-server 'mspyls)
      ;; (python :variables python-backend 'lsp python-lsp-server 'pylsp)
@@ -60,7 +61,7 @@ This function should only modify configuration layer settings."
                  typescript-fmt-tool 'prettier
                  typescript-linter 'eslint
                  typescript-backend 'lsp
-                 ;; typescript-fmt-on-save t
+                 typescript-fmt-on-save t
                  ;; default: 'tide
                  )
      gpu
@@ -151,7 +152,6 @@ This function should only modify configuration layer settings."
                                       sqlite3 ;; just to silence the warning
                                       )
    ;; A list of packages that cannot be updated.
-   dotspacemacs-frozen-packages '()
 
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(importmagic org-brain)  ;; importmagic uses too much RAM for too little gain
@@ -670,6 +670,7 @@ before packages are loaded."
   ;; my own customized versions from ./patched/
   (require 'pabbrev)
   (require 'swbuff)
+  (require 'add-node-modules-path)
 
   (setq-default swbuff-exclude-buffer-regexps '("^ " "^\*.*\*" "TAGS" "magit[-:]"))
   (define-key evil-normal-state-map "q" 'swbuff-switch-to-next-buffer)
@@ -682,20 +683,15 @@ before packages are loaded."
   (defun maxy-show-manpage ()
     (interactive)
     (manual-entry (current-word)))
+  (defun maxy-show-devdocs ()
+    (interactive)
+    (devdocs-search (current-word)))
   (spacemacs/set-leader-keys "hm" 'maxy-show-manpage)
   (spacemacs/set-leader-keys "hh" 'devdocs-search)
-  (global-set-key [f1] 'maxy-show-manpage)
-  (global-set-key [f2] 'devdocs-search)
-
-  ;; from devdocs.el
-  (defun maxy-devdocs-do-search (pattern)
-    (let ((arg (format "--app=%s/#q=%s" devdocs-url (url-hexify-string pattern))))
-      (start-process "chromium devdocs" nil "chromium" "--password-store=basic" arg)
-      ))
-  (advice-add 'devdocs-do-search :override #'maxy-devdocs-do-search)
+  (keymap-global-set "<f1>" 'maxy-show-manpage)
+  (keymap-global-set "<f2>" 'maxy-show-devdocs)
 
   (spacemacs/set-leader-keys "op" 'js2r-log-this)  ;; a bit easier than SPC m r l t
-
 
                                         ;(spacemacs/set-leader-keys "og" 'ggtags-find-tag)
   (define-key evil-normal-state-map "Ω" 'evil-record-macro) ;; Shift-@
@@ -809,7 +805,7 @@ before packages are loaded."
   ;; ivy-find-file should not open "dired" when hitting RET on a directory
   (define-key ivy-minibuffer-map (kbd "RET") 'ivy-alt-done)
 
-                                        ;(global-set-key  "\C-e" 'bigterm-in-current-directory)
+  ;; (global-set-key  "\C-e" 'bigterm-in-current-directory)
   (define-key evil-normal-state-map "\C-e" 'bigterm-in-current-directory)
   (define-key evil-visual-state-map "\C-e" 'bigterm-in-current-directory)
   (define-key evil-insert-state-map "\C-e" 'bigterm-in-current-directory)
@@ -820,7 +816,12 @@ before packages are loaded."
     ;; background it to avoid "active processes exist" question when exiting emacs
     ;; (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&")) ;; cargo missing from $PATH
     ;; (start-process "terminal" nil "~/scripts/bigterm")) ;; cargo missing from $PATH
-    (start-process "terminal" nil "konsole")) ;; $PATH okay
+    ;; (start-process "terminal" nil "konsole")) ;; $PATH okay
+    ;; (start-process "terminal" nil "wezterm")) ;; starts in $home
+
+
+    ;; (start-process "terminal" nil "wezterm" "start" "--cwd" default-directory "--" "/usr/bin/fish" "-l"))
+    (start-process "terminal" nil "wezterm" "start" "--cwd" (file-name-directory buffer-file-name) "--" "/usr/bin/fish" "-l"))
 
   ;; Uralte Gewohnheiten aus Borland-Produkten
   (global-set-key  [f4]  'next-error)
@@ -899,6 +900,20 @@ before packages are loaded."
   ;; spacemacs//setup-lsp-for-html-buffer enables this only for .html
   (add-hook 'web-mode-hook #'lsp t)
 
+
+  ;; (add-hook 'js-mode-hook #'add-node-modules-path)
+  ;; (add-hook 'web-mode-hook #'add-node-modules-path)
+  ;; (add-hook 'typescript-mode-hook #'add-node-modules-path)
+  ;; (add-hook 'svelte-mode-hook #'add-node-modules-path)
+  (add-hook 'web-mode-hook #'add-node-modules-path)
+  (add-hook 'web-mode-hook #'prettier-js-mode)
+
+
+  ;; to get rid of org-mode's warning (doesn't work)
+  ;; (defun org-custom-settings ()
+  ;;   (setq tab-width 8))
+  ;; (add-hook 'org-mode-hook 'org-custom-settings)
+
   (defun noop () (interactive))
 
   ;; org-mode should not override tab in insert-mode
@@ -927,7 +942,7 @@ before packages are loaded."
   ;; (require 'qml-mode)
   ;; (require 'protobuf-mode)
 
-  (require 'yasnippet)
+  ;; (require 'yasnippet)  ;; error
   (yas-global-mode 1)
   (define-key yas-minor-mode-map [(tab)]        nil)
   ;; (define-key yas-minor-mode-map (kbd "TAB")    nil)
@@ -1019,7 +1034,7 @@ before packages are loaded."
   (defun my-json-mode-hook ()
     (setq js-indent-level 4)
     (setq tab-width 4)
-                                        ;    (prettier-js-mode 't)
+    (prettier-js-mode 't)
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
@@ -1354,7 +1369,7 @@ This function is called at the very end of Spacemacs initialization."
        (org-refile)
        (t)))
    '(js2-strict-missing-semi-warning nil)
-   '(js2-strict-trailing-comma-warning nil)
+   '(js2-strict-trailing-comma-warning nil t)
    '(lsp-eldoc-enable-hover nil)
    '(lsp-file-watch-threshold 10000)
    '(lsp-prefer-flymake nil)
@@ -1375,7 +1390,7 @@ This function is called at the very end of Spacemacs initialization."
    '(mouse-yank-at-point t)
    '(pabbrev-idle-timer-verbose nil)
    '(package-selected-packages
-     '(svelte-mode magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
+     '(add-node-modules-path svelte-mode magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
    '(projectile-completion-system 'ido)
    '(projectile-enable-caching nil)
    '(projectile-git-command "rg --files --null")
@@ -1415,7 +1430,7 @@ This function is called at the very end of Spacemacs initialization."
    '(rust-format-on-save t)
    '(rustic-ansi-faces
      ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
-   '(rustic-format-trigger 'on-save)
+   '(rustic-format-trigger 'on-compile)
    '(rustic-rustfmt-args "fmt")
    '(rustic-rustfmt-bin "cargo")
    '(safe-local-variable-values

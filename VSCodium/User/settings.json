@@ -21,7 +21,6 @@
     "rust-client.engine": "rust-analyzer",
     "workbench.sideBar.location": "right",
     "typescript.npm": "/home/martin/.local/bin/npm",
-    "svelte.language-server.runtime": "/home/martin/.local/bin/node",
     "rust-analyzer.diagnostics.disabled": [
         "macro-error",
         "unresolved-proc-macro"
@@ -35,6 +34,14 @@
         "<C-w>": false
     },
     "vim.normalModeKeyBindings": [
+        {
+            "before": [
+                ","
+            ],
+            "commands": [
+                "editor.action.showHover"
+            ]
+        },
         {
             "before": [
                 "t"
@@ -204,7 +211,6 @@
         }
     ],
     "extensions.autoUpdate": false,
-    "rust-analyzer.lruCapacity": 256,
     "editor.renderWhitespace": "none",
     "editor.semanticTokenColorCustomizations": {
         "enabled": true,
@@ -216,12 +222,15 @@
     },
     "vscode-neovim.neovimExecutablePaths.linux": "/home/martin/.local/bin/nvim",
     "magit.display-buffer-function": "same-column",
-    "rust-analyzer.inlayHints.enable": true,
     "editor.formatOnSave": true,
-    "rust-analyzer.checkOnSave.command": "clippy",
-    "rust-analyzer.server.path": "/home/martin/.local/bin/rust-analyzer",
     "window.zoomLevel": 1,
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
-    }
+    },
+    "rust-analyzer.runnables.extraEnv": null,
+    "git.untrackedChanges": "separate",
+    "window.titleBarStyle": "custom",
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "editor.inlayHints.maximumLength": 0,
+    "svelte.enable-ts-plugin": true
 }

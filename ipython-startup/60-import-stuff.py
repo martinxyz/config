@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt  # slow
 #matplotlib.use('QtAgg')
 #matplotlib.use('GTK4Agg') # broken
 # --> .config/matplotlib/matplotlibrc
-import pandas as pd
 import os, sys, random, time, re, pprint, math
 pp = pprint
 from numpy import log, log2, exp, pi, sin, cos, sqrt
@@ -17,3 +16,7 @@ def plot(*args, **argv):  # because always loading %matplotlib is too slow
     plt.plot(*args, **argv)
     plt.show()  # blocking (can't call %matplotlib from here, it seems)
 
+try:
+    import pandas as pd
+except ModuleNotFoundError:
+    pass

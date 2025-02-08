@@ -31,6 +31,8 @@ symlink ~/config/flake8 ~/.config/flake8
 symlink ~/config/sway ~/.config/sway
 symlink ~/config/xkb ~/.xkb
 
+symlink ~/config/wezterm ~/.config/wezterm
+
 mkdir -p ~/.ipython/profile_default/startup
 symlink ~/config/ipython-startup/60-import-stuff.py ~/.ipython/profile_default/startup/60-import-stuff.py
 

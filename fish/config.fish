@@ -38,8 +38,14 @@ end
 set -xg DOTNET_CLI_TELEMETRY_OPTOUT true
 # set -xg FIREJAIL_FILE_COPY_LIMIT 5000
 
-set -xg PYENV_ROOT /home/martin/.pyenv
-fish_add_path -g /home/martin/.pyenv/bin
-pyenv init - --no-rehash | source
+# set -xg PYENV_ROOT /home/martin/.pyenv
+# fish_add_path -g /home/martin/.pyenv/bin
+# pyenv init - --no-rehash | source
 
-set -xg HELIX_RUNTIME ~/compile/helix/runtime
+if test -d ~/.rye/shims
+    set -xg fish_user_pathsu ~/.rye/shims
+end
+
+if test -d ~/compile/helix/runtime
+    set -xg HELIX_RUNTIME ~/compile/helix/runtime
+end

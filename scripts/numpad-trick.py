@@ -14,6 +14,23 @@ device.grab()  # prevent X11 from getting the events, too
 
 active_keycodes = set()
 
+token_bucket = 0.0
+token_bucket_updated_ts = 0
+def limit():
+    global token_bucket, token_bucket_updated_ts
+    ts = time.monotonic()
+    dt = ts - token_bucket_updated_ts
+    token_bucket_updated_ts = ts
+    token_bucket += dt * 0.9  # key events per second allowed (long-term)
+    token_bucket = min(token_bucket, 5)  # burst allowed
+    token_bucket -= 1
+    # print(f'token_bucket: {token_bucket:.3f} dt was {dt:.3f}')
+    if token_bucket < 1:
+        token_bucket = 0
+        print('token_bucket depleted, dropping key press', file=sys.stderr)
+        return True
+    return False
+
 def mplaylist_send(s):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -41,7 +58,7 @@ def volume_keys(keyset):
 
 
 async def handle_active_keys():
-    while active_keycodes:
+    while active_keycodes:    # could just use device.active_keys?
         volume_keys(active_keycodes)
         await asyncio.sleep(0.07)
 
@@ -69,12 +86,16 @@ async def listen_to_numpad():
                 active_key_task = asyncio.ensure_future(handle_active_keys())
 
             if event.code == ecodes.KEY_KPENTER:
+                if limit(): continue
                 mplaylist_send(b'\n')
             if event.code == ecodes.KEY_KP1:
+                if limit(): continue
                 mplaylist_send(b'p\n')
             if event.code == ecodes.KEY_KP2:
+                if limit(): continue
                 mplaylist_send(b'n\n')
             if event.code == ecodes.KEY_KP0:
+                if limit(): continue
                 mplaylist_send(b's\n')
         if event.code == ecodes.KEY_NUMLOCK:
             continue
@@ -83,10 +104,13 @@ async def listen_to_numpad():
 def on_press(key):
     try:
         if key == keyboard.Key.media_play_pause:
+            if limit(): return
             mplaylist_send(b'P\n')
         if key == keyboard.Key.media_next:
+            if limit(): return
             mplaylist_send(b'n\n')
         if key == keyboard.Key.media_previous:
+            if limit(): return
             mplaylist_send(b'p\n')
     except Exception as e:
         print(e)

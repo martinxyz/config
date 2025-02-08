@@ -1,4 +1,6 @@
 // Place your key bindings in this file to override the defaultsauto[]
+//
+// For neovim, see: .config/nvim/init.lua
 [
 	{
 		"key": "ctrl+oem_minus",
@@ -91,6 +93,11 @@
 		"when": "editorFocus && vim.active && !inDebugRepl && vim.mode != 'Insert'"
 	},
 	{
+		"key": ",",
+		"command": "editor.action.showHover",
+		"when": "editorFocus && vim.active && !inDebugRepl && vim.mode != 'Insert'"
+	},
+	{
 		"key": "x",
 		"command": "magit.discard-at-point",
 		"when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
@@ -145,8 +152,7 @@
 	},
 	{
 		"key": "ctrl+j",
-		"command": "workbench.action.quickOpenSelectNext",
-		"when": "inQuickOpen"
+		"comman: "workbench.action.quickOpenSelectNext","when": "inQuickOpen"
 	},
 	{
 		"key": "ctrl+k",

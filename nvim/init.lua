@@ -78,10 +78,18 @@ if (vim.g.vscode) then -- VSCode only
     nnoremap('<space>', "<Cmd>call VSCodeNotify('whichkey.show')<Cr>")
 
     -- <c-w> is window management (actually very useful... I should probably learn to use it instead of SPC-w)
-    nnoremap('<c-w>', "<Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<Cr>", { nowait = true })
+    -- nnoremap('<c-w>', "<Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<Cr>", { nowait = true })
+	-- Learn to use C-w q for that!
+	-- (or SPC b d)
 
     -- not exactly what I wanted, but pretty close:
     nnoremap('q', "<Cmd>call VSCodeNotify('workbench.action.openPreviousEditorFromHistory')<Cr>")
     -- nnoremap('Q', "<Cmd>call VSCodeNotify('workbench.action.quickOpenNavigatePrejqvious')<Cr>")
+	
+    -- this is Ctrl-p by VSCode default (learn that instead?)
+    nnoremap('t', "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<Cr>")
+    -- this is also the VSCode default ; seems to be correct, however it never finds anything... (lsp issue?)
+    nnoremap('<c-t>', "<Cmd>call VSCodeNotify('workbench.action.showAllSymbols')<Cr>")
+	
 else -- ordinary neovim only
 end
