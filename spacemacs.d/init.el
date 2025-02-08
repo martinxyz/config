@@ -908,12 +908,6 @@ before packages are loaded."
   (add-hook 'web-mode-hook #'add-node-modules-path)
   (add-hook 'web-mode-hook #'prettier-js-mode)
 
-
-  ;; to get rid of org-mode's warning (doesn't work)
-  ;; (defun org-custom-settings ()
-  ;;   (setq tab-width 8))
-  ;; (add-hook 'org-mode-hook 'org-custom-settings)
-
   (defun noop () (interactive))
 
   ;; org-mode should not override tab in insert-mode
@@ -1334,6 +1328,7 @@ This function is called at the very end of Spacemacs initialization."
    '(dabbrev-case-replace nil)
    '(delete-trailing-lines nil)
    '(dumb-jump-confirm-jump-to-modified-file nil)
+   '(editorconfig-exclude-modes '(org-mode))
    '(evil-ex-search-persistent-highlight nil)
    '(evil-repeat-move-cursor nil)
    '(evil-surround-pairs-alist
