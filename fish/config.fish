@@ -49,3 +49,8 @@ end
 if test -d ~/compile/helix/runtime
     set -xg HELIX_RUNTIME ~/compile/helix/runtime
 end
+
+if command -q fnm
+    fnm env --use-on-cd --shell fish | source
+end
+

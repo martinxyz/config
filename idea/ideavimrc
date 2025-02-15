@@ -1,0 +1,68 @@
+" https://github.com/marcoieni/intellimacs
+source ~/.intellimacs/spacemacs.vim
+
+" Enable other Intellimacs modules
+source ~/.intellimacs/extra.vim
+source ~/.intellimacs/major.vim
+source ~/.intellimacs/hybrid.vim
+
+" Learn to use SPC * instead? (Show usages)
+" GotoDeclaration is "Go to Declartion or Usages" (also mapped to: ,gd or SPC g d)
+let g:WhichKeyDesc_Major_Goto_References = "<leader>mgr references"
+nnoremap <leader>mgr    :action GotoDeclaration<CR>
+vnoremap <leader>mgr    <Esc>:action GotoDeclaration<CR>
+
+" Comma for major mode
+nmap , <leader>m
+vmap , <leader>m
+
+" Scrolling
+nnoremap <nowait> [ jjjjzz
+vnoremap <nowait> [ jjjjzz
+nnoremap <nowait> ] kkkkzz
+vnoremap <nowait> ] kkkkzz
+
+nnoremap <C-/>  :action CommentByLineComment<CR>k
+vnoremap <C-/>  :action CommentByBlockComment<CR>
+
+nnoremap <backspace> V
+vnoremap <backspace> V
+
+source ~/.intellimacs/which-key.vim
+" override settings from the above import:
+" set timeoutlen=5000
+" fixes issue with my Scrolling keys above:
+let g:WhichKey_ShowVimActions = "false"
+" milliseconds (default: 200)
+let g:WhichKey_DefaultDelay = 0
+
+" turn off vi compatibility (does this do anything?)
+set nocompatible
+
+" not sure if those have effect in ideavim (seems not)
+set cindent
+set autoindent
+set smartindent
+
+"set showmode
+set incsearch
+set number
+
+" for J
+set ideajoin
+
+" Add/edit actions
+nnoremap <leader>gl    :action Vcs.Show.Log<CR>
+vnoremap <leader>gl    :action Vcs.Show.Log<CR>
+
+map gh <Action>(ShowErrorDescription)
+" map <Leader>e <Action>(GotoNextError)
+" map <leader>b <Action>(Switcher)
+
+set scrolloff=5
+
+
+" Use Ctrl-Tab instead?
+nnoremap q :action Switcher<CR>
+
+Plug 'tpope/vim-surround'

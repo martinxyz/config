@@ -36,6 +36,15 @@ This function should only modify configuration layer settings."
      asciidoc
      vimscript
      (python :variables python-backend 'lsp python-lsp-server 'pyright)
+     ;; javascript
+     (javascript :variables
+                 javascript-backend 'lsp
+                 javascript-fmt-tool 'prettier
+                 node-add-modules-path 't
+                 )
+     (node :variables
+           node-add-modules-path 't
+           )
      (vue)
      svelte
      ;; (vue :variables vue-backend 'lsp)
@@ -57,13 +66,15 @@ This function should only modify configuration layer settings."
      ansible
      systemd
      yaml
+     lsp  ;; breaks my typescript workflow (?is this still true?)
      (typescript :variables
+                 typescript-fmt-on-save t
                  typescript-fmt-tool 'prettier
                  typescript-linter 'eslint
+                 ;; typescript-lsp-linter nil
                  typescript-backend 'lsp
-                 typescript-fmt-on-save t
-                 ;; default: 'tide
                  )
+     prettier
      gpu
      rust
      ;; not using the auto-completion layer because it rebinds <tab> in too many places, clashing with dabbrev-expand, and generally produces too much noise
@@ -92,7 +103,8 @@ This function should only modify configuration layer settings."
      ;; spell-checking
      (syntax-checking :variables
                       ;; rather annoying to see a tooltip about "missing ;" every time you pause typing
-                      syntax-checking-enable-tooltips nil
+                      ;; syntax-checking-enable-tooltips nil
+                      syntax-checking-enable-tooltips 't
                       )
      version-control
      colors
@@ -114,17 +126,11 @@ This function should only modify configuration layer settings."
            scss-enable-lsp 't
            html-enable-lsp 't
            )
-     ;; javascript
-     (javascript :variables
-                 javascript-backend 'lsp
-                 javascript-fmt-tool 'prettier
-                 )
      tern
      ;; c++-rtags ;; git clone https://github.com/kzemek/cpp-rtags-layer ~/.emacs.d/private/c++-rtags
 
                                         ;react
                                         ;restclient
-     ;; lsp  ;; breaks my typescript workflow
      ;; (cmake :variables cmake-enable-cmake-ide-support t)
      (cmake :variables cmake-enable-cmake-ide-support nil)
      )
@@ -143,6 +149,7 @@ This function should only modify configuration layer settings."
                                       yasnippet-snippets
                                       auto-yasnippet
                                       company ;; for company-clang-arguments
+                                      sqlite3
                                         ;(pabbrev :location (recipe :fetcher file
                                       ;;                           :repo (expand-file-name "~/config/spacemacs.d/patched")))
                                       cmake-mode
@@ -171,8 +178,8 @@ This function is called at the very beginning of Spacemacs startup,
 before layer configuration.
 It should only modify the values of Spacemacs settings."
 
-  ;; https://github.com/emacs-lsp/lsp-pyright/issues/66
-  (setq lsp-pyright-multi-root nil)
+  ;; Just an annoyance, mainly "auto-evilication failed" in org-mode
+  (setq spacemacs-buffer--warnings nil)
 
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
@@ -585,6 +592,7 @@ It should only modify the values of Spacemacs settings."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
+   ;; dotspacemacs-whitespace-cleanup 'nil
 
    ;; If non-nil activate `clean-aindent-mode' which tries to correct
    ;; virtual indentation of simple modes. This can interfere with mode specific
@@ -812,16 +820,8 @@ before packages are loaded."
   (defun bigterm-in-current-directory ()
     "start a terminal in the current directory"
     (interactive)
-                                        ;(start-process "terminal" nil "~/scripts/bigterm"))
-    ;; background it to avoid "active processes exist" question when exiting emacs
-    ;; (start-process "terminal" nil "bash" "-c" "~/scripts/bigterm" "&")) ;; cargo missing from $PATH
-    ;; (start-process "terminal" nil "~/scripts/bigterm")) ;; cargo missing from $PATH
-    ;; (start-process "terminal" nil "konsole")) ;; $PATH okay
-    ;; (start-process "terminal" nil "wezterm")) ;; starts in $home
+    (start-process "bigterm" nil "sh" "-c" "nohup ~/scripts/bigterm </dev/null >/dev/null 2>&1" "&"))
 
-
-    ;; (start-process "terminal" nil "wezterm" "start" "--cwd" default-directory "--" "/usr/bin/fish" "-l"))
-    (start-process "terminal" nil "wezterm" "start" "--cwd" (file-name-directory buffer-file-name) "--" "/usr/bin/fish" "-l"))
 
   ;; Uralte Gewohnheiten aus Borland-Produkten
   (global-set-key  [f4]  'next-error)
@@ -908,6 +908,11 @@ before packages are loaded."
   (add-hook 'web-mode-hook #'add-node-modules-path)
   (add-hook 'web-mode-hook #'prettier-js-mode)
 
+  ;; to get rid of org-mode's warning (doesn't work?)
+  (defun org-custom-settings ()
+    (setq tab-width 8))
+  (add-hook 'org-mode-hook 'org-custom-settings)
+
   (defun noop () (interactive))
 
   ;; org-mode should not override tab in insert-mode
@@ -916,6 +921,17 @@ before packages are loaded."
   ;; override spacemacs hook: orgtbl steals my <tab> key
   (with-eval-after-load 'markdown-mode
     (remove-hook 'markdown-mode-hook 'orgtbl-mode))
+
+  ;; Does not work. (However, enabling `prettier-js-mode` works)
+  ;; (add-hook 'web-mode-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'before-save-hook 'prettier nil 'make-it-local)))
+  (with-eval-after-load 'web
+    (add-hook 'local-write-file-hooks
+              (lambda ()
+                (lsp-format-buffer)
+                nil))
+    )
 
   (with-eval-after-load 'company
     ;; the tab key belongs to me, damn it!
@@ -932,9 +948,6 @@ before packages are loaded."
 
   ;; (setq spacemacs-default-jump-handlers
   ;;       (remove 'evil-goto-definition spacemacs-default-jump-handlers))
-
-  ;; (require 'qml-mode)
-  ;; (require 'protobuf-mode)
 
   ;; (require 'yasnippet)  ;; error
   (yas-global-mode 1)
@@ -1032,25 +1045,31 @@ before packages are loaded."
     (dtrt-indent-mode 't))
   (add-hook 'json-mode-hook 'my-json-mode-hook)
 
-  (editorconfig-mode 1)
+  (defun my-web-mode-hook ()
+    (prettier-js-mode 't)
+    (dtrt-indent-mode 't)
+    )
+  (add-hook 'web-mode-hook 'my-web-mode-hook)
 
-  ;; use the current project's eslint binary
-  ;; source: https://emacs.stackexchange.com/a/21207/12292
-  (defun my/use-linter-from-node-modules ()
-    (let* ((root (locate-dominating-file
-                  (or (buffer-file-name) default-directory)
-                  "node_modules"))
-           (eslint (and root
-                        (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                          root)))
-           (tslint (and root
-                        (expand-file-name "node_modules/tslint/bin/tslint"
-                                          root))))
-      (when (and eslint (file-executable-p eslint))
-        (setq-local flycheck-javascript-eslint-executable eslint))
-      (when (and tslint (file-executable-p tslint))
-        (setq-local flycheck-typescript-tslint-executable tslint))))
-  (add-hook 'flycheck-mode-hook #'my/use-linter-from-node-modules)
+  (defun my-typescript-mode-hook ()
+    (prettier-js-mode 't))
+  (add-hook 'typescript-mode-hook 'my-typescript-mode-hook)
+
+  ;; typescript-mode has terrible performance (plus, web-mode does typescript
+  ;; quite allright; it actually seems to require the emacs typescript package?)
+  (add-to-list 'auto-mode-alist '("\\.ts$" . web-mode))
+  ;; svelte-mode doesn't show errors right, web-mode works fine (using svelte-ls)
+  (add-to-list 'auto-mode-alist '("\\.svelte$" . web-mode))
+
+  (defun my-js2-mode-hook ()
+    (prettier-js-mode 't))
+  (add-hook 'js2-mode-hook 'my-js2-mode-hook)
+
+  (defun my-scss-mode-hook ()
+    (prettier-js-mode 't))
+  (add-hook 'scss-mode-hook 'my-scss-mode-hook)
+
+  (editorconfig-mode 1)
 
   ;; some javascript stuff picked from https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-javascript.el
   (setq-default js2-strict-trailing-comma-warning nil ;; it's encouraged to use trailing comma in ES6
@@ -1185,6 +1204,8 @@ Suitable for inclusion in `c-offsets-alist'."
   (define-key evil-normal-state-map (kbd "C-p") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "C--" )'evil-jump-backward)
 
+  (define-key evil-normal-state-map (kbd "gh") 'lsp-describe-thing-at-point)
+  (define-key evil-visual-state-map (kbd "gh") 'lsp-describe-thing-at-point)
 
   (with-eval-after-load 'rtags
     ;; (spacemacs/set-leader-keys "og" 'ggtags-find-definition)
@@ -1284,15 +1305,20 @@ Suitable for inclusion in `c-offsets-alist'."
     (aset buffer-display-table ?\^M []))
   (add-hook 'csharp-mode-hook 'remove-dos-eol)
 
+  ;; https://github.com/emacs-lsp/lsp-pyright/issues/66
+  (setq lsp-pyright-multi-root nil)
+
+  ;; Seems to be not needed any more? Instead, do this in the project:
+  ;;   npm i --dev '@angular/language-server'
   ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
-  (setq lsp-clients-angular-language-server-command
-        '("node"
-          "/home/martin/.local/lib/node_modules/@angular/language-server"
-          "--ngProbeLocations"
-          "/home/martin/.local/lib/node_modules"
-          "--tsProbeLocations"
-          "/home/martin/.local/lib/node_modules"
-          "--stdio"))
+  ;; (setq lsp-clients-angular-language-server-command
+  ;;       '("node"
+  ;;         "/home/martin/.local/lib/node_modules/@angular/language-server"
+  ;;         "--ngProbeLocations"
+  ;;         "/home/martin/.local/lib/node_modules"
+  ;;         "--tsProbeLocations"
+  ;;         "/home/martin/.local/lib/node_modules"
+  ;;         "--stdio"))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will

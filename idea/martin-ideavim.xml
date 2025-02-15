@@ -1,0 +1,92 @@
+<keymap version="1" name="martin-ideavim" parent="VSCode">
+  <action id="ActivateTerminalToolWindow">
+    <keyboard-shortcut first-keystroke="ctrl back_quote" />
+    <keyboard-shortcut first-keystroke="ctrl e" />
+  </action>
+  <action id="CloseAllEditors" />
+  <action id="CloseAllEditorsButActive" />
+  <action id="CloseProject">
+    <keyboard-shortcut first-keystroke="shift ctrl w" />
+  </action>
+  <action id="CollapseAllRegions" />
+  <action id="CollapseBlock">
+    <keyboard-shortcut first-keystroke="ctrl alt open_bracket" />
+  </action>
+  <action id="CollapseDocComments" />
+  <action id="CollapseRegionRecursively" />
+  <action id="CommentByLineComment">
+    <keyboard-shortcut first-keystroke="ctrl slash" />
+  </action>
+  <action id="CompareClipboardWithSelection" />
+  <action id="CopyAbsolutePath">
+    <keyboard-shortcut first-keystroke="shift alt c" />
+  </action>
+  <action id="CopyPaths">
+    <keyboard-shortcut first-keystroke="shift alt c" />
+  </action>
+  <action id="EditSourceInNewWindow" />
+  <action id="EditorDown">
+    <keyboard-shortcut first-keystroke="down" />
+    <keyboard-shortcut first-keystroke="ctrl j" />
+  </action>
+  <action id="EditorPageDown">
+    <keyboard-shortcut first-keystroke="page_down" />
+    <keyboard-shortcut first-keystroke="ctrl d" />
+  </action>
+  <action id="EditorPageUp">
+    <keyboard-shortcut first-keystroke="page_up" />
+    <keyboard-shortcut first-keystroke="ctrl u" />
+  </action>
+  <action id="EditorUp">
+    <keyboard-shortcut first-keystroke="up" />
+    <keyboard-shortcut first-keystroke="ctrl k" />
+  </action>
+  <action id="ExpandAllRegions" />
+  <action id="ExpandRegionRecursively" />
+  <action id="FindNext">
+    <keyboard-shortcut first-keystroke="f3" />
+  </action>
+  <action id="GotoDeclaration">
+    <keyboard-shortcut first-keystroke="f12" />
+    <mouse-shortcut keystroke="control button1" />
+    <keyboard-shortcut first-keystroke="shift ctrl f12" />
+  </action>
+  <action id="Help.KeymapReference" />
+  <action id="HideActiveWindow" />
+  <action id="JumpToLastChange" />
+  <action id="MoveTabRight" />
+  <action id="NextSplitter" />
+  <action id="OverrideFileTypeAction" />
+  <action id="PinActiveTabAction" />
+  <action id="PrevSplitter" />
+  <action id="QuickChangeScheme" />
+  <action id="QuickJavaDoc" />
+  <action id="RecentFiles" />
+  <action id="RemoteServers.EditServerConfig" />
+  <action id="RevealIn">
+    <keyboard-shortcut first-keystroke="shift alt r" />
+  </action>
+  <action id="RunDashboard.EditConfiguration" />
+  <action id="SaveAll" />
+  <action id="SearchEverywhere">
+    <keyboard-shortcut first-keystroke="shift ctrl a" />
+  </action>
+  <action id="SelectInProjectView" />
+  <action id="SelectNextOccurrence">
+    <keyboard-shortcut first-keystroke="ctrl f3" />
+  </action>
+  <action id="ShowHoverInfo">
+    <keyboard-shortcut first-keystroke="f1" />
+  </action>
+  <action id="SwitcherIterateItems" />
+  <action id="SwitcherRecentEditedChangedToggleCheckBox" />
+  <action id="Terminal.CloseSession" />
+  <action id="Terminal.NextSplitter" />
+  <action id="Terminal.PrevSplitter" />
+  <action id="Terminal.SelectBlockBelow" />
+  <action id="TextEditorWithPreview.Layout.EditorAndPreview" />
+  <action id="ToggleZenMode" />
+  <action id="UnselectPreviousOccurrence" />
+  <action id="Vcs.Log.ShowTooltip" />
+  <action id="org.intellij.plugins.markdown.ui.actions.styling.InsertImageAction" />
+</keymap>

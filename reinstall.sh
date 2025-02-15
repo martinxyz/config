@@ -24,6 +24,8 @@ for i in vimrc cvsrc Xdefaults fluxbox gitconfig gitignore ignore wmii-3.5 pylin
   symlink config/$i .$i
 done
 
+symlink ~/config/idea/ideavimrc ~/.ideavimrc 
+
 symlink ~/config/nvim ~/.config/nvim
 symlink ~/config/flake8 ~/.config/flake8
 
