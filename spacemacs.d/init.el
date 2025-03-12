@@ -145,7 +145,6 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages '(cycbuf
                                       dtrt-indent
                                       devdocs
-                                      editorconfig
                                       yasnippet-snippets
                                       auto-yasnippet
                                       company ;; for company-clang-arguments
@@ -740,7 +739,7 @@ before packages are loaded."
 
                                         ;(define-key evil-normal-state-map "M" 'evil-record-macro)
   (define-key evil-normal-state-map "M" 'delete-other-windows)
-  (define-key evil-normal-state-map "K" 'kill-this-buffer)
+  (define-key evil-normal-state-map "K" 'spacemacs/kill-this-buffer)
                                         ;(define-key evil-normal-state-map "K" 'bury-buffer)
   ;;(define-key evil-normal-state-map "D" 'kill-this-buffer)
   (define-key evil-normal-state-map "W" 'copy-region-as-kill)
@@ -908,10 +907,17 @@ before packages are loaded."
   (add-hook 'web-mode-hook #'add-node-modules-path)
   (add-hook 'web-mode-hook #'prettier-js-mode)
 
-  ;; to get rid of org-mode's warning (doesn't work?)
+  ;; to get rid of org-mode's warning: (doesn't work, editorconfig overwrites it)
   (defun org-custom-settings ()
-    (setq tab-width 8))
+    (setq-local tab-width 8))
   (add-hook 'org-mode-hook 'org-custom-settings)
+  ;; (debug-on-variable-change 'tab-width)
+  ;;
+  ;; Doesn't work, either:
+  ;; (add-hook 'org-mode-hook (lambda () (add-to-list 'editorconfig-exclude-modes 'org-mode)))
+  ;; (setq editorconfig-exclude-regexps (append editorconfig-exclude-regexps '("\\.org$")))
+  ;;
+  ;; (What works is not using [*] in .editorconfig, so project settings don't apply to TODOs.org)
 
   (defun noop () (interactive))
 
@@ -1068,8 +1074,6 @@ before packages are loaded."
   (defun my-scss-mode-hook ()
     (prettier-js-mode 't))
   (add-hook 'scss-mode-hook 'my-scss-mode-hook)
-
-  (editorconfig-mode 1)
 
   ;; some javascript stuff picked from https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-javascript.el
   (setq-default js2-strict-trailing-comma-warning nil ;; it's encouraged to use trailing comma in ES6
@@ -1354,7 +1358,9 @@ This function is called at the very end of Spacemacs initialization."
    '(dabbrev-case-replace nil)
    '(delete-trailing-lines nil)
    '(dumb-jump-confirm-jump-to-modified-file nil)
-   '(editorconfig-exclude-modes '(org-mode))
+   '(editorconfig-exclude-modes '(org-mode snippet org))
+   '(editorconfig-exclude-regexps
+     '("\\`/home/martin/\\.emacs\\.d-spacemacs/recentf" "\\\\.org$"))
    '(evil-ex-search-persistent-highlight nil)
    '(evil-repeat-move-cursor nil)
    '(evil-surround-pairs-alist
@@ -1400,18 +1406,18 @@ This function is called at the very end of Spacemacs initialization."
    '(lsp-rust-analyzer-server-display-inlay-hints t)
    '(lsp-rust-server 'rust-analyzer)
    '(lsp-signature-auto-activate nil)
-   '(lsp-ui-doc-enable nil)
+   '(lsp-ui-doc-enable nil t)
    '(lsp-ui-sideline-delay 0.8)
    '(magit-diff-refine-hunk t)
    '(magit-diff-refine-ignore-whitespace nil)
-   '(magit-revision-show-gravatars nil t)
+   '(magit-revision-show-gravatars nil)
    '(magit-save-repository-buffers 'dontask)
    '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
    '(markdown-indent-function 'noop)
    '(mouse-yank-at-point t)
    '(pabbrev-idle-timer-verbose nil)
    '(package-selected-packages
-     '(add-node-modules-path svelte-mode magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
+     '(add-node-modules-path svelte-mode magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
    '(projectile-completion-system 'ido)
    '(projectile-enable-caching nil)
    '(projectile-git-command "rg --files --null")
