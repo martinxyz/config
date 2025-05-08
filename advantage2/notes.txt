@@ -1,0 +1,72 @@
+--- /media/martin/ADVANTAGE2/active/qwerty.txt ---
+
+v1: (simple)
+
+[caps]>[escape]
+[up]>[down]
+[down]>[up]
+[kp-up]>[down]
+[kp-down]>[up]
+[lalt]>[rwin]
+[kp-lalt]>[kp-rwin]
+[delete]>[kp-ralt]
+[rwin]>[lalt]
+[kp-rwin]>[kp-lalt]
+{lalt}{6}>{-rctrl}{-lalt}{delete}{+lalt}{+rctrl}
+
+v2:
+
+[caps]>[escape]
+[up]>[down]
+[kp-up]>[down]
+[down]>[up]
+[kp-down]>[up]
+[lalt]>[rwin]
+[kp-lalt]>[kp-rwin]
+[delete]>[kp-ralt]
+[rwin]>[lalt]
+[kp-rwin]>[kp-lalt]
+{lalt}{6}>{-rctrl}{-lalt}{delete}{+lalt}{+rctrl}
+{kp-lshift}{kp-6}>{numlk}
+[']>[KPSHIFT]
+[kp-']>[KPSHIFT]
+[kp-1]>[F1]
+[kp-2]>[F2]
+[kp-3]>[F3]
+[kp-4]>[F4]
+[kp-5]>[F5]
+[kp-6]>[F6]
+[numlk]>[F7]
+[kp=]>[F8]
+[kpdiv]>[F9]
+[kpmult]>[F10]
+[kp-hyphen]>[F11]
+[kp-f]>[F11]
+
+---
+
+Model: Advantage2
+Firmware: 1.0.431.us \4MB=, 11-14-2017
+Active lazout file: 
+Thumb kezs mode: win
+Macro plaz speed: off^0, slow^1, normal^3, fast^9: 3
+Status report plaz speed: off^0, slow^1, normal^3, fast^4: 3
+Kezclick status: on
+Toggle tone status: on
+Stored macros: 0
+Kezs remapped: 0
+Power user mode: on
+
+--- after update ---
+
+Model: Advantage2
+Firmware: 1.0.521.us \4MB=, 06-25-2020
+Active lazout file: qwertz.txt
+Thumb kezs mode: win
+Macro plaz speed: off^0, slow^1, normal^3, fast^9: 3
+Status report plaz speed: off^0, slow^1, normal^3, fast^4: 3
+Kezclick status: on
+Toggle tone status: on
+Stored macros: 0
+Kezs remapped: 0
+

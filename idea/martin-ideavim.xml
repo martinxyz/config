@@ -78,6 +78,7 @@
   <action id="ShowHoverInfo">
     <keyboard-shortcut first-keystroke="f1" />
   </action>
+  <action id="StepInto" />
   <action id="SwitcherIterateItems" />
   <action id="SwitcherRecentEditedChangedToggleCheckBox" />
   <action id="Terminal.CloseSession" />
@@ -85,6 +86,9 @@
   <action id="Terminal.PrevSplitter" />
   <action id="Terminal.SelectBlockBelow" />
   <action id="TextEditorWithPreview.Layout.EditorAndPreview" />
+  <action id="ToggleFullScreen">
+    <keyboard-shortcut first-keystroke="f11" />
+  </action>
   <action id="ToggleZenMode" />
   <action id="UnselectPreviousOccurrence" />
   <action id="Vcs.Log.ShowTooltip" />
