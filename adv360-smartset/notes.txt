@@ -1,20 +1,23 @@
+
+---------------------------------------------------------------
+layout1.txt: (light modification of swiss-german layout)
 /media/martin/ADV360/layouts/layout1.txt
-
-layout1.txt:
-
+---------------------------------------------------------------
 <base>
 [rwin]>[lalt]
 [down]>[up]
 [up]>[down]
 [del]>[ralt]
 [lalt]>[lwin]
-[caps]>[esc]
-[hk1]>[F1]
-[hk2]>[F11]
-[hk4]>[F4]
+[caps]>[int\][t&h500][caps]
+[hk1]>{x1}[F1][t&h250][F2]
+[hk2]>{x1}[F11][t&h250][F4]
+[hk3]>[F3][t&h500][kh9A]
+[hk4]>[F11][t&h250][F4]
 [apos]>[fn1s]
-{lalt}{hk4}>{x1}{-lctr}{-lalt}{del}{+lalt}{+lctr}
+{lalt}{hk4}>{s2}{x1}{-lctr}{-lalt}{del}{+lalt}{+lctr}
 {rctr}{ent}>{x1}{-rctr}
+{khb1}>{x1}{-lshf}{F4}{+lshf}
 
 <keypad>
 [rwin]>[lalt]
@@ -44,16 +47,91 @@ layout1.txt:
 [0]>[F10]
 [s]>[prnt]
 [hyph]>[F11]
-[caps]>[esc]
-[hk1]>[F1]
-[hk2]>[F11]
-
+[caps]>[int\][t&h500][esc]
+[hk1]>[F1][t&h250][x1][F2]
+{hk2}>{F4}{t&h250}{-lshf}{F4}{+lshf}
+[hk3]>[F3][t&h500][kh9A]
+[hk4]>[F4][t&h250][khb1]
 
 <function2>
 
 <function3>
 
+---------------------------------------------------------------
+layout2.txt: (more heavily customized swiss-german layout)
+/media/martin/ADV360/layouts/layout2.txt
+---------------------------------------------------------------
+<base>
+[rwin]>[lalt]
+[apos]>[fn1s]
+[down]>[up]
+[hk3]>[F3][t&h500][kh9A]
+[hk4]>[F11][t&h250][F4]
+[up]>[down]
+[del]>[ralt]
+[lalt]>[lwin]
+[caps]>[int#][t&h500][caps]
+[hk1]>[°>][t&h0][°>]
+[hk2]>[°>][t&h0][°>]
+{lalt}{hk4}>{s1}{-lctr}{-lalt}{del}{+lalt}{+lctr}
+{rctr}{ent}>{x1}{-rctr}
+{khB1}>{x1}{-lshf}{F4}{+lshf}
+{ralt}{u}>{s8}{int#}
+{ralt}{i}>{s8}{-rshf}{int#}{+rshf}
+{scol}>{s8}{-lshf}{7}{+lshf}
+{lshf}{scol}>{s8}{scol}
+{lshf}{7}>{s8}{-lshf}{8}{+lshf}
+{lshf}{8}>{s8}{-lshf}{9}{+lshf}
+{rshf}{7}>{s8}{-rshf}{8}{+rshf}
+{rshf}{8}>{s8}{-rshf}{9}{+rshf}
+{ralt}{7}>{s8}{-lshf}{8}{+lshf}
+{ralt}{8}>{s8}{-lshf}{9}{+lshf}
+{ralt}{j}>{s8}{-ralt}{obrk}{+ralt}
+{ralt}{k}>{s8}{-ralt}{cbrk}{+ralt}
+{ralt}{comm}>{s8}{-ralt}{fn1s}{bsls}{+ralt}
+{ralt}{m}>{s8}{-ralt}{fn1s}{apos}{+ralt}
+{ralt}{9}>{s8}{-ralt}{int#}{+ralt}
 
+<keypad>
+[rwin]>[lalt]
+[down]>[up]
+[up]>[down]
+[del]>[ralt]
+[lalt]>[lwin]
+
+<function1>
+[rwin]>[lalt]
+[0]>[F10]
+[hyph]>[F11]
+[9]>[F9]
+[down]>[up]
+[7]>[F7]
+[j]>[pgdn]
+[k]>[pgup]
+[8]>[F8]
+[hk3]>[F3][t&h500][kh9A]
+[hk4]>[F4][t&h250][khB1]
+[up]>[down]
+[6]>[F6]
+[lalt]>[lwin]
+[1]>[F1]
+[eql]>[F12]
+[s]>[prnt]
+[2]>[F2]
+[caps]>[int#][t&h500][esc]
+[4]>[F4]
+[3]>[F3]
+[hk1]>[F1][t&h250][°>]
+[5]>[F5]
+{hk2}>{x1}{F4}{-lshf}{F4}{+lshf}
+
+<function2>
+
+<function3>
+
+---------------------------------------------------------------
+LEDs
+---------------------------------------------------------------
 
 The lowest LED brightness is 43 (42 is dark). (Not quite sure if it is deterministic... using 45 now.)
 led1.txt: (same as led2.txt but with dark prof)
