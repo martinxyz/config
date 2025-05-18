@@ -15,7 +15,7 @@ layout1.txt: (light modification of swiss-german layout)
 [hk3]>[F3][t&h500][kh9A]
 [hk4]>[F11][t&h250][F4]
 [apos]>[fn1s]
-{lalt}{hk4}>{s2}{x1}{-lctr}{-lalt}{del}{+lalt}{+lctr}
+{lalt}{F11}>{x1}{-lctr}{-lalt}{d200}{del}{+lalt}{+lctr}
 {rctr}{ent}>{x1}{-rctr}
 {khb1}>{x1}{-lshf}{F4}{+lshf}
 
@@ -73,24 +73,46 @@ layout2.txt: (more heavily customized swiss-german layout)
 [caps]>[int#][t&h500][caps]
 [hk1]>[°>][t&h0][°>]
 [hk2]>[°>][t&h0][°>]
-{lalt}{hk4}>{s1}{-lctr}{-lalt}{del}{+lalt}{+lctr}
+{lalt}{F11}>{x1}{-lctr}{-lalt}{d200}{del}{+lalt}{+lctr}
 {rctr}{ent}>{x1}{-rctr}
 {khB1}>{x1}{-lshf}{F4}{+lshf}
-{ralt}{u}>{s8}{int#}
-{ralt}{i}>{s8}{-rshf}{int#}{+rshf}
-{scol}>{s8}{-lshf}{7}{+lshf}
-{lshf}{scol}>{s8}{scol}
-{lshf}{7}>{s8}{-lshf}{8}{+lshf}
-{lshf}{8}>{s8}{-lshf}{9}{+lshf}
-{rshf}{7}>{s8}{-rshf}{8}{+rshf}
-{rshf}{8}>{s8}{-rshf}{9}{+rshf}
-{ralt}{7}>{s8}{-lshf}{8}{+lshf}
-{ralt}{8}>{s8}{-lshf}{9}{+lshf}
-{ralt}{j}>{s8}{-ralt}{obrk}{+ralt}
-{ralt}{k}>{s8}{-ralt}{cbrk}{+ralt}
-{ralt}{comm}>{s8}{-ralt}{fn1s}{bsls}{+ralt}
-{ralt}{m}>{s8}{-ralt}{fn1s}{apos}{+ralt}
-{ralt}{9}>{s8}{-ralt}{int#}{+ralt}
+{ralt}{u}>{x1}{s8}{int#}{-ralt}
+{ralt}{i}>{x1}{s8}{-rshf}{int#}{+rshf}{-ralt}
+{scol}>{x1}{s8}{-lshf}{7}{+lshf}
+{lshf}{scol}>{x1}{s8}{scol}{-lshf}
+{ralt}{j}>{x1}{s8}{-ralt}{obrk}
+{ralt}{k}>{x1}{s8}{-ralt}{cbrk}
+{ralt}{m}>{x1}{s8}{-ralt}{fn1s}{apos}
+{obrk}>{x1}{s8}{-ralt}{scol}{+ralt}
+{lshf}{obrk}>{x1}{s8}{-lshf}{eql}
+{grav}>{x1}{s8}{-lshf}{eql}{+lshf}{spc}
+{rshf}{eql}>{x1}{s8}{-ralt}{1}{+ralt}{-rshf}
+{lshf}{eql}>{x1}{s8}{-ralt}{1}{+ralt}{-lshf}
+{lshf}{bsls}>{x1}{s8}{-ralt}{eql}{+ralt}{spc}{-lshf}
+{rshf}{bsls}>{x1}{s8}{-ralt}{eql}{+ralt}{spc}{-rshf}
+{ralt}{o}>{x1}{s8}{-rshf}{1}{+rshf}{-ralt}
+{ralt}{3}>{x1}{s8}{-rshf}{3}{+rshf}{-ralt}
+{ralt}{4}>{x1}{s8}{-ralt}{3}
+{rshf}{4}>{x1}{s8}{-ralt}{3}{+ralt}{-rshf}
+{lshf}{4}>{x1}{s8}{-ralt}{3}{+ralt}{-lshf}
+{ralt}{5}>{x1}{s8}{-lshf}{5}{+lshf}{-ralt}
+{lshf}{7}>{x1}{s8}{-lshf}{8}
+{rshf}{7}>{x1}{s8}{-rshf}{8}
+{ralt}{7}>{x1}{s8}{-lshf}{8}{+lshf}{-ralt}
+{lshf}{8}>{x1}{s8}{-lshf}{9}
+{rshf}{8}>{x1}{s8}{-rshf}{9}
+{ralt}{8}>{x1}{s8}{-lshf}{9}{+lshf}{-ralt}
+{lshf}{9}>{x1}{s8}{-ralt}{int#}{+ralt}{-lshf}
+{rshf}{9}>{x1}{s8}{-ralt}{int#}{+ralt}{-rshf}
+{ralt}{9}>{x1}{s8}{-ralt}{int#}
+{ralt}{0}>{x1}{s8}{-lshf}{0}{+lshf}{-ralt}
+{ralt}{hyp}>{x1}{s8}{-lshf}{hyp}{+lshf}{-ralt}
+{ralt}{bsls}>{x1}{s8}{-ralt}{eql}{+ralt}{spc}{-ralt}
+{ralt}{cbrk}>{x1}{s8}{-lshf}{cbrk}{+lshf}{-ralt}
+{ralt}{scol}>{x1}{s8}{-lshf}{comm}{+lshf}{-ralt}
+{ralt}{perd}>{x1}{s8}{-lshf}{perd}{+lshf}{-ralt}
+{ralt}{comm}>{x1}{s8}{-lshf}{comm}{+lshf}{-ralt}
+{ralt}{fsls}>{x1}{s8}{-rshf}{fsls}{+rshf}{-ralt}
 
 <keypad>
 [rwin]>[lalt]
@@ -128,6 +150,39 @@ layout2.txt: (more heavily customized swiss-german layout)
 <function2>
 
 <function3>
+
+---------------------------------------------------------------
+notes layout2
+---------------------------------------------------------------
+BASE:
+
+^1234567890'$ "'<`
+^1234567890'$ "'<`
+.............X..X.
+
+/-.,
+/-.,
+....
+
+SHIFT:
+
+|+"*#%&()\=?~ !`>°
+|+"*#%&()\=?~ !`>°
+.............X..Xx
+
+;_:;
+ö_:;
+X...
+
+ALTGR:
+
+~|@*#%&()\=?~ !`\¬
+~|@*#%&()\=?~ !`\¬
+X...XXX......X..xx
+
+;_:}
+;_:;
+
 
 ---------------------------------------------------------------
 LEDs
