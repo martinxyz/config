@@ -9,15 +9,15 @@ layout1.txt: (light modification of swiss-german layout)
 [up]>[down]
 [del]>[ralt]
 [lalt]>[lwin]
-[caps]>[int\][t&h500][caps]
-[hk1]>{x1}[F1][t&h250][F2]
-[hk2]>{x1}[F11][t&h250][F4]
+[hk1]>[F1][t&h250][F2]
+[hk2]>[F11][t&h250][F4]
 [hk3]>[F3][t&h500][kh9A]
 [hk4]>[F11][t&h250][F4]
-[apos]>[fn1s]
+[caps]>[int#][t&h500][caps]
 {lalt}{F11}>{x1}{-lctr}{-lalt}{d200}{del}{+lalt}{+lctr}
 {rctr}{ent}>{x1}{-rctr}
-{khb1}>{x1}{-lshf}{F4}{+lshf}
+{khB1}>{x1}{-lshf}{F4}{+lshf}
+{F11}>{x1}{-lalt}{-rctr}{fn1s}{del}{+rctr}{+lalt}
 
 <keypad>
 [rwin]>[lalt]
@@ -32,7 +32,6 @@ layout1.txt: (light modification of swiss-german layout)
 [k]>[pgup]
 [up]>[down]
 [down]>[up]
-[del]>[del]
 [lalt]>[lwin]
 [eql]>[F12]
 [1]>[F1]
@@ -47,11 +46,7 @@ layout1.txt: (light modification of swiss-german layout)
 [0]>[F10]
 [s]>[prnt]
 [hyph]>[F11]
-[caps]>[int\][t&h500][esc]
-[hk1]>[F1][t&h250][x1][F2]
-{hk2}>{F4}{t&h250}{-lshf}{F4}{+lshf}
-[hk3]>[F3][t&h500][kh9A]
-[hk4]>[F4][t&h250][khb1]
+[caps]>[int#][t&h500][esc]
 
 <function2>
 
@@ -63,7 +58,6 @@ layout2.txt: (more heavily customized swiss-german layout)
 ---------------------------------------------------------------
 <base>
 [rwin]>[lalt]
-[apos]>[fn1s]
 [down]>[up]
 [hk3]>[F3][t&h500][kh9A]
 [hk4]>[F11][t&h250][F4]
@@ -71,8 +65,8 @@ layout2.txt: (more heavily customized swiss-german layout)
 [del]>[ralt]
 [lalt]>[lwin]
 [caps]>[int#][t&h500][caps]
-[hk1]>[°>][t&h0][°>]
-[hk2]>[°>][t&h0][°>]
+[hk1]>[F1][t&h250][F2]
+[hk2]>[F11][t&h250][F4]
 {lalt}{F11}>{x1}{-lctr}{-lalt}{d200}{del}{+lalt}{+lctr}
 {rctr}{ent}>{x1}{-rctr}
 {khB1}>{x1}{-lshf}{F4}{+lshf}
@@ -82,8 +76,8 @@ layout2.txt: (more heavily customized swiss-german layout)
 {lshf}{scol}>{x1}{s8}{scol}{-lshf}
 {ralt}{j}>{x1}{s8}{-ralt}{obrk}
 {ralt}{k}>{x1}{s8}{-ralt}{cbrk}
-{ralt}{m}>{x1}{s8}{-ralt}{fn1s}{apos}
-{obrk}>{x1}{s8}{-ralt}{scol}{+ralt}
+{ralt}{m}>{x1}{s8}{-ralt}{apos}
+{obrk}>{x1}{s8}{-ralt}{hyph}{+ralt}
 {lshf}{obrk}>{x1}{s8}{-lshf}{eql}
 {grav}>{x1}{s8}{-lshf}{eql}{+lshf}{spc}
 {rshf}{eql}>{x1}{s8}{-ralt}{1}{+ralt}{-rshf}
@@ -106,13 +100,15 @@ layout2.txt: (more heavily customized swiss-german layout)
 {rshf}{9}>{x1}{s8}{-ralt}{int#}{+ralt}{-rshf}
 {ralt}{9}>{x1}{s8}{-ralt}{int#}
 {ralt}{0}>{x1}{s8}{-lshf}{0}{+lshf}{-ralt}
-{ralt}{hyp}>{x1}{s8}{-lshf}{hyp}{+lshf}{-ralt}
+{ralt}{hyph}>{x1}{s8}{-lshf}{hyph}{+lshf}{-ralt}
 {ralt}{bsls}>{x1}{s8}{-ralt}{eql}{+ralt}{spc}{-ralt}
 {ralt}{cbrk}>{x1}{s8}{-lshf}{cbrk}{+lshf}{-ralt}
 {ralt}{scol}>{x1}{s8}{-lshf}{comm}{+lshf}{-ralt}
 {ralt}{perd}>{x1}{s8}{-lshf}{perd}{+lshf}{-ralt}
-{ralt}{comm}>{x1}{s8}{-lshf}{comm}{+lshf}{-ralt}
+{ralt}{comm}>{x1}{s8}{-ralt}{bsls}
 {ralt}{fsls}>{x1}{s8}{-rshf}{fsls}{+rshf}{-ralt}
+{ralt}{1}>{x1}{s8}{-ralt}{7}
+{eql}>{x1}{s8}{eql}{spc}
 
 <keypad>
 [rwin]>[lalt]
@@ -143,9 +139,7 @@ layout2.txt: (more heavily customized swiss-german layout)
 [caps]>[int#][t&h500][esc]
 [4]>[F4]
 [3]>[F3]
-[hk1]>[F1][t&h250][°>]
 [5]>[F5]
-{hk2}>{x1}{F4}{-lshf}{F4}{+lshf}
 
 <function2>
 
