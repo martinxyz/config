@@ -739,9 +739,9 @@ before packages are loaded."
 
                                         ;(define-key evil-normal-state-map "M" 'evil-record-macro)
   (define-key evil-normal-state-map "M" 'delete-other-windows)
-  (define-key evil-normal-state-map "K" 'spacemacs/kill-this-buffer)
+  (define-key evil-normal-state-map "K" 'kill-current-buffer)
                                         ;(define-key evil-normal-state-map "K" 'bury-buffer)
-  ;;(define-key evil-normal-state-map "D" 'kill-this-buffer)
+  ;;(define-key evil-normal-state-map "D" 'kill-current-buffer)
   (define-key evil-normal-state-map "W" 'copy-region-as-kill)
 
   ;; old stuff from old config
@@ -1397,20 +1397,64 @@ This function is called at the very end of Spacemacs initialization."
    '(lsp-ui-sideline-delay 0.8)
    '(magit-diff-refine-hunk t)
    '(magit-diff-refine-ignore-whitespace nil)
-   '(magit-revision-show-gravatars nil)
+   '(magit-revision-show-gravatars nil t)
    '(magit-save-repository-buffers 'dontask)
    '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
    '(markdown-indent-function 'noop)
    '(mouse-yank-at-point t)
    '(pabbrev-idle-timer-verbose nil)
    '(package-selected-packages
-     '(add-node-modules-path svelte-mode magit-svn json-navigator hierarchy yapfify ws-butler winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tide tern tagedit symon string-inflection spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode restart-emacs request realgud rainbow-mode rainbow-identifiers rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort pug-mode popwin pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox overseer orgit org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file neotree nameless mwim move-text mmm-mode material-theme markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide importmagic impatient-mode hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate google-c-style golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags font-lock+ flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav dumb-jump dtrt-indent disaster diminish diff-hl devdocs define-word cython-mode cycbuf counsel-projectile counsel-gtags counsel-css column-enforce-mode color-theme-sanityinc-tomorrow color-identifiers-mode coffee-mode clean-aindent-mode clang-format centered-cursor-mode cargo browse-at-remote auto-highlight-symbol auto-compile anaconda-mode aggressive-indent adaptive-wrap ace-window ace-link))
+     '(add-node-modules-path svelte-mode magit-svn json-navigator hierarchy yapfify
+                             ws-butler winum which-key wgrep web-mode web-beautify
+                             volatile-highlights vi-tilde-fringe uuidgen
+                             use-package unfill toml-mode toc-org tide tern
+                             tagedit symon string-inflection
+                             spaceline-all-the-icons smex smeargle slim-mode
+                             scss-mode sass-mode restart-emacs request realgud
+                             rainbow-mode rainbow-identifiers rainbow-delimiters
+                             racer pyvenv pytest pyenv-mode py-isort pug-mode
+                             popwin pippel pipenv pip-requirements persp-mode
+                             pcre2el password-generator paradox overseer orgit
+                             org-projectile org-present org-pomodoro org-mime
+                             org-download org-bullets org-brain open-junk-file
+                             neotree nameless mwim move-text mmm-mode
+                             material-theme markdown-toc magit-gitflow macrostep
+                             lorem-ipsum livid-mode live-py-mode linum-relative
+                             link-hint less-css-mode json-mode js2-refactor js-doc
+                             ivy-xref ivy-rtags ivy-purpose ivy-hydra indent-guide
+                             importmagic impatient-mode hy-mode hungry-delete
+                             hl-todo highlight-parentheses highlight-numbers
+                             highlight-indentation helm-make google-translate
+                             google-c-style golden-ratio gnuplot gitignore-mode
+                             gitconfig-mode gitattributes-mode git-timemachine
+                             git-messenger git-link git-gutter-fringe
+                             git-gutter-fringe+ gh-md ggtags font-lock+
+                             flycheck-rust flycheck-rtags flycheck-pos-tip flx-ido
+                             fill-column-indicator fancy-battery eyebrowse
+                             expand-region exec-path-from-shell evil-visualstar
+                             evil-visual-mark-mode evil-unimpaired evil-tutor
+                             evil-surround evil-search-highlight-persist evil-org
+                             evil-numbers evil-nerd-commenter evil-mc evil-matchit
+                             evil-magit evil-lisp-state evil-lion evil-indent-plus
+                             evil-iedit-state evil-exchange evil-escape evil-ediff
+                             evil-cleverparens evil-args evil-anzu eval-sexp-fu
+                             emmet-mode elisp-slime-nav dumb-jump dtrt-indent
+                             disaster diminish diff-hl devdocs define-word
+                             cython-mode cycbuf counsel-projectile counsel-gtags
+                             counsel-css column-enforce-mode
+                             color-theme-sanityinc-tomorrow color-identifiers-mode
+                             coffee-mode clean-aindent-mode clang-format
+                             centered-cursor-mode cargo browse-at-remote
+                             auto-highlight-symbol auto-compile anaconda-mode
+                             aggressive-indent adaptive-wrap ace-window ace-link))
    '(projectile-completion-system 'ido)
    '(projectile-enable-caching nil)
    '(projectile-git-command "rg --files --null")
    '(projectile-globally-ignored-buffers '("TAGS" "*anaconda-mode*" "GTAGS" "GRTAGS" "GPATH"))
    '(projectile-globally-ignored-directories
-     '(".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages" ".pyc" "__pycache__"))
+     '(".idea" ".ensime_cache" ".eunit" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr"
+       "_darcs" ".tox" ".svn" ".stack-work" "bower_components" "node_packages"
+       ".pyc" "__pycache__"))
    '(projectile-globally-ignored-files '("TAGS" "GTAGS" "GRTAGS" "GPATH"))
    '(projectile-other-file-alist
      '(("cpp" "h" "hpp" "ipp") ("ipp" "h" "hpp" "cpp") ("hpp" "h" "ipp" "cpp" "cc")

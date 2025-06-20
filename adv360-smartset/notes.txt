@@ -59,7 +59,7 @@ layout2.txt: (more heavily customized swiss-german layout)
 <base>
 [rwin]>[lalt]
 [down]>[up]
-[hk3]>[F3][t&h500][kh9A]
+[hk3]>[hk3][t&h500][kh9A]
 [hk4]>[F11][t&h250][F4]
 [up]>[down]
 [del]>[ralt]
@@ -107,8 +107,12 @@ layout2.txt: (more heavily customized swiss-german layout)
 {ralt}{perd}>{x1}{s8}{-lshf}{perd}{+lshf}{-ralt}
 {ralt}{comm}>{x1}{s8}{-ralt}{bsls}
 {ralt}{fsls}>{x1}{s8}{-rshf}{fsls}{+rshf}{-ralt}
+{hk3}>{x1}{-rctr}{-lalt}{home}{+rctr}{+lalt}{-lalt}{tab}{+lalt}
 {ralt}{1}>{x1}{s8}{-ralt}{7}
 {eql}>{x1}{s8}{eql}{spc}
+{lshf}{F11}>{x1}{tab}{spc}{down}{spc}{m}{r}{e}{n}{o}{l}{d}{a}{d}{m}{tab}
+{ralt}{F11}>{x1}{tab}{spc}{down}{spc}{m}{r}{e}{n}{o}{l}{d}{a}{d}{m}{tab}
+{rctr}{scol}>{s8}{x1}{-rctr}{-rshf}{7}{+rctr}{+rshf}
 
 <keypad>
 [rwin]>[lalt]
