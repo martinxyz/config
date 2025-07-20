@@ -1195,9 +1195,9 @@ Suitable for inclusion in `c-offsets-alist'."
   (define-key evil-normal-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
   (define-key evil-visual-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
   (define-key evil-insert-state-map (kbd "M-.") 'spacemacs/jump-to-definition)
-  (define-key evil-normal-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
-  (define-key evil-visual-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
-  (define-key evil-insert-state-map (kbd "C-.") 'spacemacs/jump-to-definition)
+  (define-key evil-normal-state-map (kbd "C-.") 'lsp-execute-code-action)
+  (define-key evil-visual-state-map (kbd "C-.") 'lsp-execute-code-action)
+  (define-key evil-insert-state-map (kbd "C-.") 'lsp-execute-code-action)
   (define-key evil-normal-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
   (define-key evil-visual-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
   (define-key evil-insert-state-map (kbd "C-,") 'spacemacs/jump-to-definition)
@@ -1384,6 +1384,7 @@ This function is called at the very end of Spacemacs initialization."
        (counsel-git-grep-function) (Man-goto-section) (org-refile) (t)))
    '(js2-strict-missing-semi-warning nil)
    '(js2-strict-trailing-comma-warning nil t)
+   '(lsp-auto-execute-action nil)
    '(lsp-eldoc-enable-hover nil)
    '(lsp-file-watch-threshold 10000)
    '(lsp-prefer-flymake nil)
@@ -1393,7 +1394,7 @@ This function is called at the very end of Spacemacs initialization."
    '(lsp-rust-analyzer-server-display-inlay-hints t)
    '(lsp-rust-server 'rust-analyzer)
    '(lsp-signature-auto-activate nil)
-   '(lsp-ui-doc-enable nil)
+   '(lsp-ui-doc-enable nil t)
    '(lsp-ui-sideline-delay 0.8)
    '(magit-diff-refine-hunk t)
    '(magit-diff-refine-ignore-whitespace nil)
@@ -1470,6 +1471,12 @@ This function is called at the very end of Spacemacs initialization."
         "component.js" "component.ts")))
    '(py-shell-name "python3")
    '(python-shell-interpreter "python3")
+   '(recentf-exclude
+     '("/home/martin/.emacs.d/.cache/treemacs-persist-at-last-error"
+       "/home/martin/.emacs.d/.cache/treemacs-persist"
+       "~/.emacs.d/.cache/.custom-settings" "COMMIT_EDITMSG\\'"
+       "~/.emacs.d/elpa.*" "~/.emacs.d/.cache/.*"
+       "~/.emacs.d/session.*"))
    '(rtags-path "/home/martin/.local/bin/")
    '(rust-format-on-save t)
    '(rustic-ansi-faces
@@ -1488,6 +1495,7 @@ This function is called at the very end of Spacemacs initialization."
                            (locate-dominating-file default-directory
                                                    ".dir-locals.el")
                            "node_modules/.bin/")))))
+   '(savehist-save-minibuffer-history nil)
    '(sp-escape-quotes-after-insert nil)
    '(sp-escape-wrapped-region nil)
    '(swbuff-clear-delay 20)

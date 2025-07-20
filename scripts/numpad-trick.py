@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+#
+# Service: ~/.config/systemd/user/numpad-trick.service
+# [Unit]
+# Description=numpad-trick.py - grabs keypad input
+# 
+# [Service]
+# Restart=on-failure
+# RestartSec=8
+# ExecStart=/usr/bin/python3 -u %h/code/scripts/numpad-trick.py
+# 
+# [Install]
+# WantedBy=default.target
+
 import evdev
 import asyncio
 from evdev import ecodes
