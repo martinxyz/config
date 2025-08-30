@@ -12,6 +12,7 @@ if status is-interactive
     alias ..... "cd ../../../.."
     alias ...... "cd ../../../../.."
     abbr -a -- - 'cd -'
+    alias ip "ip -color=auto"
 
     set -xg EDITOR nvim
     set -xg VISUAL nvim
@@ -41,10 +42,7 @@ set -xg DOTNET_CLI_TELEMETRY_OPTOUT true
 # set -xg PYENV_ROOT /home/martin/.pyenv
 # fish_add_path -g /home/martin/.pyenv/bin
 # pyenv init - --no-rehash | source
-
-if test -d ~/.rye/shims
-    set -xg fish_user_pathsu ~/.rye/shims
-end
+# pyenv init - --no-rehash fish | source
 
 if test -d ~/compile/helix/runtime
     set -xg HELIX_RUNTIME ~/compile/helix/runtime

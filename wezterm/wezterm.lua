@@ -21,5 +21,8 @@ config.set_environment_variables = {
 	SHELL = '/usr/bin/fish'
 }
 
+config.initial_cols = 100
+config.initial_rows = 35
+
 return config
 

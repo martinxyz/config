@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
-    
+echo "No longer using this! Directly program the keyboard instead."
+exit 1
+
 if ! grep 'xkb_symbols "maxy"' /usr/share/X11/xkb/symbols/ch; then
     cp /usr/share/X11/xkb/symbols/ch symbols/ch.system
 fi

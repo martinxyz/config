@@ -1383,7 +1383,7 @@ This function is called at the very end of Spacemacs initialization."
      '((read-file-name-internal . compare-files-by-date) (internal-complete-buffer)
        (counsel-git-grep-function) (Man-goto-section) (org-refile) (t)))
    '(js2-strict-missing-semi-warning nil)
-   '(js2-strict-trailing-comma-warning nil t)
+   '(js2-strict-trailing-comma-warning nil)
    '(lsp-auto-execute-action nil)
    '(lsp-eldoc-enable-hover nil)
    '(lsp-file-watch-threshold 10000)
@@ -1394,11 +1394,11 @@ This function is called at the very end of Spacemacs initialization."
    '(lsp-rust-analyzer-server-display-inlay-hints t)
    '(lsp-rust-server 'rust-analyzer)
    '(lsp-signature-auto-activate nil)
-   '(lsp-ui-doc-enable nil t)
+   '(lsp-ui-doc-enable nil)
    '(lsp-ui-sideline-delay 0.8)
    '(magit-diff-refine-hunk t)
    '(magit-diff-refine-ignore-whitespace nil)
-   '(magit-revision-show-gravatars nil t)
+   '(magit-revision-show-gravatars nil)
    '(magit-save-repository-buffers 'dontask)
    '(magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
    '(markdown-indent-function 'noop)
@@ -1475,8 +1475,7 @@ This function is called at the very end of Spacemacs initialization."
      '("/home/martin/.emacs.d/.cache/treemacs-persist-at-last-error"
        "/home/martin/.emacs.d/.cache/treemacs-persist"
        "~/.emacs.d/.cache/.custom-settings" "COMMIT_EDITMSG\\'"
-       "~/.emacs.d/elpa.*" "~/.emacs.d/.cache/.*"
-       "~/.emacs.d/session.*"))
+       "~/.emacs.d/elpa.*" "~/.emacs.d/.cache/.*" "~/.emacs.d/session.*"))
    '(rtags-path "/home/martin/.local/bin/")
    '(rust-format-on-save t)
    '(rustic-ansi-faces

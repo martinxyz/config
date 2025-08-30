@@ -1,3 +1,5 @@
+set clipboard^=unnamed,unnamedplus
+
 " https://github.com/marcoieni/intellimacs
 source ~/.intellimacs/spacemacs.vim
 
@@ -15,6 +17,11 @@ vnoremap <leader>mgr    <Esc>:action GotoDeclaration<CR>
 " Comma for major mode
 nmap , <leader>m
 vmap , <leader>m
+
+" .ideavimrc is a configuration file for IdeaVim plugin. It uses
+"   the same commands as the original .vimrc configuration.
+" You can find a list of commands here: https://jb.gg/h38q75
+" Find more examples here: https://jb.gg/share-ideavimrc
 
 " Scrolling
 nnoremap <nowait> [ jjjjzz
@@ -47,6 +54,21 @@ set smartindent
 "set showmode
 set incsearch
 set number
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+" Highlight copied text
+Plug 'machakann/vim-highlightedyank'
+" Commentary plugin
+Plug 'tpope/vim-commentary'
+
+"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+"" Map \r to the Reformat Code action
+"map \r <Action>(ReformatCode)
+
+"" Map <leader>d to start debug
+"map <leader>d <Action>(Debug)
 
 " for J
 set ideajoin

@@ -31,7 +31,8 @@ symlink ~/config/flake8 ~/.config/flake8
 
 symlink ~/config/flake8 ~/.config/flake8
 symlink ~/config/sway ~/.config/sway
-symlink ~/config/xkb ~/.xkb
+# symlink ~/config/xkb ~/.xkb
+rm -f ~/.xkb
 
 symlink ~/config/wezterm ~/.config/wezterm
 

@@ -26,6 +26,7 @@ require('packer').startup(function(use)
 end
 )
 
+-- broken in some setups? (works fine on debian 13 nvim)
 require('mapx').setup{ global = true }
 
 -- vim.g.mapleader = ","
@@ -50,7 +51,9 @@ end
 nnoremap(';', toggle_semicolon)
 
 -- set clipboard to global clipboard
-vim.opt.clipboard:append("unnamedplus")
+-- vim.opt.clipboard:append("unnamedplus")
+vim.opt.clipboard="unnamed,unnamedplus"
+
 
 nnoremap('<backspace>', 'V')
 vnoremap('<backspace>', 'V')

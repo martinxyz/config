@@ -5,6 +5,14 @@
 # un-do spacemacs pager setting (if called from emacs)
 unset PAGER
 
+if test -n "$WSL_INTEROP"; then
+    #wt.exe new-tab --profile U24cwd
+    #wt.exe --window emacs --inheritEnvironment new-tab --profile U24cwd
+    wt.exe --window last new-tab --profile U24cwd
+    #wt.exe --focus new-tab --profile U24cwd
+    exit $?
+fi
+
 # konsole -e bash -l -c /usr/bin/fish "$@"
 # konsole -e /usr/bin/fish "$@"
 # konsole -e bash "$@"
