@@ -33,6 +33,11 @@ if status is-interactive
        ~/scripts/calshow-rust/target/release/calshow
     end
 
+    if command -q fnm
+        fnm env --use-on-cd --shell fish | source
+        fnm completions --shell fish | source
+    end
+
     sleep 0.05  # reduces "first prompt sometimes empty" problem?
 end
 
@@ -48,7 +53,4 @@ if test -d ~/compile/helix/runtime
     set -xg HELIX_RUNTIME ~/compile/helix/runtime
 end
 
-if command -q fnm
-    fnm env --use-on-cd --shell fish | source
-end
 
