@@ -70,12 +70,12 @@ layout2.txt: (more heavily customized swiss-german layout)
 {rctr}{ent}>{x1}{-rctr}
 {khB1}>{x1}{-lshf}{F4}{+lshf}
 {ralt}{u}>{x1}{s9}{int#}{-ralt}
-{ralt}{i}>{x1}{s9}{-rshf}{int#}{+rshf}{-ralt}
+{ralt}{i}>{s9}{-rshf}{int#}{+rshf}
 {scol}>{x1}{s9}{-lshf}{7}{+lshf}
 {lshf}{scol}>{x1}{s9}{scol}{-lshf}
-{ralt}{j}>{x1}{s9}{-ralt}{obrk}
-{ralt}{k}>{x1}{s9}{-ralt}{cbrk}
-{ralt}{m}>{x1}{s9}{-ralt}{apos}
+{ralt}{j}>{s9}{-ralt}{obrk}{+ralt}
+{ralt}{k}>{s9}{-ralt}{cbrk}{+ralt}
+{ralt}{m}>{s9}{-ralt}{apos}{+ralt}
 {obrk}>{x1}{s9}{-ralt}{hyph}{+ralt}
 {lshf}{obrk}>{x1}{s9}{-lshf}{eql}
 {grav}>{x1}{s9}{-lshf}{eql}{+lshf}{spc}
@@ -83,7 +83,7 @@ layout2.txt: (more heavily customized swiss-german layout)
 {lshf}{eql}>{x1}{s9}{-ralt}{1}{+ralt}{-lshf}
 {lshf}{bsls}>{x1}{s9}{-ralt}{eql}{+ralt}{spc}{-lshf}
 {rshf}{bsls}>{x1}{s9}{-ralt}{eql}{+ralt}{spc}{-rshf}
-{ralt}{o}>{x1}{s9}{-rshf}{1}{+rshf}{-ralt}
+{ralt}{o}>{s9}{-rshf}{1}{+rshf}
 {ralt}{3}>{x1}{s9}{-rshf}{3}{+rshf}{-ralt}
 {ralt}{4}>{x1}{s9}{-ralt}{3}
 {rshf}{4}>{x1}{s9}{-ralt}{3}{+ralt}{-rshf}
