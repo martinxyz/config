@@ -554,7 +554,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
    ;; (default '("rg" "ag" "pt" "ack" "grep"))
-   dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
+   dotspacemacs-search-tools '("rg" "ag" "ack" "grep")
 
    ;; Format specification for setting the frame title.
    ;; %a - the `abbreviated-file-name', or `buffer-name'
@@ -1383,7 +1383,7 @@ This function is called at the very end of Spacemacs initialization."
      '((read-file-name-internal . compare-files-by-date) (internal-complete-buffer)
        (counsel-git-grep-function) (Man-goto-section) (org-refile) (t)))
    '(js2-strict-missing-semi-warning nil)
-   '(js2-strict-trailing-comma-warning nil)
+   '(js2-strict-trailing-comma-warning nil t)
    '(lsp-auto-execute-action nil)
    '(lsp-eldoc-enable-hover nil)
    '(lsp-file-watch-threshold 10000)
@@ -1484,8 +1484,10 @@ This function is called at the very end of Spacemacs initialization."
    '(rustic-rustfmt-args "fmt")
    '(rustic-rustfmt-bin "cargo")
    '(safe-local-variable-values
-     '((web-mode-indent-style . 2) (web-mode-block-padding . 4)
-       (web-mode-script-padding . 4) (web-mode-style-padding . 4)
+     '((web-mode-block-padding . 2) (web-mode-script-padding . 2)
+       (web-mode-style-padding . 2) (web-mode-indent-style . 2)
+       (web-mode-block-padding . 4) (web-mode-script-padding . 4)
+       (web-mode-style-padding . 4)
        (cmake-ide-project-dir . "/home/martin/code/pixelcrawl")
        (cmake-ide-build-dir . "/home/martin/code/pixelcrawl/build-dbg")
        (eval progn
