@@ -94,6 +94,10 @@ gsettings set org.gnome.nautilus.preferences default-folder-viewer list-view
 gsettings set org.gnome.nautilus.preferences default-sort-order mtime
 gsettings set org.gnome.nautilus.preferences default-sort-in-reverse-order true
 
+# For KDE/Plasma
+# https://www.reddit.com/r/kde/comments/1o1v0gf/fonts_on_firefox_look_broken/
+gsettings set org.gnome.desktop.interface font-antialiasing rgba
+
 dconf write /org/gnome/mutter/workspaces-only-on-primary false
 dconf write /org/gnome/shell/overrides/workspaces-only-on-primary false
 

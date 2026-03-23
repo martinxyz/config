@@ -11,6 +11,11 @@ config.color_scheme = 'Hardcore'
 -- font = wezterm.font('JetBrainsMono Nerd Font')
 -- font_size = 14
 -- line_height = 1.2
+
+-- config.freetype_load_target = 'Light'
+config.freetype_load_target = 'HorizontalLcd'
+config.freetype_render_target = 'HorizontalLcd'
+
 scrollback_lines = 10000
 
 -- no effect?
